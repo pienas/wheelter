@@ -13,9 +13,16 @@ export enum DaySelectionTypes {
 type Props = {
   onSelectedDays: (days) => void
   type: DaySelectionTypes
+  onDaySelectionTypeChanged: (selectionType) => void
+  finalDate: Date[]
 }
 
-const DaySelector: FC<Props> = ({ onSelectedDays, type = DaySelectionTypes.Single }: Props) => {
+const DaySelector: FC<Props> = ({
+  onSelectedDays,
+  type = DaySelectionTypes.Single,
+  onDaySelectionTypeChanged,
+  finalDate,
+}: Props) => {
   const [selectedDays, setSelectedDays] = useState<Date[]>([])
   const [selectedRange, setSelectedRange] = useState<RangeModifier>({
     from: new Date(),
@@ -24,10 +31,26 @@ const DaySelector: FC<Props> = ({ onSelectedDays, type = DaySelectionTypes.Singl
   const [daySelectionType, setDaySelectionType] = useState(type)
   const modifiers = { start: selectedRange.from, end: selectedRange.to }
 
-  useEffect(() => {
-    setSelectedDays([new Date()])
-    setSelectedRange({ from: new Date(), to: new Date() })
-  }, [daySelectionType])
+  if (finalDate.length === 0) {
+    useEffect(() => {
+      setSelectedDays([new Date()])
+      setSelectedRange({ from: new Date(), to: new Date() })
+    }, [daySelectionType])
+  } else if (finalDate.length === 1) {
+    useEffect(() => {
+      setSelectedDays(finalDate)
+    }, [DaySelectionTypes.Single])
+  } else if (finalDate.length > 1) {
+    useEffect(() => {
+      setSelectedDays(finalDate)
+      setDaySelectionType(DaySelectionTypes.Multi)
+    }, [DaySelectionTypes.Multi])
+  } else if (finalDate.length === undefined) {
+    useEffect(() => {
+      setSelectedRange({ from: finalDate.from, to: finalDate.to })
+      setDaySelectionType(DaySelectionTypes.Range)
+    }, [DaySelectionTypes.Range])
+  }
 
   const handleDayClicked = (day: Date, modifiers: DayModifiers) => {
     if (modifiers.disabled) return
@@ -61,12 +84,17 @@ const DaySelector: FC<Props> = ({ onSelectedDays, type = DaySelectionTypes.Singl
         {[DaySelectionTypes.Single, DaySelectionTypes.Multi, DaySelectionTypes.Range].map(
           (dst, index) => (
             <RadioPill
-              onChange={() => {
-                setDaySelectionType(dst)
-              }}
-              key={index}
+              key={dst}
               isSelected={daySelectionType === dst}
               value={index}
+              onChange={() => {
+                setDaySelectionType(dst)
+                setSelectedDays([new Date()])
+                setSelectedRange({ from: new Date(), to: new Date() })
+                if (onDaySelectionTypeChanged) {
+                  onDaySelectionTypeChanged(dst)
+                }
+              }}
             >
               {dst}
             </RadioPill>
@@ -121,39 +149,69 @@ const DaySelector: FC<Props> = ({ onSelectedDays, type = DaySelectionTypes.Singl
         />
         <DaySelectorStyles type={daySelectionType ?? "Single"} />
       </Flex>
-
       {daySelectionType === DaySelectionTypes.Range && !selectedRange.from && !selectedRange.to && (
-        <Text fontSize="14px" textAlign="center">
-          Pasirinkite pirmąją dieną
-        </Text>
+        <>
+          <Text fontSize="14px" textAlign="center" fontWeight="600">
+            Jūsų pasirinktas intervalas:
+          </Text>
+          <Text fontSize="14px" textAlign="center">
+            Pasirinkite pirmąją dieną
+          </Text>
+        </>
       )}
       {daySelectionType === DaySelectionTypes.Range && selectedRange.from && !selectedRange.to && (
-        <Text fontSize="14px" textAlign="center">
-          Pasirinkite paskutinę dieną
-        </Text>
+        <>
+          <Text fontSize="14px" textAlign="center" fontWeight="600">
+            Jūsų pasirinktas intervalas:
+          </Text>
+          <Text fontSize="14px" textAlign="center">
+            Pasirinkite paskutinę dieną
+          </Text>
+        </>
       )}
       {daySelectionType === DaySelectionTypes.Range && selectedRange.from && selectedRange.to && (
-        <Text fontSize="14px" textAlign="center">
-          {selectedRange.from.toLocaleDateString()} - {selectedRange.to.toLocaleDateString()}
+        <>
+          <Text fontSize="14px" textAlign="center" fontWeight="600">
+            Jūsų pasirinktas intervalas:
+          </Text>
+          <Text fontSize="14px" textAlign="center">
+            {selectedRange.from.toLocaleDateString("lt")} -{" "}
+            {selectedRange.to.toLocaleDateString("lt")}
+          </Text>
+        </>
+      )}
+      {daySelectionType === DaySelectionTypes.Multi && selectedDays.length > 0 && (
+        <Text fontSize="14px" textAlign="center" fontWeight="600">
+          Jūsų pasirinktos dienos:
         </Text>
       )}
       {daySelectionType === DaySelectionTypes.Multi &&
         selectedDays.length > 0 &&
         selectedDays.map((day) => (
           <Text fontSize="14px" textAlign="center">
-            {day.toLocaleString().substring(0, 10)}
+            {day.toLocaleString("lt").substring(0, 10)}
             <br />
           </Text>
         ))}
-      {daySelectionType === DaySelectionTypes.Multi && selectedDays.length == 0 && (
-        <Text fontSize="14px" textAlign="center">
-          Pasirinkite dienas
-        </Text>
+      {daySelectionType === DaySelectionTypes.Multi && selectedDays.length === 0 && (
+        <>
+          <Text fontSize="14px" textAlign="center" fontWeight="600">
+            Jūsų pasirinktos dienos:
+          </Text>
+          <Text fontSize="14px" textAlign="center">
+            Pasirinkite dienas
+          </Text>
+        </>
       )}
       {daySelectionType === DaySelectionTypes.Single && (
-        <Text fontSize="14px" textAlign="center">
-          {selectedDays.toLocaleString().substring(0, 10)}
-        </Text>
+        <>
+          <Text fontSize="14px" textAlign="center" fontWeight="600">
+            Jūsų pasirinkta diena:
+          </Text>
+          <Text fontSize="14px" textAlign="center">
+            {selectedDays.toLocaleString("lt").substring(0, 10)}
+          </Text>
+        </>
       )}
     </>
   )

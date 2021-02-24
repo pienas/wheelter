@@ -1,15 +1,6 @@
 import React, { Suspense } from "react"
 import { Link, useMutation } from "blitz"
-import {
-  Container,
-  Flex,
-  Box,
-  Link as ChakraLink,
-  Button,
-  Grid,
-  Input,
-  Heading,
-} from "@chakra-ui/react"
+import { Container, Flex, Box, Link as ChakraLink, Button, Grid, Heading } from "@chakra-ui/react"
 import { SearchIcon } from "@chakra-ui/icons"
 import { Image } from "blitz"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
@@ -95,8 +86,10 @@ const Main = () => {
     >
       <Box ml="15vw" mr="15vw" width="70vw" mt="30px" overflow="hidden" id="menu">
         <Flex alignItems="center">
-          <Box mr="80px" height="41px">
-            <Image src="/logo.svg" height="41" width="200px" alt="Wheelter logo" />
+          <Box mr="80px" height="41px" cursor="pointer">
+            <Link href="/">
+              <Image src="/logo.svg" height="41" width="200px" alt="Wheelter logo" />
+            </Link>
           </Box>
           <Grid templateColumns="2fr 1fr" width="calc(100% - 280px)">
             <Flex alignItems="center">
@@ -108,7 +101,7 @@ const Main = () => {
               <ChakraLink>Dujos</ChakraLink>
             </Flex>
             <Flex justifySelf="flex-end" alignItems="center">
-              <ChakraLink mr="30px">Partneriams</ChakraLink>
+              <ChakraLink mr="30px">Paslaugų teikėjams</ChakraLink>
               <Suspense fallback="Kraunama...">
                 <UserInfo />
               </Suspense>
@@ -164,7 +157,9 @@ const Main = () => {
             />
           </Box>
         </Grid>
-        <QuickHelp />
+        <Suspense fallback="Kraunama...">
+          <QuickHelp />
+        </Suspense>
       </Box>
     </Container>
   )
