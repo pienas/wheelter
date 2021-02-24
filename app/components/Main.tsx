@@ -101,7 +101,7 @@ const Main = () => {
               <ChakraLink>Dujos</ChakraLink>
             </Flex>
             <Flex justifySelf="flex-end" alignItems="center">
-              <ChakraLink mr="30px">Partneriams</ChakraLink>
+              <ChakraLink mr="30px">Paslaugų teikėjams</ChakraLink>
               <Suspense fallback="Kraunama...">
                 <UserInfo />
               </Suspense>

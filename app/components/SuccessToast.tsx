@@ -5,7 +5,7 @@ import { CheckCircleIcon, CloseIcon } from "@chakra-ui/icons"
 type Props = {
   heading: string
   text: string
-  id: number
+  id: any
 }
 
 const SuccessToast = ({ heading, text, id }: Props) => {

@@ -5,7 +5,7 @@ import { WarningIcon, CloseIcon } from "@chakra-ui/icons"
 type Props = {
   heading: string
   text: string
-  id: number
+  id: any
 }
 
 const WarningToast = ({ heading, text, id }: Props) => {

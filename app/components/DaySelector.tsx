@@ -175,7 +175,8 @@ const DaySelector: FC<Props> = ({
             Jūsų pasirinktas intervalas:
           </Text>
           <Text fontSize="14px" textAlign="center">
-            {selectedRange.from.toLocaleDateString()} - {selectedRange.to.toLocaleDateString()}
+            {selectedRange.from.toLocaleDateString("lt")} -{" "}
+            {selectedRange.to.toLocaleDateString("lt")}
           </Text>
         </>
       )}
@@ -188,7 +189,7 @@ const DaySelector: FC<Props> = ({
         selectedDays.length > 0 &&
         selectedDays.map((day) => (
           <Text fontSize="14px" textAlign="center">
-            {day.toLocaleString().substring(0, 10)}
+            {day.toLocaleString("lt").substring(0, 10)}
             <br />
           </Text>
         ))}
@@ -208,7 +209,7 @@ const DaySelector: FC<Props> = ({
             Jūsų pasirinkta diena:
           </Text>
           <Text fontSize="14px" textAlign="center">
-            {selectedDays.toLocaleString().substring(0, 10)}
+            {selectedDays.toLocaleString("lt").substring(0, 10)}
           </Text>
         </>
       )}

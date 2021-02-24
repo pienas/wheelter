@@ -165,7 +165,7 @@ const Tabs = () => {
               {finalDays.length === undefined && "Pasirinktas intervalas"}
               {finalDays.length > 1 && "Pasirinktos kelios dienos"}
               {finalDays.length === 0 && "Pasirinkite datą"}
-              {finalDays.length === 1 && finalDays.toLocaleString().substring(0, 10)}
+              {finalDays.length === 1 && finalDays.toLocaleString("lt").substring(0, 10)}
               {/* {selectedDays.length === 0 && "Pasirinkite datą"}
               {selectedDays.from &&
                 `${selectedDays.to

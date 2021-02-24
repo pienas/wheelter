@@ -1,12 +1,12 @@
-import { forwardRef, PropsWithoutRef } from "react"
+import { forwardRef, PropsWithoutRef, useState } from "react"
 import { useField } from "react-final-form"
+import PhoneInput from "react-phone-input-2"
+import "react-phone-input-2/lib/style.css"
+import lt from "app/components/phoneLang.json"
 
 export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
-  /** Field name. */
   name: string
-  /** Field label. */
-  label?: string
-  /** Field type. Doesn't include radio buttons and checkboxes */
+  label: string
   type?: "text" | "password" | "email" | "tel" | "number"
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
 }
@@ -19,26 +19,19 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
     } = useField(name, {
       parse: props.type === "number" ? Number : undefined,
     })
-
     const normalizedError = Array.isArray(error) ? error.join(", ") : error || submitError
 
     return (
-      <div {...outerProps}>
-        {label ? (
-          <label>
-            {label}
-            <input {...input} disabled={submitting} {...props} ref={ref} />
-          </label>
-        ) : (
+      <div {...outerProps} className="fullW">
+        <label>
+          {label}
           <input {...input} disabled={submitting} {...props} ref={ref} />
-        )}
-
+        </label>
         {touched && normalizedError && (
           <div role="alert" style={{ color: "red" }}>
             {normalizedError}
           </div>
         )}
-
         <style jsx>{`
           label {
             display: flex;
@@ -46,13 +39,8 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             align-items: start;
             font-size: 1rem;
           }
-          input {
-            font-size: 1rem;
-            padding: 0.25rem 0.5rem;
-            border-radius: 3px;
-            border: 1px solid purple;
-            appearance: none;
-            margin-top: 0.5rem;
+          .fullW {
+            width: 100%;
           }
         `}</style>
       </div>
