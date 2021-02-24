@@ -1,5 +1,5 @@
 import React from "react"
-import { Box, useColorModeValue } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
 
 type Props = {
   isSelected: boolean
@@ -9,7 +9,6 @@ type Props = {
 }
 
 const RadioPill = ({ isSelected, children, onChange, value }: Props) => {
-  const pillBackground = useColorModeValue("brand.500", "brand.500")
   return (
     <Box
       borderRadius="5px"
@@ -17,8 +16,8 @@ const RadioPill = ({ isSelected, children, onChange, value }: Props) => {
       px={4}
       py={2}
       transition="background-color 0.3s ease !important"
-      _hover={{ background: pillBackground, color: "white" }}
-      background={isSelected ? pillBackground : "transparent"}
+      _hover={{ background: "brand.500", color: "white" }}
+      background={isSelected ? "brand.500" : "transparent"}
       color={isSelected ? "white" : "inherit"}
       onClick={() => onChange(value)}
     >

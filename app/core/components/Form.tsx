@@ -52,8 +52,20 @@ export function Form<S extends z.ZodType<any, any>>({
           )}
 
           <style global jsx>{`
-            .form > * + * {
-              margin-top: 1rem;
+            .form {
+              display: grid;
+              grid-gap: 2.5rem;
+              grid-template-columns: 3.9fr 2.2fr;
+            }
+            .form button {
+              background-color: #a18fff;
+              color: #f4f8f8;
+              border-radius: 5px;
+              font-weight: 600;
+              transition: all 250ms;
+            }
+            .form button:hover {
+              background-color: #7e1aff;
             }
           `}</style>
         </form>

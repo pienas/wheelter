@@ -3,7 +3,10 @@ import * as z from "zod"
 const password = z.string().min(8).max(100)
 
 export const Signup = z.object({
+  name: z.string(),
+  surname: z.string(),
   email: z.string().email(),
+  phone: z.string().regex(/^([0-9]{8})$/m),
   password,
 })
 
