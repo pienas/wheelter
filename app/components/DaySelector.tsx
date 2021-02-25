@@ -32,22 +32,26 @@ const DaySelector: FC<Props> = ({
   const [daySelectionType, setDaySelectionType] = useState(type)
   const modifiers = { start: selectedRange.from, end: selectedRange.to }
 
-  useEffect(() => {
-    if (finalDate.length === 0) {
+  if (finalDate.length === 0) {
+    useEffect(() => {
       setSelectedDays([new Date()])
       setSelectedRange({ from: new Date(), to: new Date() })
-      setDaySelectionType(type)
-    } else if (finalDate.length === 1) {
+    }, [daySelectionType])
+  } else if (finalDate.length === 1) {
+    useEffect(() => {
       setSelectedDays(finalDate)
-      setDaySelectionType(DaySelectionTypes.Single)
-    } else if (finalDate.length > 1) {
+    }, [DaySelectionTypes.Single])
+  } else if (finalDate.length > 1) {
+    useEffect(() => {
       setSelectedDays(finalDate)
       setDaySelectionType(DaySelectionTypes.Multi)
-    } else if (finalDate.length === undefined) {
+    }, [DaySelectionTypes.Multi])
+  } else if (finalDate.length === undefined) {
+    useEffect(() => {
       setSelectedRange({ from: finalDate.from, to: finalDate.to })
       setDaySelectionType(DaySelectionTypes.Range)
-    }
-  }, [daySelectionType])
+    }, [DaySelectionTypes.Range])
+  }
 
   const handleDayClicked = (day: Date, modifiers: DayModifiers) => {
     if (modifiers.disabled) return
