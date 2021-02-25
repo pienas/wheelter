@@ -38,6 +38,7 @@ export const LoginForm = (props: LoginFormProps) => {
           schema={Login}
           initialValues={{ email: "", password: "" }}
           onSubmit={async (values) => {
+            console.log(values)
             try {
               await loginMutation(values)
               props.onSuccess?.()
@@ -54,28 +55,24 @@ export const LoginForm = (props: LoginFormProps) => {
             }
           }}
         >
-          {/* <Box cursor="pointer" margin="0 auto" width="50px" mb={4}>
-            <Link href="/">
-              <Image src="/logo-no-text.svg" height="34.125px" width="37.5px" alt="Wheelter logo" />
-            </Link>
-          </Box> */}
           <Heading as="h3" size="lg" mb={6}>
             Prisijungimas
           </Heading>
-          <Flex>
-            <LabeledTextField
-              name="email"
-              className="loginFormInput"
-              label="El. paštas"
-              placeholder="Įveskite savo el. paštą"
-            />
-          </Flex>
+          <LabeledTextField
+            name="email"
+            className="loginFormInput"
+            label="El. paštas"
+            placeholder="Įveskite savo el. paštą"
+            type="email"
+            required
+          />
           <LabeledTextField
             name="password"
             label="Slaptažodis"
             placeholder="Įveskite savo slaptažodį"
             type="password"
             className="loginFormInput"
+            required
           />
         </Form>
         <Flex flexDirection="column" alignItems="center">
@@ -85,11 +82,6 @@ export const LoginForm = (props: LoginFormProps) => {
           <Link href="/signup">
             <a className="loginLink">Neturite paskyros? Prisiregistruokite.</a>
           </Link>
-          {/* <Box cursor="pointer" margin="0 auto" width="50px" mt={4}>
-            <Link href="/">
-              <Image src="/logo-no-text.svg" height="34.125px" width="37.5px" alt="Wheelter logo" />
-            </Link>
-          </Box> */}
         </Flex>
       </Box>
       <Link href="/">
@@ -104,10 +96,10 @@ export const LoginForm = (props: LoginFormProps) => {
           .loginLink:hover {
             color: #7700ff;
           }
-          .reset {
+          .loginLink.reset {
             margin-bottom: 0.15rem;
           }
-          .back {
+          .loginLink.back {
             margin-top: 0.5rem;
           }
         `}

@@ -87,7 +87,7 @@ const QuickHelp = () => {
                   name="phone"
                   type="tel"
                   component={PhoneInputComponent}
-                  pattern={/^([0-9]{11})$/m}
+                  pattern={/^([0-9]{7,15})$/m}
                 />
               </div>
               <button type="submit" disabled={submitting}>

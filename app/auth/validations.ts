@@ -6,7 +6,7 @@ export const Signup = z.object({
   name: z.string(),
   surname: z.string(),
   email: z.string().email(),
-  phone: z.string().regex(/^([0-9]{11})$/m),
+  phone: z.string().regex(/^([0-9]{7,15})$/m),
   password,
 })
 

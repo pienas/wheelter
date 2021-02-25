@@ -8,6 +8,13 @@ const SignupPage: BlitzPage = () => {
   return (
     <div>
       <SignupForm onSuccess={() => router.push("/")} />
+      <style jsx global>
+        {`
+          .selected-flag:hover {
+            background-color: #eff0f7 !important;
+          }
+        `}
+      </style>
     </div>
   )
 }
