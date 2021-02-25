@@ -26,10 +26,11 @@ import { DaySelectionTypes } from "./DaySelector"
 import SuccessToast from "./SuccessToast"
 import WarningToast from "./WarningToast"
 import { CloseIcon } from "@chakra-ui/icons"
+import { format } from "date-fns"
 
 const Tabs = () => {
   const toast = useToast()
-  const toastIdRef = useRef()
+  const toastIdRef = useRef<any>()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedDays, setSelectedDays] = useState<Date[]>([new Date()])
   const [finalDays, setFinalDays] = useState<Date[]>([])
@@ -165,14 +166,9 @@ const Tabs = () => {
               {finalDays.length === undefined && "Pasirinktas intervalas"}
               {finalDays.length > 1 && "Pasirinktos kelios dienos"}
               {finalDays.length === 0 && "Pasirinkite datą"}
-              {finalDays.length === 1 && finalDays.toLocaleString("lt").substring(0, 10)}
-              {/* {selectedDays.length === 0 && "Pasirinkite datą"}
-              {selectedDays.from &&
-                `${selectedDays.to
-                  .toLocaleString()
-                  .substring(0, 10)} - ${selectedDays.from.toLocaleString().substring(0, 10)}`}
-              {selectedDays.length > 1 && "Pasirinktos kelios dienos"}
-              {selectedDays.length === 1 && selectedDays.toLocaleString().substring(0, 10)} */}
+              {finalDays.length === 1 &&
+                finalDays[0]?.toDateString() &&
+                format(new Date(Date.parse(finalDays[0].toDateString())), "yyyy-MM-dd")}
             </Box>
             {finalDays.length === undefined && (
               <CloseIcon

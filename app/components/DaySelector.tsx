@@ -3,6 +3,7 @@ import { Text, Flex, HStack } from "@chakra-ui/react"
 import DayPicker, { DateUtils, DayModifiers, RangeModifier } from "react-day-picker"
 import RadioPill from "./RadioPill"
 import DaySelectorStyles from "./DaySelectorStyles"
+import { format } from "date-fns"
 
 export enum DaySelectionTypes {
   Single = "Viena diena",
@@ -14,7 +15,7 @@ type Props = {
   onSelectedDays: (days) => void
   type: DaySelectionTypes
   onDaySelectionTypeChanged: (selectionType) => void
-  finalDate: Date[]
+  finalDate: any
 }
 
 const DaySelector: FC<Props> = ({
@@ -31,26 +32,22 @@ const DaySelector: FC<Props> = ({
   const [daySelectionType, setDaySelectionType] = useState(type)
   const modifiers = { start: selectedRange.from, end: selectedRange.to }
 
-  if (finalDate.length === 0) {
-    useEffect(() => {
+  useEffect(() => {
+    if (finalDate.length === 0) {
       setSelectedDays([new Date()])
       setSelectedRange({ from: new Date(), to: new Date() })
-    }, [daySelectionType])
-  } else if (finalDate.length === 1) {
-    useEffect(() => {
+      setDaySelectionType(type)
+    } else if (finalDate.length === 1) {
       setSelectedDays(finalDate)
-    }, [DaySelectionTypes.Single])
-  } else if (finalDate.length > 1) {
-    useEffect(() => {
+      setDaySelectionType(DaySelectionTypes.Single)
+    } else if (finalDate.length > 1) {
       setSelectedDays(finalDate)
       setDaySelectionType(DaySelectionTypes.Multi)
-    }, [DaySelectionTypes.Multi])
-  } else if (finalDate.length === undefined) {
-    useEffect(() => {
+    } else if (finalDate.length === undefined) {
       setSelectedRange({ from: finalDate.from, to: finalDate.to })
       setDaySelectionType(DaySelectionTypes.Range)
-    }, [DaySelectionTypes.Range])
-  }
+    }
+  }, [daySelectionType])
 
   const handleDayClicked = (day: Date, modifiers: DayModifiers) => {
     if (modifiers.disabled) return
@@ -175,8 +172,7 @@ const DaySelector: FC<Props> = ({
             Jūsų pasirinktas intervalas:
           </Text>
           <Text fontSize="14px" textAlign="center">
-            {selectedRange.from.toLocaleDateString("lt")} -{" "}
-            {selectedRange.to.toLocaleDateString("lt")}
+            {format(selectedRange.from, "yyyy-MM-dd")} - {format(selectedRange.to, "yyyy-MM-dd")}
           </Text>
         </>
       )}
@@ -189,7 +185,7 @@ const DaySelector: FC<Props> = ({
         selectedDays.length > 0 &&
         selectedDays.map((day) => (
           <Text fontSize="14px" textAlign="center">
-            {day.toLocaleString("lt").substring(0, 10)}
+            {format(day, "yyyy-MM-dd")}
             <br />
           </Text>
         ))}
@@ -209,7 +205,8 @@ const DaySelector: FC<Props> = ({
             Jūsų pasirinkta diena:
           </Text>
           <Text fontSize="14px" textAlign="center">
-            {selectedDays.toLocaleString("lt").substring(0, 10)}
+            {selectedDays[0]?.toDateString() &&
+              format(new Date(Date.parse(selectedDays[0].toDateString())), "yyyy-MM-dd")}
           </Text>
         </>
       )}

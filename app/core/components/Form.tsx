@@ -50,6 +50,23 @@ export function Form<S extends z.ZodType<any, any>>({
               {submitText}
             </button>
           )}
+          <style jsx>
+            {`
+              button {
+                background-color: #7000ff;
+                border-radius: 0.6rem;
+                height: 2.5rem;
+                width: 20rem;
+                color: #f4f8f8;
+                font-weight: 500;
+                transition: all 0.2s;
+                margin: 1rem 0;
+              }
+              button:hover {
+                background-color: #7e1aff;
+              }
+            `}
+          </style>
         </form>
       )}
     />

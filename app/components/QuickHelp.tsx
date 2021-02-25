@@ -24,7 +24,7 @@ const PhoneInputComponent = ({ input }) => (
 
 const QuickHelp = () => {
   const toast = useToast()
-  const toastIdRef = useRef()
+  const toastIdRef = useRef<any>()
   const router = useRouter()
   const currentUser = useCurrentUser()
   const onSubmit = async (values) => {
@@ -96,54 +96,6 @@ const QuickHelp = () => {
             </form>
           )}
         />
-        {/* <Form
-          submitText="PRAŠYTI PAGALBOS"
-          schema={QuickHelpPhone}
-          initialValues={{ phone: phone }}
-          onSubmit={async () => {
-            console.log(phone)
-            try {
-              if (currentUser) {
-                router.push("/success")
-              } else {
-                const userByPhone = await invoke(getUserByPhone, phone)
-                if (userByPhone) router.push("/login")
-                else router.push("/signup")
-              }
-            } catch (error) {
-              console.log(error)
-              toastIdRef.current = toast({
-                duration: 3000,
-                render: () => (
-                  <WarningToast
-                    heading="Kažkas netaip!"
-                    text="Apgailestaujame, užklausos išsiųsti nepavyko. Pamėginkite dar kartą."
-                    id={toastIdRef.current}
-                  />
-                ),
-              })
-            }
-          }}
-        >
-          <div className="inputGroup">
-            <PhoneInput
-              country={"lt"}
-              value={phone}
-              onChange={setPhone}
-              enableSearch
-              preferredCountries={["lt"]}
-              searchNotFound="Šalis nerasta"
-              searchPlaceholder="Paieška"
-              localization={lt}
-            />
-             <LabeledTextField
-              name="phone"
-              placeholder="Įveskite savo telefono numerį"
-              type="tel"
-              required
-            /> *
-          </div>
-        </Form> */}
       </Grid>
     </Box>
   )
