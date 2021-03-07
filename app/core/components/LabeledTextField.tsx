@@ -13,7 +13,7 @@ export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElem
   outerProps?: PropsWithoutRef<JSX.IntrinsicElements["div"]>
 }
 
-const PhoneInputComponent = (input) => (
+const PhoneInputComponent = ({ input }) => (
   <PhoneInput
     {...input}
     country={"lt"}
@@ -38,7 +38,7 @@ const PhoneInputComponent = (input) => (
       backgroundColor: "#eff0f7",
       borderTopLeftRadius: "0",
       borderBottomLeftRadius: "0",
-      width: "calc(100% - 3.375rem)",
+      width: "calc(20rem - 3.375rem)",
       marginLeft: "3.375rem",
       paddingTop: "1px",
       fontFamily: "inherit",
@@ -86,6 +86,9 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
               type="tel"
               component={PhoneInputComponent}
               pattern={/^([0-9]{7,15})$/m}
+              disabled={submitting}
+              {...props}
+              ref={ref}
             />
           </div>
         )}

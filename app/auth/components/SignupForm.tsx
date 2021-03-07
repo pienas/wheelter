@@ -38,7 +38,6 @@ export const SignupForm = (props: SignupFormProps) => {
           schema={Signup}
           initialValues={{ name: "", surname: "", email: "", phone: "", password: "" }}
           onSubmit={async (values) => {
-            console.log(values)
             try {
               await signupMutation(values)
               props.onSuccess?.()
@@ -83,8 +82,8 @@ export const SignupForm = (props: SignupFormProps) => {
             className="registerFormInput"
             label="Mob. tel. nr."
             placeholder="Įveskite savo telefono numerį"
-            pattern="/^([+][0-9]{7,15})$/m"
-            // isPhone
+            // pattern="/^([+]{1}[0-9]{7,15})$/m"
+            isPhone
             required
           />
           <LabeledTextField
@@ -97,7 +96,7 @@ export const SignupForm = (props: SignupFormProps) => {
           />
         </Form>
         <Flex flexDirection="column" alignItems="center">
-          <Link href="/signup">
+          <Link href="/login">
             <a className="registerLink">Jau turite paskyrą? Prisijunkite.</a>
           </Link>
         </Flex>

@@ -4,6 +4,8 @@ import { LabeledTextField } from "app/core/components/LabeledTextField"
 import { Form, FORM_ERROR } from "app/core/components/Form"
 import { ResetPassword } from "app/auth/validations"
 import resetPassword from "app/auth/mutations/resetPassword"
+import { hash256 } from "blitz"
+import db from "db"
 
 const ResetPasswordPage: BlitzPage = () => {
   const query = useRouterQuery()
@@ -54,6 +56,8 @@ const ResetPasswordPage: BlitzPage = () => {
 }
 
 ResetPasswordPage.redirectAuthenticatedTo = "/"
-ResetPasswordPage.getLayout = (page) => <Layout title="Reset Your Password">{page}</Layout>
+ResetPasswordPage.getLayout = (page) => (
+  <Layout title="Naujo slaptažodžio kūrimas - Wheelter">{page}</Layout>
+)
 
 export default ResetPasswordPage
