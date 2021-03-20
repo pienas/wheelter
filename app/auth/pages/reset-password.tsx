@@ -1,56 +1,30 @@
-import { BlitzPage, useRouterQuery, Link, useMutation } from "blitz"
+import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
-import { LabeledTextField } from "app/core/components/LabeledTextField"
-import { Form, FORM_ERROR } from "app/core/components/Form"
-import { ResetPassword } from "app/auth/validations"
-import resetPassword from "app/auth/mutations/resetPassword"
-import { hash256 } from "blitz"
-import db from "db"
+import ResetPasswordForm from "../components/ResetPasswordForm"
+import SuccessToast from "app/components/SuccessToast"
+import { useToast } from "@chakra-ui/toast"
+import { useRef } from "react"
 
 const ResetPasswordPage: BlitzPage = () => {
-  const query = useRouterQuery()
-  const [resetPasswordMutation, { isSuccess }] = useMutation(resetPassword)
+  const toast = useToast()
+  const toastIdRef = useRef<any>()
 
   return (
     <div>
-      <h1>Set a New Password</h1>
-
-      {isSuccess ? (
-        <div>
-          <h2>Password Reset Successfully</h2>
-          <p>
-            Go to the <Link href="/">homepage</Link>
-          </p>
-        </div>
-      ) : (
-        <Form
-          submitText="Reset Password"
-          schema={ResetPassword.omit({ token: true })}
-          initialValues={{ password: "", passwordConfirmation: "" }}
-          onSubmit={async (values) => {
-            try {
-              await resetPasswordMutation({ ...values, token: query.token as string })
-            } catch (error) {
-              if (error.name === "ResetPasswordError") {
-                return {
-                  [FORM_ERROR]: error.message,
-                }
-              } else {
-                return {
-                  [FORM_ERROR]: "Sorry, we had an unexpected error. Please try again.",
-                }
-              }
-            }
-          }}
-        >
-          <LabeledTextField name="password" label="New Password" type="password" />
-          <LabeledTextField
-            name="passwordConfirmation"
-            label="Confirm New Password"
-            type="password"
-          />
-        </Form>
-      )}
+      <ResetPasswordForm
+        onSuccess={() =>
+          (toastIdRef.current = toast({
+            duration: 3000,
+            render: () => (
+              <SuccessToast
+                heading="Pavyko!"
+                text="Jei nurodytas el. paštas registruotas mūsų sistemoje, netrukus į nurodytą el. paštą gausite savo slaptažodžio atkūrimo instrukcijas."
+                id={toastIdRef.current}
+              />
+            ),
+          }))
+        }
+      />
     </div>
   )
 }

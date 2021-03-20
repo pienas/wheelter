@@ -14,8 +14,26 @@ const theme = extendTheme({
       800: "#220050",
       900: "#0d0020",
     },
-    white: "#f4f8f8",
-    black: "#081631",
+    white: "#ffffff",
+    black: "#0b132a",
+    gray: "#f8f8f8",
+    text: "#4F5665",
+  },
+  fonts: {
+    heading: "Rubik",
+    body: "Rubik",
+  },
+  styles: {
+    global: {
+      heading: {
+        color: "black",
+      },
+      body: {
+        color: "black",
+        padding: "0",
+        margin: "0",
+      },
+    },
   },
 })
 

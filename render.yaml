@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: wheelter
+    env: node
+    plan: starter
+    buildCommand: yarn --frozen-lockfile --prod=false && blitz build
+    startCommand: blitz start
+    envVars:
+      - key: NODE_ENV
+        value: production

@@ -67,7 +67,7 @@ const Tabs = () => {
         <TabPanel padding="0">
           <FormControl id="service">
             <FormLabel
-              color="gray.500"
+              color="text"
               fontWeight="600"
               fontSize="12px"
               position="absolute"
@@ -87,7 +87,7 @@ const Tabs = () => {
               borderRadius="0"
               borderBottom="1px solid #cbd5e0"
               mb="25px"
-              focusBorderColor="gray.300"
+              focusBorderColor="text"
               _focus={{ boxShadow: "none", borderBottom: "1px solid #cbd5e0" }}
               placeholder="Pasirinkite paslaugą"
               fontWeight="600"
@@ -102,7 +102,7 @@ const Tabs = () => {
           </FormControl>
           <FormControl id="area">
             <FormLabel
-              color="gray.500"
+              color="text"
               fontWeight="600"
               fontSize="12px"
               position="absolute"
@@ -122,7 +122,7 @@ const Tabs = () => {
               borderRadius="0"
               borderBottom="1px solid #cbd5e0"
               mb="25px"
-              focusBorderColor="gray.300"
+              focusBorderColor="text"
               _focus={{ boxShadow: "none", borderBottom: "1px solid #cbd5e0" }}
               placeholder="Pasirinkite rajoną"
               fontWeight="600"
@@ -137,7 +137,7 @@ const Tabs = () => {
           </FormControl>
           <FormControl id="date">
             <FormLabel
-              color="gray.500"
+              color="text"
               fontWeight="600"
               fontSize="12px"
               position="absolute"
@@ -174,7 +174,7 @@ const Tabs = () => {
               <CloseIcon
                 boxSize={3}
                 ml={2}
-                color="gray.500"
+                color="text"
                 position="absolute"
                 right="6.5%"
                 top="35%"
@@ -189,7 +189,7 @@ const Tabs = () => {
               <CloseIcon
                 boxSize={3}
                 ml={2}
-                color="gray.500"
+                color="text"
                 position="absolute"
                 right="6.5%"
                 top="35%"
@@ -234,7 +234,7 @@ const Tabs = () => {
         <TabPanel padding="0">
           <FormControl id="serviceName">
             <FormLabel
-              color="gray.500"
+              color="text"
               fontWeight="600"
               fontSize="12px"
               position="absolute"
@@ -254,7 +254,7 @@ const Tabs = () => {
               borderRadius="0"
               borderBottom="1px solid #cbd5e0"
               mb="114px"
-              focusBorderColor="gray.300"
+              focusBorderColor="text"
               _focus={{ boxShadow: "none", borderBottom: "1px solid #cbd5e0" }}
               placeholder="Pasirinkite paslaugą"
               fontWeight="600"

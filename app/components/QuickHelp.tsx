@@ -63,9 +63,15 @@ const QuickHelp = () => {
     }
   }
   return (
-    <Box borderRadius="10px" backgroundColor="brand.500" mb="30px" width="70vw">
+    <Box
+      borderRadius="10px"
+      backgroundColor="brand.500"
+      mb="30px"
+      width="70vw"
+      boxShadow="0px 5px 15px 0px rgba(100, 0, 230, 0.3);"
+    >
       <Grid
-        templateColumns="3fr 4.7fr"
+        templateColumns="3fr 6fr"
         gap={10}
         pt="40px"
         pb="40px"
@@ -74,7 +80,7 @@ const QuickHelp = () => {
         display="grid"
         alignItems="center"
       >
-        <Heading size="lg" color="white" mr="30px">
+        <Heading fontSize="3xl" color="white" fontWeight="600">
           Sugedo automobilis ir reikia skubios pagalbos?
         </Heading>
         <FinalForm

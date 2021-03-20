@@ -9,15 +9,7 @@ const Home: BlitzPage = () => {
     <Scrollbar style={{ height: "100vh" }} noScrollX>
       <Main />
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: "Inter", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-            Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-          color: #081631;
-        }
+        @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap");
         * {
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
@@ -25,8 +17,8 @@ const Home: BlitzPage = () => {
         }
         #menu a:hover {
           color: #7000ff;
-          "name"-decoration: none;
-          -webkit-"name"-decoration: none;
+          text-decoration: none;
+          -webkit-text-decoration: none;
         }
         option {
           direction: ltr;
@@ -63,7 +55,7 @@ const Home: BlitzPage = () => {
           inset: 0px 6px 0px 0px !important;
         }
         input.form-control {
-          border-radius: 0.375rem !important;
+          border-radius: 10px !important;
           border: 0 !important;
           appearance: none !important;
           outline: 0 !important;
@@ -119,7 +111,7 @@ const Home: BlitzPage = () => {
           padding-left: 1.5rem !important;
           padding-right: 1.5rem !important;
           height: 2.5rem !important;
-          border-radius: 0.375rem !important;
+          border-radius: 10px !important;
           border: 0 !important;
           background: #f4f8f8 !important;
           margin-right: -1px !important;
@@ -137,7 +129,7 @@ const Home: BlitzPage = () => {
         .flag-dropdown {
           border: none !important;
           bottom: auto !important;
-          border-radius: 0.375rem !important;
+          border-radius: 10px !important;
           border-top-right-radius: 0 !important;
           border-bottom-right-radius: 0 !important;
         }
@@ -149,8 +141,8 @@ const Home: BlitzPage = () => {
         .form button {
           background-color: #a18fff;
           color: #f4f8f8;
-          border-radius: 5px;
-          font-weight: 600;
+          border-radius: 10px;
+          font-weight: 500;
           transition: all 250ms;
         }
         .form button:hover {

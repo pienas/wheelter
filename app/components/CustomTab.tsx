@@ -54,14 +54,14 @@ const CustomTab = React.forwardRef((props: any, ref) => {
           position="relative"
         >
           {props.icon === "vehicle" ? (
-            <VehicleIcon boxSize={8} color="gray.500" transition="color 0.3s ease !important" />
+            <VehicleIcon boxSize={8} color="text" transition="color 0.3s ease !important" />
           ) : (
-            <WrenchIcon boxSize={8} color="gray.500" transition="color 0.3s ease !important" />
+            <WrenchIcon boxSize={8} color="text" transition="color 0.3s ease !important" />
           )}
           <Text
             fontSize="16px"
             fontWeight="600"
-            color="gray.500"
+            color="text"
             transition="color 0.3s ease !important"
             mt="-8px"
           >

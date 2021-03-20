@@ -41,11 +41,11 @@ const SuccessToast = ({ heading, text, id }: Props) => {
         <Heading as="h4" size="md">
           {heading}
         </Heading>
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="text">
           {text}
         </Text>
       </Box>
-      <CloseIcon boxSize={4} color="gray.400" onClick={close} cursor="pointer" />
+      <CloseIcon boxSize={4} color="text" onClick={close} cursor="pointer" />
     </Flex>
   )
 }
