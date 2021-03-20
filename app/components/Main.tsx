@@ -32,15 +32,13 @@ const UserInfo = () => {
         <Button
           variant="solid"
           size="md"
-          backgroundColor="transparent"
-          color="brand.500"
+          backgroundColor="brand.500"
+          color="white"
           width="150px"
           height="41px"
-          border="1px solid"
-          borderColor="brand.500"
           borderRadius="50px"
           fontWeight="500"
-          _hover={{ backgroundColor: "brand.500", color: "white" }}
+          _hover={{ backgroundColor: "brand.400" }}
           onClick={async () => {
             await logoutMutation()
           }}
@@ -74,18 +72,13 @@ const UserInfo = () => {
           <Button
             variant="solid"
             size="md"
-            backgroundColor="transparent"
-            color="brand.500"
+            backgroundColor="brand.500"
+            color="white"
             width="150px"
             height="41px"
-            border="1px solid"
-            borderColor="brand.500"
             borderRadius="50px"
             fontWeight="500"
-            _hover={{ backgroundColor: "brand.500", color: "white" }}
-            onClick={async () => {
-              await logoutMutation()
-            }}
+            _hover={{ backgroundColor: "brand.400" }}
           >
             Prisijungti
           </Button>
