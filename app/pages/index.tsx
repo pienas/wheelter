@@ -2,7 +2,7 @@ import React from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
-import Main from "app/components/Main"
+import Main from "app/components/index/Main"
 
 const Home: BlitzPage = () => {
   return (
@@ -155,7 +155,7 @@ const Home: BlitzPage = () => {
 
 Home.suppressFirstRenderFlicker = true
 Home.getLayout = (page) => (
-  <Layout title="Užsirašyk autopaslaugoms internetu - Wheelter">{page}</Layout>
+  <Layout title="Užsirašyk autopaslaugoms internetu ・ Wheelter">{page}</Layout>
 )
 
 export default Home

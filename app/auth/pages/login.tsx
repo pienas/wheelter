@@ -4,13 +4,13 @@ import { LoginForm } from "app/auth/components/LoginForm"
 
 const LoginPage: BlitzPage = () => {
   const router = useRouter()
-
+  console.log(router.query.next)
   return (
     <div>
       <LoginForm
         onSuccess={() => {
           const next = (router.query.next as string) ?? "/"
-          router.push(next)
+          router.push(unescape(next))
         }}
       />
     </div>

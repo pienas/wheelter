@@ -9,14 +9,12 @@ import {
   Grid,
   Heading,
   Text,
-  Icon,
 } from "@chakra-ui/react"
-import { CopyIcon, SearchIcon } from "@chakra-ui/icons"
+import { SearchIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
-import Tabs from "app/components/Tabs"
+import Tabs from "app/components/index/Tabs"
 import QuickHelp from "./QuickHelp"
-import { FaFacebook, FaInstagram } from "react-icons/fa"
 import CheckIcon from "./CheckIcon"
 import FastIcon from "./FastIcon"
 import ReliableIcon from "./ReliableIcon"
@@ -96,7 +94,7 @@ const Main = () => {
         <Flex alignItems="center">
           <Box mr="80px" height="41px" cursor="pointer">
             <Link href="/">
-              <Image src="/logo.svg" height="41px" width="158px" alt="Wheelter logo" />
+              <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
             </Link>
           </Box>
           <Grid templateColumns="2fr 1fr" width="calc(100% - 238px)">
@@ -367,7 +365,7 @@ const Main = () => {
           <Flex flexDirection="column">
             <Box height="41px" cursor="pointer">
               <Link href="/">
-                <Image src="/logo.svg" height="41" width="158px" alt="Wheelter logo" />
+                <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
               </Link>
             </Box>
             <Flex my={6}>
