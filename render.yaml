@@ -2,6 +2,7 @@ services:
   - type: web
     name: wheelter
     env: node
+    region: frankfurt
     plan: starter
     buildCommand: yarn --prod=false &&
       blitz build &&
@@ -17,4 +18,5 @@ services:
 
 databases:
   - name: wheelter-db
+    region: frankfurt
     plan: starter
