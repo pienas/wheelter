@@ -3,7 +3,7 @@ import Layout from "app/core/layouts/Layout"
 import ForgotPasswordForm from "../components/ForgotPasswordForm"
 import { useToast } from "@chakra-ui/toast"
 import { useRef } from "react"
-import SuccessToast from "app/components/SuccessToast"
+import SuccessToast from "app/components/index/SuccessToast"
 
 const ForgotPasswordPage: BlitzPage = () => {
   const toast = useToast()
