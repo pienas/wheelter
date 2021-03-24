@@ -3,7 +3,7 @@ import { Field, useField } from "react-final-form"
 import "react-phone-input-2/lib/style.css"
 import { Text } from "@chakra-ui/react"
 import PhoneInput from "react-phone-input-2"
-import lt from "app/components/phoneLang.json"
+import lt from "app/components/index/phoneLang.json"
 
 export interface LabeledTextFieldProps extends PropsWithoutRef<JSX.IntrinsicElements["input"]> {
   name: string
