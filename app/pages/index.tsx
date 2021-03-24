@@ -9,12 +9,6 @@ const Home: BlitzPage = () => {
     <Scrollbar style={{ height: "100vh" }} noScrollX>
       <Main />
       <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap");
-        * {
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-          box-sizing: border-box;
-        }
         #menu a:hover {
           color: #7000ff;
           text-decoration: none;

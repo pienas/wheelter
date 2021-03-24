@@ -11,6 +11,7 @@ import { queryCache } from "react-query"
 import LoginForm from "app/auth/components/LoginForm"
 import { ChakraProvider } from "@chakra-ui/react"
 import theme from "../theme"
+import { Fonts } from "./Fonts"
 
 export default function App({ Component, pageProps }: AppProps) {
   const getLayout = Component.getLayout || ((page) => page)
@@ -18,6 +19,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <ChakraProvider theme={theme}>
+      <Fonts />
       <ErrorBoundary
         FallbackComponent={RootErrorFallback}
         resetKeys={[router.asPath]}
