@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Global } from "@emotion/react"
 
-export const Fonts = () => (
+const Fonts = () => (
   <Global
     styles={`
     /* rubik-300 - latin-ext_latin */
@@ -98,3 +98,5 @@ export const Fonts = () => (
       `}
   />
 )
+
+export default Fonts
