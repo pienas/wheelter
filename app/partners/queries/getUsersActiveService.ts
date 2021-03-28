@@ -1,14 +1,15 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db from "db"
 
-export default async function getUsersActiveService(
-  input: Prisma.CarServiceUserRelationFindFirstArgs,
-  ctx: Ctx
-) {
+export default async function getUsersActiveService(input: number, ctx: Ctx) {
   ctx.session.$authorize()
-  return await db.carServiceUserRelation.findFirst(
-    Object.assign(input, {
-      include: { carService: true, user: true },
-    } as Prisma.CarServiceUserRelationFindFirstArgs)
-  )
+  return await db.carServiceUserRelation.findFirst({
+    where: { carServiceId: input },
+    select: {
+      userRole: true,
+      carService: {
+        select: { name: true, income: true },
+      },
+    },
+  })
 }

@@ -1,17 +1,22 @@
 import { Ctx } from "blitz"
-import db, { Prisma } from "db"
+import db from "db"
 
-export default async function getUsersServices(
-  input: Prisma.CarServiceUserRelationFindManyArgs,
-  ctx: Ctx
-) {
-  ctx.session.$authorize()
-  return await db.carServiceUserRelation.findMany(
-    Object.assign(input, {
-      where: {
-        userId: 1,
+export default async function getUsersServices(_ = null, { session }: Ctx) {
+  if (!session.userId) return null
+
+  const services = await db.carServiceUserRelation.findMany({
+    where: {
+      userId: session.userId,
+    },
+    select: {
+      carServiceId: true,
+      userRole: true,
+      carService: {
+        select: { name: true },
       },
-      include: { carService: true },
-    } as Prisma.CarServiceUserRelationFindManyArgs)
-  )
+    },
+    orderBy: { carService: { name: "asc" } },
+  })
+
+  return services
 }

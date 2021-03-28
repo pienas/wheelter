@@ -257,6 +257,7 @@ model Service {
   description String?
   price       Float
   duration    Int
+  viewCount   Int
   orders      Order[]
   category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  Int?

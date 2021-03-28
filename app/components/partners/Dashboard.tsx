@@ -31,14 +31,12 @@ import logout from "app/auth/mutations/logout"
 import getUsersServices from "app/partners/queries/getUsersServices"
 import getUsersActiveService from "app/partners/queries/getUsersActiveService"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
-import getServiceNotifications from "app/partners/queries/getServiceNotifications"
-import getServiceReviews from "app/partners/queries/getServiceReviews"
+import getServiceNotificationsCount from "app/partners/queries/getServiceNotificationsCount"
+import getServiceReviewsCount from "app/partners/queries/getServiceReviewsCount"
 import getServiceRating from "app/partners/queries/getServiceRating"
 import getServiceOrders from "app/partners/queries/getServiceOrders"
 import getServiceIncome from "app/partners/queries/getServiceIncome"
 import { format } from "date-fns"
-import getClientName from "app/partners/queries/getClientName"
-import getEmployeeName from "app/partners/queries/getEmployeeName"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -59,7 +57,7 @@ const UserInfo = () => {
         }}
       >
         <Flex alignItems="center">
-          <Avatar size="sm" name={name} />
+          <Avatar size="sm" name={name} src={currentUser?.avatarUrl!} />
           <Text fontWeight="500" mx="10px" transition="all 0.2s">
             {name}
           </Text>
@@ -86,12 +84,6 @@ const UserInfo = () => {
 
 const OrderTableRow = (props) => {
   const { order } = props
-  const [client] = useQuery(getClientName, {
-    where: { id: order.clientId },
-  })
-  const [employee] = useQuery(getEmployeeName, {
-    where: { id: order.employeeId },
-  })
   return (
     <Tr height="50px" key={order.id}>
       <Td border="none" color="#0B132A" fontWeight="500">
@@ -105,13 +97,13 @@ const OrderTableRow = (props) => {
         {format(order.endsAt.getTime() - order.startsAt.getTime(), "mm")} min.
       </Td>
       <Td border="none" color="#0B132A" fontWeight="500">
-        {client?.name} {client?.surname[0]}.
+        {order.client.name} {order.client.surname[0]}.
       </Td>
       <Td border="none" color="#0B132A" fontWeight="500">
-        {employee?.name} {employee?.surname[0]}.
+        {order.employee.name} {order.employee.surname[0]}.
       </Td>
       <Td border="none" color="#0B132A" fontWeight="500">
-        {order.price}
+        {order.price} €
       </Td>
       <Td border="none" color="#0B132A" fontWeight="500">
         {order.status}
@@ -121,13 +113,10 @@ const OrderTableRow = (props) => {
 }
 
 const Dashboard = () => {
-  const [carServices] = useQuery(getUsersServices, {
-    orderBy: { carService: { name: "asc" } },
-  })
-  const [activeService, setActiveService] = useState(carServices[0].carServiceId)
-  const [activeCarService] = useQuery(getUsersActiveService, {
-    where: { carServiceId: activeService },
-  })
+  const [carServices] = useQuery(getUsersServices, null)
+  const services = carServices!
+  const [activeService, setActiveService] = useState(services[0].carServiceId)
+  const [activeCarService] = useQuery(getUsersActiveService, activeService)
   const [newOrders] = useQuery(getServiceOrdersCount, {
     where: { carServiceId: activeService, status: "NEW" },
   })
@@ -148,11 +137,23 @@ const Dashboard = () => {
   })
   const [serviceOrders] = useQuery(getServiceOrders, {
     where: { carServiceId: activeService },
+    select: {
+      id: true,
+      clientId: true,
+      employeeId: true,
+      startsAt: true,
+      endsAt: true,
+      name: true,
+      price: true,
+      status: true,
+      employee: { select: { name: true, surname: true } },
+      client: { select: { name: true, surname: true } },
+    },
   })
-  const [notifications] = useQuery(getServiceNotifications, {
+  const [notifications] = useQuery(getServiceNotificationsCount, {
     where: { carServiceId: activeService },
   })
-  const [allReviews] = useQuery(getServiceReviews, {
+  const [allReviews] = useQuery(getServiceReviewsCount, {
     where: { carServiceId: activeService },
   })
   const [serviceRating] = useQuery(getServiceRating, {
@@ -659,7 +660,7 @@ const Dashboard = () => {
               </Flex>
             </MenuButton>
             <MenuList>
-              {carServices.map((service) => {
+              {services.map((service) => {
                 if (service?.carServiceId !== activeService) {
                   return (
                     <MenuItem
@@ -803,7 +804,7 @@ const Dashboard = () => {
                 />
               </Flex>
               <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-                {serviceIncome.sum?.price + activeCarService?.carService.income}€
+                {serviceIncome.sum?.price! + activeCarService!.carService.income} €
               </Text>
               <Text fontSize="xl" color="#A8A8A8">
                 <b>Visos</b> pajamos
@@ -951,9 +952,9 @@ const Dashboard = () => {
                 mt="20px"
                 justifyContent="space-between"
                 alignItems="center"
-                background="#F4E3FF"
+                background={newOrders ? "#F4E3FF" : "transparent"}
                 borderRadius="10px"
-                p="10px"
+                p={newOrders ? "10px" : "0"}
               >
                 <Flex alignItems="center">
                   <Flex
