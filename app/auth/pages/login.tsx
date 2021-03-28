@@ -4,7 +4,6 @@ import { LoginForm } from "app/auth/components/LoginForm"
 
 const LoginPage: BlitzPage = () => {
   const router = useRouter()
-  console.log(router.query.next)
   return (
     <div>
       <LoginForm
@@ -18,6 +17,6 @@ const LoginPage: BlitzPage = () => {
 }
 
 LoginPage.redirectAuthenticatedTo = "/"
-LoginPage.getLayout = (page) => <Layout title="Prisijungimas - Wheelter">{page}</Layout>
+LoginPage.getLayout = (page) => <Layout title="Prisijungimas ・ Wheelter">{page}</Layout>
 
 export default LoginPage

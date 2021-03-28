@@ -31,7 +31,7 @@ const ResetPasswordPage: BlitzPage = () => {
 
 ResetPasswordPage.redirectAuthenticatedTo = "/"
 ResetPasswordPage.getLayout = (page) => (
-  <Layout title="Naujo slaptažodžio kūrimas - Wheelter">{page}</Layout>
+  <Layout title="Naujo slaptažodžio kūrimas ・ Wheelter">{page}</Layout>
 )
 
 export default ResetPasswordPage

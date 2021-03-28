@@ -9,6 +9,12 @@ import {
   Grid,
   Heading,
   Text,
+  Avatar,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  MenuDivider,
 } from "@chakra-ui/react"
 import { SearchIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
@@ -20,52 +26,57 @@ import FastIcon from "./FastIcon"
 import ReliableIcon from "./ReliableIcon"
 import FacebookIcon from "./FacebookIcon"
 import InstagramIcon from "./InstagramIcon"
+import DownIcon from "../partners/DownIcon"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
+  const name = currentUser?.name + " " + currentUser?.surname
   const [logoutMutation] = useMutation(logout)
   if (currentUser) {
     return (
-      <>
-        <Button
-          variant="solid"
-          size="md"
-          backgroundColor="brand.500"
-          color="white"
-          width="150px"
-          height="41px"
-          borderRadius="50px"
-          fontWeight="500"
-          _hover={{ backgroundColor: "brand.400" }}
-          onClick={async () => {
-            await logoutMutation()
+      <Menu>
+        <MenuButton
+          cursor="pointer"
+          sx={{
+            ":hover > span div p": {
+              color: "#6500E6",
+            },
+            ":hover > span div svg": {
+              color: "#6500E6",
+            },
           }}
         >
-          Atsijungti
-        </Button>
-        {/* <button
-            className="button small"
+          <Flex alignItems="center">
+            <Avatar size="sm" name={name} />
+            <Text fontWeight="500" mx="10px" transition="all 0.2s">
+              {name}
+            </Text>
+            <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
+          </Flex>
+        </MenuButton>
+        <MenuList>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Mano tr. priemonės</MenuItem>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Mano rezervacijos</MenuItem>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Pamėgti servisai</MenuItem>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Paslaugų teikėjai</MenuItem>
+          <MenuDivider />
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Naudojimosi instrukcija</MenuItem>
+          <MenuItem _hover={{ background: "#F8F8F8" }}>Nustatymai</MenuItem>
+          <MenuItem
+            _hover={{ background: "#F8F8F8" }}
             onClick={async () => {
               await logoutMutation()
             }}
           >
-            Logout
-          </button>
-          <div>
-            User id: <code>{currentUser.id}</code>
-            <br />
-            User role: <code>{currentUser.role}</code>
-          </div> */}
-      </>
+            Atsijungti
+          </MenuItem>
+        </MenuList>
+      </Menu>
     )
   } else {
     return (
       <>
-        {/* <Link href="/signup">
-            <a className="button small">
-              <strong>Sign Up</strong>
-            </a>
-          </Link> */}
         <Link href="/login">
           <Button
             variant="solid"
@@ -99,25 +110,28 @@ const Main = () => {
           </Box>
           <Grid templateColumns="2fr 1fr" width="calc(100% - 238px)">
             <Flex alignItems="center">
-              <ChakraLink mr="40px" color="text">
-                Stiklai
+              <ChakraLink mr="30px" color="text">
+                Važiuoklė
               </ChakraLink>
-              <ChakraLink mr="40px" color="text">
-                Švara
+              <ChakraLink mr="30px" color="text">
+                Kėbulas
               </ChakraLink>
-              <ChakraLink mr="40px" color="text">
+              <ChakraLink mr="30px" color="text">
+                Variklis
+              </ChakraLink>
+              <ChakraLink mr="30px" color="text">
+                Modifikavimas
+              </ChakraLink>
+              <ChakraLink mr="30px" color="text">
+                Priežiūra
+              </ChakraLink>
+              <ChakraLink mr="30px" color="text">
                 Ratai
               </ChakraLink>
-              <ChakraLink mr="40px" color="text">
-                Galia
-              </ChakraLink>
-              <ChakraLink mr="40px" color="text">
-                Remontas
-              </ChakraLink>
-              <ChakraLink color="text">Dujos</ChakraLink>
+              <ChakraLink color="text">Kita</ChakraLink>
             </Flex>
             <Flex justifySelf="flex-end" alignItems="center">
-              <ChakraLink mr="30px" fontWeight="500">
+              <ChakraLink mr="30px" fontWeight="500" href="/partners/dashboard">
                 Paslaugų teikėjams
               </ChakraLink>
               <Suspense fallback="Kraunama...">
@@ -442,7 +456,7 @@ const Main = () => {
                 color="text"
                 mb={3}
               >
-                Punktas
+                Kodėl verta būti klientu?
               </Text>
             </Link>
             <Link href="/">
@@ -453,7 +467,7 @@ const Main = () => {
                 color="text"
                 mb={3}
               >
-                Punktas
+                Naujienos
               </Text>
             </Link>
             <Link href="/">
@@ -464,12 +478,12 @@ const Main = () => {
                 color="text"
                 mb={3}
               >
-                Punktas
+                Atsiliepimai
               </Text>
             </Link>
             <Link href="/">
               <Text fontSize="sm" cursor="pointer" _hover={{ color: "brand.500" }} color="text">
-                Punktas
+                Užsisakyk naujienlaiškį
               </Text>
             </Link>
           </Flex>
@@ -485,7 +499,7 @@ const Main = () => {
                 color="text"
                 mb={3}
               >
-                Punktas
+                Wheelter paslaugų teikėjams
               </Text>
             </Link>
             <Link href="/">
@@ -496,29 +510,7 @@ const Main = () => {
                 color="text"
                 mb={3}
               >
-                Punktas
-              </Text>
-            </Link>
-            <Link href="/">
-              <Text
-                fontSize="sm"
-                cursor="pointer"
-                _hover={{ color: "brand.500" }}
-                color="text"
-                mb={3}
-              >
-                Punktas
-              </Text>
-            </Link>
-            <Link href="/">
-              <Text
-                fontSize="sm"
-                cursor="pointer"
-                _hover={{ color: "brand.500" }}
-                color="text"
-                mb={3}
-              >
-                Punktas
+                Naujienos
               </Text>
             </Link>
           </Flex>

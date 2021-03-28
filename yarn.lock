@@ -1847,6 +1847,14 @@
     debug "4.3.2"
     ms "^2.1.3"
 
+"@prisma/debug@2.19.0":
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/@prisma/debug/-/debug-2.19.0.tgz#5d9c6b9deb0d5214360ee23644c4e40bee0f251d"
+  integrity sha512-rCFF69WVC2G8x89UaIf786m+Ik1CcEq8XiJ10kIHezOECJQRZAHVjuCXrCnHa9Z1D5r8xaSw6/SuCAmr0Fuedg==
+  dependencies:
+    debug "4.3.2"
+    ms "^2.1.3"
+
 "@prisma/engine-core@2.17.0":
   version "2.17.0"
   resolved "https://registry.yarnpkg.com/@prisma/engine-core/-/engine-core-2.17.0.tgz#c37c8d66d34c030a53c5bd172179c00ea79560ec"
@@ -1909,6 +1917,16 @@
   integrity sha512-65CzPE/Redp8Un+pNK5y3sRkA2lXnDvNlSklrbs7nl6tFa9ZEVGoVAAt9ZdQy12g95S1Npj6LPO3qWbZxwnCbg==
   dependencies:
     "@prisma/debug" "2.17.0"
+    "@types/cross-spawn" "^6.0.1"
+    chalk "^4.0.0"
+    cross-spawn "^7.0.2"
+
+"@prisma/generator-helper@^2.7.0":
+  version "2.19.0"
+  resolved "https://registry.yarnpkg.com/@prisma/generator-helper/-/generator-helper-2.19.0.tgz#452ef6f47bf47d4df8cca79c0aff52160b0a7dc0"
+  integrity sha512-ZMTLyzPiqx7CETwZuo7DBlwLeckT3no3DbWN0r6iEGEyeOgOpoXhlL/ka3Payprc3j4MJ08M8MoI80biw/vdJw==
+  dependencies:
+    "@prisma/debug" "2.19.0"
     "@types/cross-spawn" "^6.0.1"
     chalk "^4.0.0"
     cross-spawn "^7.0.2"
@@ -8811,6 +8829,13 @@ preview-email@3.0.3:
     open "^7.3.0"
     pug "^3.0.0"
     uuid "^8.3.1"
+
+prisma-dbml-generator@0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/prisma-dbml-generator/-/prisma-dbml-generator-0.4.0.tgz#37bcbdf12487646243752c246fdfcb92be77eb09"
+  integrity sha512-iESit1WM5hWbYRuejyNTuKSyOpwAobvANiAzkhhv0z38q9jgNklqWDGDfzN4bBTInmDlwtPlf8Ok+bUHRfrgmw==
+  dependencies:
+    "@prisma/generator-helper" "^2.7.0"
 
 prisma@~2.16:
   version "2.16.1"

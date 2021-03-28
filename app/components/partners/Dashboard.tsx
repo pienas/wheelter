@@ -3,8 +3,8 @@ import { useDisclosure } from "@chakra-ui/hooks"
 import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/layout"
 import { TabList, Tabs } from "@chakra-ui/tabs"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
-import { Link } from "blitz"
-import React from "react"
+import { Link, useMutation, useQuery } from "blitz"
+import React, { useState } from "react"
 import AlertIcon from "./AlertIcon"
 import BurgerIcon from "./BurgerIcon"
 import CalendarIcon from "./CalendarIcon"
@@ -26,40 +26,158 @@ import ShareIcon from "./ShareIcon"
 import WikiIcon from "./WikiIcon"
 import { Doughnut, Line } from "react-chartjs-2"
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table"
+import { Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/menu"
+import logout from "app/auth/mutations/logout"
+import getUsersServices from "app/partners/queries/getUsersServices"
+import getUsersActiveService from "app/partners/queries/getUsersActiveService"
+import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
+import getServiceNotifications from "app/partners/queries/getServiceNotifications"
+import getServiceReviews from "app/partners/queries/getServiceReviews"
+import getServiceRating from "app/partners/queries/getServiceRating"
+import getServiceOrders from "app/partners/queries/getServiceOrders"
+import getServiceIncome from "app/partners/queries/getServiceIncome"
+import { format } from "date-fns"
+import getClientName from "app/partners/queries/getClientName"
+import getEmployeeName from "app/partners/queries/getEmployeeName"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
   const name = currentUser?.name + " " + currentUser?.surname
+  const [logoutMutation] = useMutation(logout)
   return (
-    <>
-      <Avatar size="sm" name={name} />
-      <Text fontWeight="500" color="#4F5665" mx="10px" transition="all 0.2s">
-        {name}
-      </Text>
-      <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
-    </>
+    <Menu>
+      <MenuButton
+        ml="30px"
+        cursor="pointer"
+        sx={{
+          ":hover > span div p": {
+            color: "#6500E6",
+          },
+          ":hover > span div svg": {
+            color: "#6500E6",
+          },
+        }}
+      >
+        <Flex alignItems="center">
+          <Avatar size="sm" name={name} />
+          <Text fontWeight="500" mx="10px" transition="all 0.2s">
+            {name}
+          </Text>
+          <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
+        </Flex>
+      </MenuButton>
+      <MenuList>
+        <MenuItem _hover={{ background: "#F8F8F8" }}>Mano servisai</MenuItem>
+        <MenuDivider />
+        <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
+        <MenuItem _hover={{ background: "#F8F8F8" }}>Nustatymai</MenuItem>
+        <MenuItem
+          _hover={{ background: "#F8F8F8" }}
+          onClick={async () => {
+            await logoutMutation()
+          }}
+        >
+          Atsijungti
+        </MenuItem>
+      </MenuList>
+    </Menu>
+  )
+}
+
+const OrderTableRow = (props) => {
+  const { order } = props
+  const [client] = useQuery(getClientName, {
+    where: { id: order.clientId },
+  })
+  const [employee] = useQuery(getEmployeeName, {
+    where: { id: order.employeeId },
+  })
+  return (
+    <Tr height="50px" key={order.id}>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {format(order.startsAt, "yyyy-MM-dd HH:mm")}
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {order.name}
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {format(order.endsAt.getTime() - order.startsAt.getTime() - 3 * 60 * 60 * 1000, "H")} val.{" "}
+        {format(order.endsAt.getTime() - order.startsAt.getTime(), "mm")} min.
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {client?.name} {client?.surname[0]}.
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {employee?.name} {employee?.surname[0]}.
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {order.price}
+      </Td>
+      <Td border="none" color="#0B132A" fontWeight="500">
+        {order.status}
+      </Td>
+    </Tr>
   )
 }
 
 const Dashboard = () => {
-  const orders = 10
-  const quickhelp = 2
-  const notifications = 10
-  const serviceName = "Auto shop"
-  const userRole = "Savininkas"
-  const active = 11
-  const done = 1
-  const canceled = 2
-  const all = active + done + canceled
-  const backgroundActive = `linear-gradient(90deg, #6500E6 ${(active / all) * 100}%, #E5E5E5 ${
-    (active / all) * 100
-  }%)`
-  const backgroundDone = `linear-gradient(90deg, #9B4CFF ${(done / all) * 100}%, #E5E5E5 ${
-    (done / all) * 100
-  }%)`
-  const backgroundCanceled = `linear-gradient(90deg, #46009F ${(canceled / all) * 100}%, #E5E5E5 ${
-    (canceled / all) * 100
-  }%)`
+  const [carServices] = useQuery(getUsersServices, {
+    orderBy: { carService: { name: "asc" } },
+  })
+  const [activeService, setActiveService] = useState(carServices[0].carServiceId)
+  const [activeCarService] = useQuery(getUsersActiveService, {
+    where: { carServiceId: activeService },
+  })
+  const [newOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "NEW" },
+  })
+  const [quickHelpOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "QUICK" },
+  })
+  const [activeOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "ACTIVE" },
+  })
+  const [doneOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "DONE" },
+  })
+  const [cancelledOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "CANCELLED" },
+  })
+  const [allOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService },
+  })
+  const [serviceOrders] = useQuery(getServiceOrders, {
+    where: { carServiceId: activeService },
+  })
+  const [notifications] = useQuery(getServiceNotifications, {
+    where: { carServiceId: activeService },
+  })
+  const [allReviews] = useQuery(getServiceReviews, {
+    where: { carServiceId: activeService },
+  })
+  const [serviceRating] = useQuery(getServiceRating, {
+    avg: { rating: true },
+    where: { carServiceId: activeService },
+  })
+  const [serviceIncome] = useQuery(getServiceIncome, {
+    sum: { price: true },
+    where: { carServiceId: activeService },
+  })
+  const backgroundActive = allOrders
+    ? `linear-gradient(90deg, #6500E6 ${(activeOrders / allOrders) * 100}%, #E5E5E5 ${
+        (activeOrders / allOrders) * 100
+      }%)`
+    : "#E5E5E5"
+  const backgroundDone = allOrders
+    ? `linear-gradient(90deg, #9B4CFF ${(doneOrders / allOrders) * 100}%, #E5E5E5 ${
+        (doneOrders / allOrders) * 100
+      }%)`
+    : "#E5E5E5"
+  const backgroundCancelled = allOrders
+    ? `linear-gradient(90deg, #46009F ${(cancelledOrders / allOrders) * 100}%, #E5E5E5 ${
+        (cancelledOrders / allOrders) * 100
+      }%)`
+    : "#E5E5E5"
   const { isOpen, onToggle } = useDisclosure({
     defaultIsOpen: false,
   })
@@ -67,8 +185,14 @@ const Dashboard = () => {
     labels: ["Aktyvūs užsakymai", "Atlikti užsakymai", "Atmesti užsakymai"],
     datasets: [
       {
-        data: [11, 1, 2],
-        backgroundColor: ["#6500E6", "#9B4CFF", "#46009F"],
+        data:
+          activeOrders || doneOrders || cancelledOrders
+            ? [activeOrders, doneOrders, cancelledOrders]
+            : [1],
+        backgroundColor:
+          activeOrders || doneOrders || cancelledOrders
+            ? ["#6500E6", "#9B4CFF", "#46009F"]
+            : ["#E5E5E5"],
       },
     ],
   }
@@ -251,7 +375,7 @@ const Dashboard = () => {
               Užsakymai
             </Text>
           )}
-          {orders > 0 && (
+          {newOrders > 0 && (
             <Flex
               justifyContent="center"
               alignItems="center"
@@ -264,7 +388,7 @@ const Dashboard = () => {
               transition="all 0.2s"
             >
               <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                {orders > 9 ? "9+" : orders}
+                {newOrders > 9 ? "9+" : newOrders}
               </Text>
             </Flex>
           )}
@@ -333,7 +457,7 @@ const Dashboard = () => {
               Greita pagalba
             </Text>
           )}
-          {quickhelp > 0 && (
+          {quickHelpOrders > 0 && (
             <Flex
               justifyContent="center"
               alignItems="center"
@@ -346,7 +470,7 @@ const Dashboard = () => {
               transition="all 0.2s"
             >
               <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                {quickhelp > 9 ? "9+" : quickhelp}
+                {quickHelpOrders > 9 ? "9+" : quickHelpOrders}
               </Text>
             </Flex>
           )}
@@ -485,49 +609,103 @@ const Dashboard = () => {
           )}
         </Flex>
         <Box position="absolute" bottom="0" width="100%">
-          <Flex
-            justifyContent="center"
-            alignItems="center"
-            height="50px"
-            cursor="pointer"
-            _hover={{ background: "#FDF9FF" }}
-            sx={{
-              ":hover > svg": {
-                color: "#6500E6",
-              },
-              ":hover > div h5": {
-                color: "#6500E6",
-              },
-            }}
-          >
-            <Avatar size="sm" name={serviceName} border="2px solid #6500E6" transition="all 0.2s" />
-            {isOpen && (
-              <Flex flexDirection="column" ml="15px" transition="all 0.2s">
-                <Heading
-                  as="h5"
-                  fontSize="sm"
-                  fontWeight="600"
-                  color="#4F5665"
-                  textAlign="center"
+          <Menu>
+            <MenuButton
+              width="100%"
+              cursor="pointer"
+              _hover={{ background: "#FDF9FF" }}
+              sx={{
+                ":hover > span div div h5": {
+                  color: "#6500E6",
+                },
+                ":hover > span div svg": {
+                  color: "#6500E6",
+                },
+              }}
+            >
+              <Flex alignItems="center" justifyContent="center" height="50px">
+                <Avatar
+                  size="sm"
+                  name={activeCarService?.carService.name}
+                  border="2px solid #6500E6"
                   transition="all 0.2s"
-                  whiteSpace="nowrap"
-                >
-                  {serviceName}
-                </Heading>
-                <Text
-                  fontWeight="400"
-                  color="#A8A8A8"
-                  textAlign="center"
-                  fontSize="xs"
-                  whiteSpace="nowrap"
-                  transition="all 0.2s"
-                >
-                  {userRole}
-                </Text>
+                />
+                {isOpen && (
+                  <Flex flexDirection="column" ml="15px" transition="all 0.2s">
+                    <Heading
+                      as="h5"
+                      fontSize="sm"
+                      fontWeight="600"
+                      color="#4F5665"
+                      textAlign="center"
+                      transition="all 0.2s"
+                      whiteSpace="nowrap"
+                    >
+                      {activeCarService?.carService.name}
+                    </Heading>
+                    <Text
+                      fontWeight="400"
+                      color="#A8A8A8"
+                      textAlign="center"
+                      fontSize="xs"
+                      whiteSpace="nowrap"
+                      transition="all 0.2s"
+                    >
+                      {activeCarService?.userRole}
+                    </Text>
+                  </Flex>
+                )}
+                <DownIcon boxSize={2} color="#4F5665" ml="10px" transition="all 0.2s" />
               </Flex>
-            )}
-            <DownIcon boxSize={2} color="#4F5665" ml="10px" transition="all 0.2s" />
-          </Flex>
+            </MenuButton>
+            <MenuList>
+              {carServices.map((service) => {
+                if (service?.carServiceId !== activeService) {
+                  return (
+                    <MenuItem
+                      _hover={{ background: "#F8F8F8" }}
+                      key={service?.carServiceId}
+                      onClick={() => {
+                        setActiveService(service?.carServiceId)
+                      }}
+                    >
+                      <Avatar
+                        size="sm"
+                        name={service?.carService.name}
+                        border="2px solid #6500E6"
+                        transition="all 0.2s"
+                      />
+                      {isOpen && (
+                        <Flex flexDirection="column" ml="15px" transition="all 0.2s">
+                          <Heading
+                            as="h5"
+                            fontSize="sm"
+                            fontWeight="600"
+                            color="#4F5665"
+                            textAlign="center"
+                            transition="all 0.2s"
+                            whiteSpace="nowrap"
+                          >
+                            {service?.carService.name}
+                          </Heading>
+                          <Text
+                            fontWeight="400"
+                            color="#A8A8A8"
+                            textAlign="center"
+                            fontSize="xs"
+                            whiteSpace="nowrap"
+                            transition="all 0.2s"
+                          >
+                            {service?.userRole}
+                          </Text>
+                        </Flex>
+                      )}
+                    </MenuItem>
+                  )
+                }
+              })}
+            </MenuList>
+          </Menu>
           <Divider borderColor="#EFEFEF" mb="20px" />
           <Text color="#4F5665" textAlign="center" fontSize="sm" mb="5px">
             Versija 1.0
@@ -573,7 +751,7 @@ const Dashboard = () => {
                 },
               }}
             >
-              <NotificationIcon boxSize={8} color="#4F5665" transition="all 0.2s" />
+              <NotificationIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
               {notifications > 0 && (
                 <Flex
                   justifyContent="center"
@@ -591,21 +769,7 @@ const Dashboard = () => {
                 </Flex>
               )}
             </Flex>
-            <Flex
-              alignItems="center"
-              ml="30px"
-              cursor="pointer"
-              sx={{
-                ":hover > p": {
-                  color: "#6500E6",
-                },
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-              }}
-            >
-              <UserInfo />
-            </Flex>
+            <UserInfo />
           </Flex>
         </Flex>
         <Box mr="70px" ml={isOpen ? "370px" : "170px"} transition="all 0.2s">
@@ -639,7 +803,7 @@ const Dashboard = () => {
                 />
               </Flex>
               <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-                79375.5 €
+                {serviceIncome.sum?.price + activeCarService?.carService.income}€
               </Text>
               <Text fontSize="xl" color="#A8A8A8">
                 <b>Visos</b> pajamos
@@ -673,7 +837,7 @@ const Dashboard = () => {
                 />
               </Flex>
               <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-                1745
+                {allOrders}
               </Text>
               <Text fontSize="xl" color="#A8A8A8">
                 <b>Viso</b> užsakymų
@@ -707,7 +871,7 @@ const Dashboard = () => {
                 />
               </Flex>
               <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-                862
+                {allReviews}
               </Text>
               <Text fontSize="xl" color="#A8A8A8">
                 <b>Viso</b> atsiliepimų
@@ -741,7 +905,7 @@ const Dashboard = () => {
                 />
               </Flex>
               <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-                4,82
+                {serviceRating.avg?.rating?.toFixed(1)}
               </Text>
               <Text fontSize="xl" color="#A8A8A8">
                 <b>Vidutinis</b> įvertinimas
@@ -801,13 +965,19 @@ const Dashboard = () => {
                     borderRadius="7px"
                   >
                     <Text fontWeight="500" fontSize="2xl" color="#ffffff">
-                      4
+                      {newOrders}
                     </Text>
                   </Flex>
                   <Text fontWeight="500" fontSize="xl" ml="20px" mr="10px">
-                    Nauji užsakymai
+                    {newOrders === 0 || newOrders > 9
+                      ? "Naujų užsakymų"
+                      : newOrders === 1
+                      ? "Naujas užsakymas"
+                      : "Nauji užsakymai"}
                   </Text>
-                  <Box width="10px" height="10px" background="#6500E6" borderRadius="100%" />
+                  {newOrders > 0 && (
+                    <Box width="10px" height="10px" background="#6500E6" borderRadius="100%" />
+                  )}
                 </Flex>
                 <Flex
                   alignItems="center"
@@ -831,7 +1001,7 @@ const Dashboard = () => {
               <Flex justifyContent="space-between" mt="20px">
                 <Box borderRadius="5px" border="1px solid #EFEFEF" px="20px" py="10px" width="30%">
                   <Text fontWeight="500" fontSize="3xl">
-                    {active}
+                    {activeOrders}
                   </Text>
                   <Text color="#A8A8A8" fontSize="xl">
                     <b>Aktyvių</b> užsakymų
@@ -839,7 +1009,7 @@ const Dashboard = () => {
                 </Box>
                 <Box borderRadius="5px" border="1px solid #EFEFEF" px="20px" py="10px" width="30%">
                   <Text fontWeight="500" fontSize="3xl">
-                    {done}
+                    {doneOrders}
                   </Text>
                   <Text color="#A8A8A8" fontSize="xl">
                     <b>Atliktų</b> užsakymų
@@ -847,7 +1017,7 @@ const Dashboard = () => {
                 </Box>
                 <Box borderRadius="5px" border="1px solid #EFEFEF" px="20px" py="10px" width="30%">
                   <Text fontWeight="500" fontSize="3xl">
-                    {canceled}
+                    {cancelledOrders}
                   </Text>
                   <Text color="#A8A8A8" fontSize="xl">
                     <b>Atmestų</b> užsakymų
@@ -866,7 +1036,10 @@ const Dashboard = () => {
                 </Box>
                 <Flex width="100%" direction="column" justifyContent="space-between">
                   <Flex alignItems="center" justifyContent="space-between">
-                    <Text>Aktyvūs užsakymai ({((active / all) * 100).toFixed(1)}%)</Text>
+                    <Text>
+                      Aktyvūs užsakymai (
+                      {allOrders ? ((activeOrders / allOrders) * 100).toFixed(1) : 0}%)
+                    </Text>
                     <Flex alignItems="center" width="70%" justifyContent="space-between">
                       <Box
                         width="90%"
@@ -874,11 +1047,14 @@ const Dashboard = () => {
                         borderRadius="8px"
                         background={backgroundActive}
                       />
-                      <Text color="#A8A8A8">{active}</Text>
+                      <Text color="#A8A8A8">{activeOrders}</Text>
                     </Flex>
                   </Flex>
                   <Flex alignItems="center" justifyContent="space-between">
-                    <Text>Atlikti užsakymai ({((done / all) * 100).toFixed(1)}%)</Text>
+                    <Text>
+                      Atlikti užsakymai (
+                      {allOrders > 0 ? ((doneOrders / allOrders) * 100).toFixed(1) : 0}%)
+                    </Text>
                     <Flex alignItems="center" width="70%" justifyContent="space-between">
                       <Box
                         width="90%"
@@ -886,19 +1062,22 @@ const Dashboard = () => {
                         borderRadius="8px"
                         background={backgroundDone}
                       />
-                      <Text color="#A8A8A8">{done}</Text>
+                      <Text color="#A8A8A8">{doneOrders}</Text>
                     </Flex>
                   </Flex>
                   <Flex alignItems="center" justifyContent="space-between">
-                    <Text>Atmesti užsakymai ({((canceled / all) * 100).toFixed(1)}%)</Text>
+                    <Text>
+                      Atmesti užsakymai (
+                      {allOrders > 0 ? ((cancelledOrders / allOrders) * 100).toFixed(1) : 0}%)
+                    </Text>
                     <Flex alignItems="center" width="70%" justifyContent="space-between">
                       <Box
                         width="90%"
                         height="8px"
                         borderRadius="8px"
-                        background={backgroundCanceled}
+                        background={backgroundCancelled}
                       />
-                      <Text color="#A8A8A8">{canceled}</Text>
+                      <Text color="#A8A8A8">{cancelledOrders}</Text>
                     </Flex>
                   </Flex>
                 </Flex>
@@ -982,378 +1161,95 @@ const Dashboard = () => {
             <Text fontSize="3xl" fontWeight="500" mb="15px">
               Šiandienos tvarkaraštis
             </Text>
-            <Table>
-              <Thead>
-                <Tr background="#E5E5E5" height="50px" borderRadius="10px">
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    Laikas
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                  >
-                    Paslauga
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                  >
-                    Trukmė
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                  >
-                    Klientas
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                  >
-                    Darbuotojas
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                  >
-                    Kaina
-                  </Th>
-                  <Th
-                    color="#4F5665"
-                    fontWeight="600"
-                    fontSize="xl"
-                    textTransform="none"
-                    letterSpacing="normal"
-                    border="none"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Statusas
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr height="50px">
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    2021-03-21 10:30
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Kėbulo dažymas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    4 val. 30 min.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Laurynas T.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Karolis
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    250 €
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="600">
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px" background="#F1F1F1">
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="500"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    2021-03-21 12:45
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Antikorozinis padengimas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    1 val.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Rokas A.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    80 €
-                  </Td>
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="600"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px">
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    2021-03-21 14:00
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Kėbulo geometrijos matavimas
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    30 min.
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    Martynas B.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    50 €
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="600">
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px" background="#F1F1F1">
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="500"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    2021-03-21 12:45
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Antikorozinis padengimas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    1 val.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Rokas A.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    80 €
-                  </Td>
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="600"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px">
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    2021-03-21 14:00
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Kėbulo geometrijos matavimas
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    30 min.
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    Martynas B.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    50 €
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="600">
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px" background="#F1F1F1">
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="500"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    2021-03-21 12:45
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Antikorozinis padengimas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    1 val.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Rokas A.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    80 €
-                  </Td>
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="600"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px">
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    2021-03-21 14:00
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Kėbulo geometrijos matavimas
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    30 min.
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    Martynas B.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    50 €
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="600">
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px" background="#F1F1F1">
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="500"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    2021-03-21 12:45
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Antikorozinis padengimas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    1 val.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Rokas A.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    80 €
-                  </Td>
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="600"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px">
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    2021-03-21 14:00
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Kėbulo geometrijos matavimas
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    30 min.
-                  </Td>
-                  <Td color="#0B132A" fontWeight="500" border="none">
-                    Martynas B.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    50 €
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="600">
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-                <Tr height="50px" background="#F1F1F1">
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="500"
-                    borderTopLeftRadius="10px"
-                    borderBottomLeftRadius="10px"
-                  >
-                    2021-03-21 12:45
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Antikorozinis padengimas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    1 val.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Rokas A.
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    Henrikas
-                  </Td>
-                  <Td border="none" color="#0B132A" fontWeight="500">
-                    80 €
-                  </Td>
-                  <Td
-                    border="none"
-                    color="#0B132A"
-                    fontWeight="600"
-                    borderTopRightRadius="10px"
-                    borderBottomRightRadius="10px"
-                  >
-                    Užbaigti užsakymą
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
+            {newOrders ? (
+              <Table mb="70px">
+                <Thead>
+                  <Tr background="#E5E5E5" height="50px" borderRadius="10px">
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                      borderTopLeftRadius="10px"
+                      borderBottomLeftRadius="10px"
+                    >
+                      Laikas
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                    >
+                      Paslauga
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                    >
+                      Trukmė
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                    >
+                      Klientas
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                    >
+                      Darbuotojas
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                    >
+                      Kaina
+                    </Th>
+                    <Th
+                      color="#4F5665"
+                      fontWeight="600"
+                      fontSize="xl"
+                      textTransform="none"
+                      letterSpacing="normal"
+                      border="none"
+                      borderTopRightRadius="10px"
+                      borderBottomRightRadius="10px"
+                    >
+                      Statusas
+                    </Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {serviceOrders.map((order) => (
+                    <OrderTableRow order={order} key={order.id} />
+                  ))}
+                </Tbody>
+              </Table>
+            ) : (
+              <Text>Šiandien užsakymų nėra</Text>
+            )}
           </Box>
         </Box>
       </Box>

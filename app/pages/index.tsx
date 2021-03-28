@@ -149,7 +149,7 @@ const Home: BlitzPage = () => {
 
 Home.suppressFirstRenderFlicker = true
 Home.getLayout = (page) => (
-  <Layout title="Užsirašyk autopaslaugoms internetu ・ Wheelter">{page}</Layout>
+  <Layout title="Registruokis autopaslaugoms internetu ・ Wheelter">{page}</Layout>
 )
 
 export default Home

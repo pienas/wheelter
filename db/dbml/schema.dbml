@@ -1,0 +1,500 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  name String [not null]
+  surname String [not null]
+  email String [unique, not null]
+  emailVerifiedAt DateTime
+  phone String [unique, not null]
+  hashedPassword String
+  avatarUrl String
+  role UserRole [not null, default: 'USER']
+  tokens Token [not null]
+  sessions Session [not null]
+  orders Order [not null]
+  reviews Review [not null]
+  favoriteServices CarService [not null]
+  vehicles Vehicle [not null]
+  settings UserSetting [not null]
+}
+
+Table Vehicle {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  type VehicleType [not null]
+  make String [not null]
+  model String [not null]
+  year Int [not null]
+  fuelType FuelType [not null]
+  bodyType BodyType [not null]
+  gearbox GearboxType [not null]
+  displacement Float [not null]
+  kw Int [not null]
+  drivingWheels DrivingWheelsType
+  engineCode String
+  colorCode String
+  vinCode String
+  user User
+  userId Int
+}
+
+Table UserSetting {
+  id Int [pk, increment]
+  updatedAt DateTime [not null]
+  settingId Int [not null]
+  value Float
+  status Boolean
+  user User
+  userId Int
+}
+
+Table Session {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  expiresAt DateTime
+  handle String [unique, not null]
+  hashedSessionToken String
+  antiCSRFToken String
+  publicData String
+  privateData String
+  user User
+  userId Int
+}
+
+Table Token {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  hashedToken String [not null]
+  type TokenType [not null]
+  expiresAt DateTime [not null]
+  sentTo String [not null]
+  user User
+  userId Int
+
+  indexes {
+    (hashedToken, type) [unique]
+  }
+}
+
+Table CarServiceUser {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  name String [not null]
+  surname String [not null]
+  email String [unique, not null]
+  emailVerifiedAt DateTime
+  phone String [unique, not null]
+  hashedPassword String
+  avatarUrl String
+  role CarServiceUserRole [not null, default: 'EMPLOYEE']
+  tokens CarServiceUserToken [not null]
+  sessions CarServiceUserSession [not null]
+  carServices CarService [not null]
+  changes Change [not null]
+  notes Note [not null]
+  goals Goal [not null]
+  settings CarServiceUserSetting [not null]
+}
+
+Table CarServiceUserSetting {
+  id Int [pk, increment]
+  updatedAt DateTime [not null]
+  settingId Int [not null]
+  value Float
+  status Boolean
+  carServiceUser CarServiceUser
+  carServiceUserId Int
+}
+
+Table CarServiceUserSession {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  expiresAt DateTime
+  handle String [unique, not null]
+  hashedSessionToken String
+  antiCSRFToken String
+  publicData String
+  privateData String
+  user CarServiceUser
+  userId Int
+}
+
+Table CarServiceUserToken {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  hashedToken String [not null]
+  type TokenType [not null]
+  expiresAt DateTime [not null]
+  sentTo String [not null]
+  user CarServiceUser
+  userId Int
+
+  indexes {
+    (hashedToken, type) [unique]
+  }
+}
+
+Table CarService {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  name String [not null]
+  description String
+  email String [unique, not null]
+  emailVerifiedAt DateTime
+  phone String [unique, not null]
+  rating Float [not null, default: 0]
+  income Float [not null, default: 0]
+  expenses Float [not null, default: 0]
+  viewCount Int [not null, default: 0]
+  isActive Boolean [not null, default: false]
+  isRevieved Boolean [not null, default: false]
+  avatarUrl String
+  changes Change [not null]
+  orders Order [not null]
+  types Type [not null]
+  categories Category [not null]
+  employees Employee [not null]
+  settings Setting [not null]
+  promos Promo [not null]
+  notes Note [not null]
+  address Address [not null]
+  goals Goal [not null]
+  notifications Notification [not null]
+  images Image [not null]
+  carServiceUser CarServiceUser
+  carServiceUserId Int
+  userWhoLikes User
+  userWhoLikesId Int
+}
+
+Table Change {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  content String [not null]
+  author CarServiceUser
+  authorId Int
+  carService CarService
+  carServiceId Int
+}
+
+Table Order {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  startsAt DateTime [not null]
+  endsAt DateTime [not null]
+  price Float [not null]
+  status OrderStatus [not null, default: 'NEW']
+  review Review
+  reviewId Int
+  service Service
+  serviceId Int
+  employee Employee
+  employeeId Int
+  client User
+  clientId Int
+  carService CarService
+  carServiceId Int
+}
+
+Table Review {
+  id Int [pk, increment]
+  rating Int [not null]
+  content String
+  isRevievew Boolean [not null, default: false]
+  Order Order [not null]
+  author User
+  authorId Int
+}
+
+Table Type {
+  id Int [pk, increment]
+  name String [not null]
+  carService CarService
+  carServiceId Int
+}
+
+Table Category {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  name String [not null]
+  description String
+  services Service [not null]
+  carService CarService
+  carServiceId Int
+}
+
+Table Service {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  imageUrl String
+  name String [not null]
+  description String
+  price Float [not null]
+  duration Int [not null]
+  orders Order [not null]
+  category Category
+  categoryId Int
+  promo Promo
+  promoId Int
+}
+
+Table Employee {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  name String [not null]
+  surname String
+  orders Order [not null]
+  carService CarService
+  carServiceId Int
+}
+
+Table Setting {
+  id Int [pk, increment]
+  updatedAt DateTime [not null]
+  settingId Int [not null]
+  value Float
+  status Boolean
+  carService CarService
+  carServiceId Int
+}
+
+Table Promo {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  startsAt DateTime [default: `now()`, not null]
+  endsAt DateTime
+  code String [not null]
+  count Int
+  isRedeemed Boolean [not null, default: false]
+  title String [not null]
+  description String [not null]
+  services Service [not null]
+  carService CarService
+  carServiceId Int
+}
+
+Table Note {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  title String [not null]
+  content String [not null]
+  isDone Boolean [not null, default: false]
+  author CarServiceUser
+  authorId Int
+  carService CarService
+  carServiceId Int
+}
+
+Table Address {
+  id Int [pk, increment]
+  city String [not null]
+  street String [not null]
+  house Int [not null]
+  appartment Int
+  postCode Int [not null]
+  coordinateX Float
+  coordinateY Float
+  carService CarService
+  carServiceId Int
+}
+
+Table Goal {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+  type GoalType [not null]
+  progress Float [not null, default: 0]
+  goal Float [not null]
+  author CarServiceUser
+  authorId Int
+  carService CarService
+  carServiceId Int
+}
+
+Table Notification {
+  id Int [pk, increment]
+  createdAt DateTime [default: `now()`, not null]
+  type NotificationType [not null]
+  title String [not null]
+  content String [not null]
+  seen Boolean [not null, default: false]
+  carService CarService
+  carServiceId Int
+}
+
+Table Image {
+  id Int [pk, increment]
+  imageUrl String [not null]
+  carService CarService
+  carServiceId Int
+}
+
+Enum TokenType {
+  RESET_PASSWORD
+}
+
+Enum UserRole {
+  USER
+  ADMIN
+}
+
+Enum CarServiceUserRole {
+  EMPLOYEE
+  OWNER
+  ADMIN
+}
+
+Enum OrderStatus {
+  NEW
+  ACTIVE
+  FINISHED
+}
+
+Enum GoalType {
+  RATING
+  REVIEWS
+  INCOME
+  EXPENSES
+  PROFIT
+}
+
+Enum NotificationType {
+  ORDER
+  UPDATE
+}
+
+Enum VehicleType {
+  CAR
+  MOTORCYCLE
+  HEAVYTRANSPORT
+}
+
+Enum FuelType {
+  PETROL
+  DIESEL
+  PETROLGAS
+  PETROLELECTRICITY
+  ELECTRICITY
+  DIESELELECTRICITY
+  BIOETANOL
+  OTHER
+}
+
+Enum BodyType {
+  SEDAN
+  HATCHBACK
+  UNIVERSAL
+  MONOTONOUS
+  SUV
+  COUPE
+  COMMERCIAL
+  CABRIOLET
+  LIMOUSINE
+  PICKUP
+  MINIBUS
+  CHOPPER
+  KARTING
+  QUAD
+  SNOWMOBILE
+  TRICYCLE
+  SUPERBIKE
+  CROSS
+  STREETBIKE
+  TOURING
+  TRUCK
+  VAN
+  TRAWL
+  OTHER
+}
+
+Enum DrivingWheelsType {
+  FWD
+  RWD
+  AWD
+}
+
+Enum GearboxType {
+  MANUAL
+  AUTOMATIC
+}
+
+Ref: Vehicle.userId > User.id
+
+Ref: UserSetting.userId > User.id
+
+Ref: Session.userId > User.id
+
+Ref: Token.userId > User.id
+
+Ref: CarServiceUserSetting.carServiceUserId > CarServiceUser.id
+
+Ref: CarServiceUserSession.userId > CarServiceUser.id
+
+Ref: CarServiceUserToken.userId > CarServiceUser.id
+
+Ref: CarService.carServiceUserId > CarServiceUser.id
+
+Ref: CarService.userWhoLikesId > User.id
+
+Ref: Change.authorId > CarServiceUser.id
+
+Ref: Change.carServiceId > CarService.id
+
+Ref: Order.reviewId > Review.id
+
+Ref: Order.serviceId > Service.id
+
+Ref: Order.employeeId > Employee.id
+
+Ref: Order.clientId > User.id
+
+Ref: Order.carServiceId > CarService.id
+
+Ref: Review.authorId > User.id
+
+Ref: Type.carServiceId > CarService.id
+
+Ref: Category.carServiceId > CarService.id
+
+Ref: Service.categoryId > Category.id
+
+Ref: Service.promoId > Promo.id
+
+Ref: Employee.carServiceId > CarService.id
+
+Ref: Setting.carServiceId > CarService.id
+
+Ref: Promo.carServiceId > CarService.id
+
+Ref: Note.authorId > CarServiceUser.id
+
+Ref: Note.carServiceId > CarService.id
+
+Ref: Address.carServiceId > CarService.id
+
+Ref: Goal.authorId > CarServiceUser.id
+
+Ref: Goal.carServiceId > CarService.id
+
+Ref: Notification.carServiceId > CarService.id
+
+Ref: Image.carServiceId > CarService.id

@@ -31,7 +31,7 @@ const ForgotPasswordPage: BlitzPage = () => {
 
 ForgotPasswordPage.redirectAuthenticatedTo = "/"
 ForgotPasswordPage.getLayout = (page) => (
-  <Layout title="Slaptažodžio atkūrimas - Wheelter">{page}</Layout>
+  <Layout title="Slaptažodžio atkūrimas ・ Wheelter">{page}</Layout>
 )
 
 export default ForgotPasswordPage
