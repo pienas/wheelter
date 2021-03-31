@@ -16,7 +16,7 @@ export const ResetPasswordForm = (props: ResetPasswordFormProps) => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100vh">
       <Box cursor="pointer" margin="0 auto" width="112.5px" mb={4}>
-        <Link href="/">
+        <Link href="/" passHref>
           <Image src="/logo-no-text.svg" height="102.375px" width="112.5px" alt="Wheelter logo" />
         </Link>
       </Box>

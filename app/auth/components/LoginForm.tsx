@@ -15,7 +15,7 @@ export const LoginForm = (props: LoginFormProps) => {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100vh">
       <Box cursor="pointer" margin="0 auto" width="112.5px" mb={4}>
-        <Link href="/">
+        <Link href="/" passHref>
           <Image src="/logo-no-text.svg" height="102.375px" width="112.5px" alt="Wheelter logo" />
         </Link>
       </Box>
@@ -76,15 +76,15 @@ export const LoginForm = (props: LoginFormProps) => {
           />
         </Form>
         <Flex flexDirection="column" alignItems="center">
-          <Link href="/forgot-password">
+          <Link href="/forgot-password" passHref>
             <a className="loginLink reset">Pamiršote slaptažodį?</a>
           </Link>
-          <Link href="/signup">
+          <Link href="/signup" passHref>
             <a className="loginLink">Neturite paskyros? Prisiregistruokite.</a>
           </Link>
         </Flex>
       </Box>
-      <Link href="/">
+      <Link href="/" passHref>
         <a className="loginLink back">Grįžti į pradinį puslapį</a>
       </Link>
 

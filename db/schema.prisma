@@ -11,6 +11,7 @@ model User {
   id               Int           @id @default(autoincrement())
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
+  lastSeen         DateTime?
   name             String
   surname          String
   email            String        @unique
@@ -91,6 +92,7 @@ model CarServiceUser {
   id                     Int                      @id @default(autoincrement())
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
+  lastSeen               DateTime?
   name                   String
   surname                String
   email                  String                   @unique
@@ -103,6 +105,7 @@ model CarServiceUser {
   changes                Change[]
   notes                  Note[]
   goals                  Goal[]
+  notifications          Notification[]
   settings               CarServiceUserSetting[]
   carServiceUserRelation CarServiceUserRelation[]
 }
@@ -149,6 +152,11 @@ model CarService {
   id                     Int                      @id @default(autoincrement())
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
+  plan                   String                   @default("STANDARD")
+  paymentExpiresAt       DateTime?
+  paymentMethod          String?
+  paymentUrl             String?
+  lastSeen               DateTime?
   name                   String
   description            String?
   email                  String                   @unique
@@ -158,7 +166,7 @@ model CarService {
   expenses               Float                    @default(0.0)
   viewCount              Int                      @default(0)
   isActive               Boolean                  @default(false)
-  isRevieved             Boolean                  @default(false)
+  isReviewed             Boolean                  @default(false)
   avatarUrl              String?
   changes                Change[]
   orders                 Order[]
@@ -170,7 +178,6 @@ model CarService {
   notes                  Note[]
   address                Address[]
   goals                  Goal[]
-  notifications          Notification[]
   images                 Image[]
   usersWhoLike           User[]
   carServiceUserRelation CarServiceUserRelation[]
@@ -202,9 +209,7 @@ model Order {
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   startsAt     DateTime
-  endsAt       DateTime
-  name         String
-  price        Float
+  price        Float       @default(0.0)
   status       String      @default("NEW")
   review       Review?
   service      Service?    @relation(fields: [serviceId], references: [id])
@@ -221,7 +226,7 @@ model Review {
   id           Int         @id @default(autoincrement())
   rating       Int
   content      String?
-  isRevieved   Boolean     @default(false)
+  isReviewed   Boolean     @default(false)
   order        Order?      @relation(fields: [orderId], references: [id])
   orderId      Int?
   author       User?       @relation(fields: [authorId], references: [id])
@@ -257,7 +262,7 @@ model Service {
   description String?
   price       Float
   duration    Int
-  viewCount   Int
+  viewCount   Int       @default(0)
   orders      Order[]
   category    Category? @relation(fields: [categoryId], references: [id])
   categoryId  Int?
@@ -342,14 +347,14 @@ model Goal {
 }
 
 model Notification {
-  id           Int         @id @default(autoincrement())
-  createdAt    DateTime    @default(now())
-  type         String
-  title        String
-  content      String
-  seen         Boolean     @default(false)
-  carService   CarService? @relation(fields: [carServiceId], references: [id])
-  carServiceId Int?
+  id               Int             @id @default(autoincrement())
+  createdAt        DateTime        @default(now())
+  type             String
+  title            String
+  content          String
+  seen             Boolean         @default(false)
+  carServiceUser   CarServiceUser? @relation(fields: [carServiceUserId], references: [id])
+  carServiceUserId Int?
 }
 
 model Image {

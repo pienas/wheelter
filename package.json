@@ -33,6 +33,9 @@
     "@chakra-ui/react": "1.1.2",
     "@emotion/react": "11.1.4",
     "@emotion/styled": "11.0.0",
+    "@nivo/core": "0.67.0",
+    "@nivo/line": "0.67.0",
+    "@nivo/pie": "0.67.0",
     "@prisma/client": "~2.16",
     "blitz": "0.33.0",
     "chart.js": "2.9.4",
@@ -52,6 +55,7 @@
     "react-scrollbars-custom": "4.0.25",
     "react-slick": "0.28.1",
     "typescript": "4.1.5",
+    "use-sound": "2.0.1",
     "zod": "1.11.11"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 import React, { Suspense } from "react"
-import { Link, useMutation, Image } from "blitz"
+import { Link, useMutation, Image, useQuery } from "blitz"
 import {
   Container,
   Flex,
@@ -27,6 +27,7 @@ import ReliableIcon from "./ReliableIcon"
 import FacebookIcon from "./FacebookIcon"
 import InstagramIcon from "./InstagramIcon"
 import DownIcon from "../partners/DownIcon"
+import getServicesCount from "app/partners/queries/getServicesCount"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -54,12 +55,12 @@ const UserInfo = () => {
             <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
           </Flex>
         </MenuButton>
-        <MenuList>
+        <MenuList border="none" boxShadow="20px 20px 30px 0px rgba(0, 0, 0, 0.03)">
           <MenuItem _hover={{ background: "#F8F8F8" }}>Mano tr. priemonės</MenuItem>
           <MenuItem _hover={{ background: "#F8F8F8" }}>Mano rezervacijos</MenuItem>
           <MenuItem _hover={{ background: "#F8F8F8" }}>Pamėgti servisai</MenuItem>
           <MenuItem _hover={{ background: "#F8F8F8" }}>Paslaugų teikėjai</MenuItem>
-          <MenuDivider />
+          <MenuDivider color="#d8d8d8" />
           <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
           <MenuItem _hover={{ background: "#F8F8F8" }}>Naudojimosi instrukcija</MenuItem>
           <MenuItem _hover={{ background: "#F8F8F8" }}>Nustatymai</MenuItem>
@@ -77,7 +78,7 @@ const UserInfo = () => {
   } else {
     return (
       <>
-        <Link href="/login">
+        <Link href="/login" passHref>
           <Button
             variant="solid"
             size="md"
@@ -98,13 +99,17 @@ const UserInfo = () => {
 }
 
 const Main = () => {
-  const partners = 0
+  const [servicesCount] = useQuery(getServicesCount, {
+    where: {
+      isReviewed: true,
+    },
+  })
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
       <Box ml="15vw" mr="15vw" width="70vw" mt="30px" overflow="hidden" id="menu">
         <Flex alignItems="center">
           <Box mr="80px" height="41px" cursor="pointer">
-            <Link href="/">
+            <Link href="/" passHref>
               <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
             </Link>
           </Box>
@@ -134,9 +139,7 @@ const Main = () => {
               <ChakraLink mr="30px" fontWeight="500" href="/partners/dashboard">
                 Paslaugų teikėjams
               </ChakraLink>
-              <Suspense fallback="Kraunama...">
-                <UserInfo />
-              </Suspense>
+              <UserInfo />
             </Flex>
           </Grid>
         </Flex>
@@ -234,7 +237,7 @@ const Main = () => {
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
             Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų automobiliui.
           </Text>
-          <Link href="/about">
+          <Link href="/about" passHref>
             <Text
               color="brand.500"
               fontWeight="600"
@@ -268,7 +271,7 @@ const Main = () => {
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
             Vieta ir laikas nuo šiol nebe rodikliai.
           </Text>
-          <Link href="/about">
+          <Link href="/about" passHref>
             <Text
               color="brand.500"
               fontWeight="600"
@@ -302,7 +305,7 @@ const Main = () => {
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
             Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją išmaniai.
           </Text>
-          <Link href="/about">
+          <Link href="/about" passHref>
             <Text
               color="brand.500"
               fontWeight="600"
@@ -321,7 +324,7 @@ const Main = () => {
         <Heading fontSize="4xl" as="h2" fontWeight="700" mt="1.5rem" mb="1.5rem" textAlign="center">
           Daugiau nei{" "}
           <Text fontSize="6xl" fontWeight="700" display="inline" color="brand.500">
-            {Math.floor(partners / 10) * 10}
+            {Math.floor(servicesCount / 10) * 10}
           </Text>{" "}
           įmonių
           <br />
@@ -355,7 +358,7 @@ const Main = () => {
             </Text>
           </Box>
           <Box alignSelf="center" justifySelf="flex-end">
-            <Link href="/partners/register">
+            <Link href="/partners/register" passHref>
               <Button
                 variant="solid"
                 size="md"
@@ -378,12 +381,12 @@ const Main = () => {
         <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" width="70vw" mx="15vw" pt={8} pb={12}>
           <Flex flexDirection="column">
             <Box height="41px" cursor="pointer">
-              <Link href="/">
+              <Link href="/" passHref>
                 <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
               </Link>
             </Box>
             <Flex my={6}>
-              <Link href="/">
+              <Link href="/" passHref>
                 <Box
                   backgroundColor="white"
                   borderRadius="100%"
@@ -398,7 +401,7 @@ const Main = () => {
                   <FacebookIcon boxSize={6} />
                 </Box>
               </Link>
-              <Link href="/">
+              <Link href="/" passHref>
                 <Box
                   backgroundColor="white"
                   borderRadius="100%"
@@ -430,7 +433,7 @@ const Main = () => {
             <Text fontSize="sm" mb={8} color="text">
               92264, Klaipėda
             </Text>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="md"
                 fontWeight="700"
@@ -448,7 +451,7 @@ const Main = () => {
             <Heading fontSize="md" as="h5" fontWeight="600" mb={6}>
               Klientams
             </Heading>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -459,7 +462,7 @@ const Main = () => {
                 Kodėl verta būti klientu?
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -470,7 +473,7 @@ const Main = () => {
                 Naujienos
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -481,7 +484,7 @@ const Main = () => {
                 Atsiliepimai
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text fontSize="sm" cursor="pointer" _hover={{ color: "brand.500" }} color="text">
                 Užsisakyk naujienlaiškį
               </Text>
@@ -491,7 +494,7 @@ const Main = () => {
             <Heading fontSize="md" as="h5" fontWeight="600" mb={6}>
               Paslaugų teikėjams
             </Heading>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -502,7 +505,7 @@ const Main = () => {
                 Wheelter paslaugų teikėjams
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -518,7 +521,7 @@ const Main = () => {
             <Heading fontSize="md" as="h5" fontWeight="600" mb={6}>
               Wheelter
             </Heading>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -529,7 +532,7 @@ const Main = () => {
                 Apie mus
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -540,7 +543,7 @@ const Main = () => {
                 Teisinės nuostatos
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"
@@ -551,7 +554,7 @@ const Main = () => {
                 Sausainiukų nustatymai
               </Text>
             </Link>
-            <Link href="/">
+            <Link href="/" passHref>
               <Text
                 fontSize="sm"
                 cursor="pointer"

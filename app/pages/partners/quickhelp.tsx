@@ -41,6 +41,6 @@ const PartnersDashboard: BlitzPage = () => {
 
 PartnersDashboard.authenticate = { redirectTo: "/login" }
 PartnersDashboard.suppressFirstRenderFlicker = true
-PartnersDashboard.getLayout = (page) => <Layout title="Suvestinė ・ Wheelter">{page}</Layout>
+PartnersDashboard.getLayout = (page) => <Layout title="Greita pagalba ・ Wheelter">{page}</Layout>
 
 export default PartnersDashboard
