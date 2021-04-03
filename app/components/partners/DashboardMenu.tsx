@@ -8,22 +8,22 @@ import getUsersActiveService from "app/partners/queries/getUsersActiveService"
 import getUsersServices from "app/partners/queries/getUsersServices"
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import AlertIcon from "./AlertIcon"
+import QuickhelpIcon from "./QuickhelpIcon"
 import CalendarIcon from "./CalendarIcon"
-import ChartIcon from "./ChartIcon"
-import DownIcon from "./DownIcon"
-import HelpIcon from "./HelpIcon"
-import HouseIcon from "./HouseIcon"
+import StatsIcon from "./StatsIcon"
+import ArrowIcon from "./ArrowIcon"
+import SupportIcon from "./SupportIcon"
+import DashboardIcon from "./DashboardIcon"
 import Logo from "./Logo"
 import OrdersIcon from "./OrdersIcon"
 import ServicesIcon from "./ServicesIcon"
 import SettingsIcon from "./SettingsIcon"
 import ShareIcon from "./ShareIcon"
-import WikiIcon from "./WikiIcon"
+import InstructionsIcon from "./InstructionsIcon"
 import getServiceNotificationsCount from "app/partners/queries/getServiceNotificationsCount"
 import useSound from "use-sound"
-import BurgerIcon from "./BurgerIcon"
-import NotificationIcon from "./NotificationIcon"
+import MenuIcon from "./MenuIcon"
+import NotificationsIcon from "./NotificationsIcon"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
 import Dashboard from "./Dashboard"
@@ -33,6 +33,8 @@ import Orders from "./Orders"
 import Services from "./Services"
 import Quickhelp from "./Quickhelp"
 import Settings from "./Settings"
+import NotesIcon from "./NotesIcon"
+import Notes from "./Notes"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -57,10 +59,10 @@ const UserInfo = () => {
           <Text fontWeight="500" mx="10px" transition="all 0.2s">
             {name}
           </Text>
-          <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
+          <ArrowIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
         </Flex>
       </MenuButton>
-      <MenuList border="none" boxShadow="20px 20px 30px 0px rgba(0, 0, 0, 0.03)">
+      <MenuList border="none" boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)">
         <MenuItem _hover={{ background: "#F8F8F8" }}>Mano servisai</MenuItem>
         <MenuDivider color="#d8d8d8" />
         <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
@@ -86,7 +88,7 @@ const DashboardMenu = () => {
     ? parseInt(Router.query.activeService as string)
     : carServices![0].carServiceId
   const [activeService, setActiveService] = useState(service)
-  const [activeCarService] = useQuery(getUsersActiveService, activeService)
+  const [activeCarService, { refetch }] = useQuery(getUsersActiveService, activeService)
   const { isOpen, onToggle } = useDisclosure({
     defaultIsOpen: ((Router.query.isOpen as string) === "true" ? true : false) ?? false,
   })
@@ -198,6 +200,15 @@ const DashboardMenu = () => {
           )}
         </Head>
       )}
+      {Router.route === "/partners/notes" && (
+        <Head>
+          {notifications ? (
+            <title>({notifications > 9 ? "9+" : notifications}) Užrašinė ・ Wheelter</title>
+          ) : (
+            <title>Užrašinė ・ Wheelter</title>
+          )}
+        </Head>
+      )}
       {Router.route === "/partners/settings" && (
         <Head>
           {notifications ? (
@@ -276,7 +287,7 @@ const DashboardMenu = () => {
                 left: "0",
               }}
             >
-              <HouseIcon
+              <DashboardIcon
                 boxSize={7}
                 color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -326,7 +337,7 @@ const DashboardMenu = () => {
                 left: "0",
               }}
             >
-              <ChartIcon
+              <StatsIcon
                 boxSize={7}
                 color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -543,7 +554,7 @@ const DashboardMenu = () => {
                 left: "0",
               }}
             >
-              <AlertIcon
+              <QuickhelpIcon
                 boxSize={7}
                 color={Router.route === "/partners/quickhelp" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -577,6 +588,57 @@ const DashboardMenu = () => {
                     {quickHelpOrders > 9 ? "9+" : quickHelpOrders}
                   </Text>
                 </Flex>
+              )}
+            </Flex>
+          </Link>
+          <Link
+            href={{ pathname: "/partners/notes", query: { isOpen, activeService } }}
+            as="/partners/notes"
+          >
+            <Flex
+              justifyContent="flex-start"
+              alignItems="center"
+              height="50px"
+              cursor="pointer"
+              transition="all 0.2s"
+              background={Router.route === "/partners/notes" ? "#FDF9FF" : "transparent"}
+              _hover={{ background: "#FDF9FF" }}
+              sx={{
+                ":hover > svg": {
+                  color: "#6500E6",
+                },
+                ":hover > p": {
+                  color: "#0B132A",
+                },
+              }}
+              position="relative"
+              _before={{
+                content: '""',
+                borderRadius: "0 50px 50px 0",
+                width: "6px",
+                height: "100%",
+                background: Router.route === "/partners/notes" ? "#6500E6" : "transparent",
+                position: "absolute",
+                left: "0",
+              }}
+            >
+              <NotesIcon
+                boxSize={7}
+                color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
+                transition="all 0.2s"
+              />
+              {isOpen && (
+                <Text
+                  fontWeight="600"
+                  fontSize="sm"
+                  color={Router.route === "/partners/notes" ? "#0B132A" : "#A8A8A8"}
+                  transition="all 0.2s"
+                  whiteSpace="nowrap"
+                >
+                  Užrašinė
+                </Text>
               )}
             </Flex>
           </Link>
@@ -686,7 +748,7 @@ const DashboardMenu = () => {
               },
             }}
           >
-            <WikiIcon
+            <InstructionsIcon
               boxSize={7}
               color="#A8A8A8"
               mr={isOpen ? "20px" : "0"}
@@ -715,7 +777,7 @@ const DashboardMenu = () => {
               },
             }}
           >
-            <HelpIcon
+            <SupportIcon
               boxSize={7}
               color="#A8A8A8"
               mr={isOpen ? "20px" : "0"}
@@ -753,6 +815,7 @@ const DashboardMenu = () => {
                   <Avatar
                     size="sm"
                     name={activeCarService?.carService.name}
+                    src={activeCarService?.carService.avatarUrl!}
                     border="2px solid #6500E6"
                     transition="all 0.2s"
                   />
@@ -781,12 +844,12 @@ const DashboardMenu = () => {
                       </Text>
                     </Flex>
                   )}
-                  <DownIcon boxSize={2} color="#4F5665" ml="10px" transition="all 0.2s" />
+                  <ArrowIcon boxSize={2} color="#4F5665" ml="10px" transition="all 0.2s" />
                 </Flex>
               </MenuButton>
               <MenuList
-                border="1px solid #D8D8D8"
-                boxShadow="20px 20px 30px 0px rgba(0, 0, 0, 0.03)"
+                border="none"
+                boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)"
                 width="auto"
                 minWidth="none"
               >
@@ -804,6 +867,7 @@ const DashboardMenu = () => {
                         <Avatar
                           size="sm"
                           name={service?.carService.name}
+                          src={service?.carService.avatarUrl!}
                           border="2px solid #6500E6"
                           transition="all 0.2s"
                         />
@@ -908,7 +972,7 @@ const DashboardMenu = () => {
               }}
               justifySelf="flex-start"
             >
-              <BurgerIcon boxSize={6} color="black" transition="all 0.2s" onClick={onToggle} />
+              <MenuIcon boxSize={6} color="black" transition="all 0.2s" onClick={onToggle} />
             </Box>
             <Flex alignItems="center">
               <Flex
@@ -919,7 +983,7 @@ const DashboardMenu = () => {
                   },
                 }}
               >
-                <NotificationIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
+                <NotificationsIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
                 {notifications > 0 && (
                   <Flex
                     justifyContent="center"
@@ -963,8 +1027,20 @@ const DashboardMenu = () => {
           {Router.route === "/partners/quickhelp" && (
             <Quickhelp isOpen={isOpen} activeService={activeService} />
           )}
+          {Router.route === "/partners/notes" && (
+            <Notes isOpen={isOpen} activeService={activeService} />
+          )}
           {Router.route === "/partners/settings" && (
-            <Settings isOpen={isOpen} activeService={activeService} />
+            <Settings
+              isOpen={isOpen}
+              activeService={activeService}
+              avatarUrl={activeCarService?.carService.avatarUrl!}
+              refetch={() => refetch()}
+              url={activeCarService?.carService.url!}
+              name={activeCarService?.carService.name!}
+              description={activeCarService?.carService.description!}
+              plan={activeCarService?.carService.plan!}
+            />
           )}
         </Box>
       </Flex>

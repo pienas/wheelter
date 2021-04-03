@@ -157,6 +157,7 @@ model CarService {
   paymentMethod          String?
   paymentUrl             String?
   lastSeen               DateTime?
+  url                    String                   @unique
   name                   String
   description            String?
   email                  String                   @unique

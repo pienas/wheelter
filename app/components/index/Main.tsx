@@ -16,18 +16,18 @@ import {
   MenuItem,
   MenuDivider,
 } from "@chakra-ui/react"
-import { SearchIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
 import Tabs from "app/components/index/Tabs"
 import QuickHelp from "./QuickHelp"
-import CheckIcon from "./CheckIcon"
+import TrustworthyIcon from "./TrustworthyIcon"
 import FastIcon from "./FastIcon"
 import ReliableIcon from "./ReliableIcon"
 import FacebookIcon from "./FacebookIcon"
 import InstagramIcon from "./InstagramIcon"
-import DownIcon from "../partners/DownIcon"
+import DownIcon from "../partners/ArrowIcon"
 import getServicesCount from "app/partners/queries/getServicesCount"
+import SearchIcon from "./SearchIcon"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -296,8 +296,8 @@ const Main = () => {
           position="relative"
           boxShadow="0px 0px 40px 0px rgba(0, 0, 0, 0.08);"
         >
-          <Box backgroundColor="brand.500" borderRadius="100%" p="0.2rem">
-            <CheckIcon boxSize={12} color="white" />
+          <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
+            <TrustworthyIcon boxSize={8} color="white" />
           </Box>
           <Heading fontSize="2xl" as="h5" fontWeight="600" mt="1.5rem" mb="1.5rem">
             Patikimiau

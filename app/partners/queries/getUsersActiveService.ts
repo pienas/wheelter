@@ -8,7 +8,14 @@ export default async function getUsersActiveService(input: number, ctx: Ctx) {
     select: {
       userRole: true,
       carService: {
-        select: { name: true, income: true },
+        select: {
+          url: true,
+          name: true,
+          description: true,
+          avatarUrl: true,
+          income: true,
+          plan: true,
+        },
       },
     },
   })

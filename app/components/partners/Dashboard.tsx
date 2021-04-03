@@ -4,11 +4,11 @@ import { useQuery } from "blitz"
 import React, { FC } from "react"
 import CustomTab from "./CustomTab"
 import DotsIcon from "./DotsIcon"
-import DownIcon from "./DownIcon"
+import ArrowIcon from "./ArrowIcon"
 import MoneyIcon from "./MoneyIcon"
 import OrdersIcon from "./OrdersIcon"
 import RatingIcon from "./RatingIcon"
-import ReviewIcon from "./ReviewIcon"
+import ReviewsIcon from "./ReviewsIcon"
 import { Doughnut, Line } from "react-chartjs-2"
 import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
@@ -369,7 +369,7 @@ const Dashboard: FC<Props> = ({
               justifyContent="center"
               mb="15px"
             >
-              <ReviewIcon boxSize={7} color="#ffffff" />
+              <ReviewsIcon boxSize={7} color="#ffffff" />
             </Flex>
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
@@ -434,7 +434,7 @@ const Dashboard: FC<Props> = ({
               <Text fontSize="3xl" fontWeight="500" transition="all 0.2s">
                 Užsakymai
               </Text>
-              <DownIcon boxSize={4} transition="all 0.2s" ml="10px" />
+              <ArrowIcon boxSize={4} transition="all 0.2s" ml="10px" />
             </Flex>
             <Tabs variant="unstyled" isFitted background="#F1F1F1" p="3px" borderRadius="10px">
               <TabList>
@@ -487,7 +487,7 @@ const Dashboard: FC<Props> = ({
               }}
             >
               <Text color="#6500E6">Peržiūrėti užsakymus</Text>
-              <DownIcon
+              <ArrowIcon
                 boxSize={3}
                 transition="all 0.2s"
                 mx="10px"
@@ -602,7 +602,7 @@ const Dashboard: FC<Props> = ({
               <Text fontSize="3xl" fontWeight="500" transition="all 0.2s">
                 Įvertinimas
               </Text>
-              <DownIcon boxSize={4} transition="all 0.2s" ml="10px" />
+              <ArrowIcon boxSize={4} transition="all 0.2s" ml="10px" />
             </Flex>
             <Tabs variant="unstyled" isFitted background="#F1F1F1" p="3px" borderRadius="10px">
               <TabList>
@@ -757,7 +757,7 @@ const Dashboard: FC<Props> = ({
             </Tbody>
           </Table>
         ) : (
-          <Text>Šiandien užsakymų nėra</Text>
+          <Text mb="70px">Šiandien užsakymų nėra</Text>
         )}
       </Box>
     </Box>

@@ -6,4 +6,7 @@ module.exports = {
       isAuthorized: simpleRolesIsAuthorized,
     }),
   ],
+  images: {
+    domains: ["res.cloudinary.com"],
+  },
 }

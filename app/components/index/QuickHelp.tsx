@@ -49,7 +49,6 @@ const QuickHelp = () => {
         else router.push("/signup")
       }
     } catch (error) {
-      console.log(error)
       toastIdRef.current = toast({
         duration: 3000,
         render: () => (
