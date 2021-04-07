@@ -63,11 +63,11 @@ const Settings: FC<Props> = ({
     const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
     const timestamp = Math.round(new Date().getTime() / 1000)
     const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET
-    const payloadToSign = `public_id=${url}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
+    const payloadToSign = `public_id=${activeService}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
     const signature = sha1(payloadToSign)
     data.append("file", files)
     data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-    data.append("public_id", url)
+    data.append("public_id", activeService.toString())
     data.append("timestamp", timestamp.toString())
     data.append("signature", signature)
     data.append("upload_preset", preset!)
@@ -289,7 +289,7 @@ const Settings: FC<Props> = ({
   const onServiceDescriptionChange = (value) => {
     setServiceDescription(value)
   }
-  const uploadImages = (uploadUrl, e) => {
+  const uploadImages = (e) => {
     return new Promise(async (resolve) => {
       const oldImages = Array.from(serviceActiveImages, (v) => v).map((v) => v.carServiceImageId)
       await Promise.all(
@@ -301,10 +301,10 @@ const Settings: FC<Props> = ({
                 const data = new FormData()
                 const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
                 const timestamp = Math.round(new Date().getTime() / 1000)
-                const payloadToSign = `public_id=images/carServices/${uploadUrl}_${i}&timestamp=${timestamp}${apiSecret}`
+                const payloadToSign = `public_id=images/carServices/${activeService}_${i}&timestamp=${timestamp}${apiSecret}`
                 const signature = sha1(payloadToSign)
                 data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-                data.append("public_id", "images/carServices/" + uploadUrl + "_" + i)
+                data.append("public_id", "images/carServices/" + activeService + "_" + i)
                 data.append("timestamp", timestamp.toString())
                 data.append("signature", signature)
                 const res = await fetch(
@@ -329,11 +329,11 @@ const Settings: FC<Props> = ({
             const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
             const timestamp = Math.round(new Date().getTime() / 1000)
             const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_IMAGES
-            const payloadToSign = `public_id=${uploadUrl}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
+            const payloadToSign = `public_id=${activeService}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
             const signature = sha1(payloadToSign)
             data.append("file", files)
             data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-            data.append("public_id", uploadUrl + "_" + i)
+            data.append("public_id", activeService + "_" + i)
             data.append("timestamp", timestamp.toString())
             data.append("signature", signature)
             data.append("upload_preset", preset!)
@@ -398,63 +398,15 @@ const Settings: FC<Props> = ({
         ),
       })
       setChanging(false)
-    } else if (url != serviceUrl) {
-      const data = new FormData()
-      const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
-      const timestamp = Math.round(new Date().getTime() / 1000)
-      const payloadToSign = `from_public_id=avatars/carServices/${url}&overwrite=true&timestamp=${timestamp}&to_public_id=avatars/carServices/${serviceUrl}${apiSecret}`
-      const signature = sha1(payloadToSign)
-      data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-      data.append("from_public_id", "avatars/carServices/" + url)
-      data.append("to_public_id", "avatars/carServices/" + serviceUrl)
-      data.append("overwrite", "true")
-      data.append("timestamp", timestamp.toString())
-      data.append("signature", signature)
-      await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/rename`,
-        {
-          method: "POST",
-          mode: "no-cors",
-          body: data,
-        }
-      ).then(async () => {
-        await uploadImages(serviceUrl, imagesState.items)
+    } else {
+      console.log(imagesState.items)
+      await uploadImages(imagesState.items).then(async () => {
         await updateServiceInfo({
           where: {
             id: activeService,
           },
           data: {
             url: serviceUrl,
-            name: serviceName,
-            description: serviceDescription,
-            avatarUrl:
-              avatarUrl.substring(0, avatarUrl.length - 4 - url.length) +
-              serviceUrl +
-              avatarUrl.substring(avatarUrl.length - 4),
-          },
-        })
-        refetchOther()
-        refetch()
-        toastIdRef.current = toast({
-          duration: 5000,
-          render: () => (
-            <SuccessToast
-              heading="Pavyko!"
-              text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
-              id={toastIdRef.current}
-            />
-          ),
-        })
-        setChanging(false)
-      })
-    } else {
-      console.log(imagesState.items)
-      await uploadImages(url, imagesState.items).then(async () => {
-        await updateServiceInfo({
-          where: {
-            id: activeService,
-          },
-          data: {
             name: serviceName,
             description: serviceDescription,
           },
