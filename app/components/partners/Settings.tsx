@@ -168,11 +168,35 @@ const Settings: FC<Props> = ({
     })
   })
   const [imagesLoading, setImagesLoading] = useState(true)
+  const [finalImagesLoading, setFinalImagesLoading] = useState(true)
   useEffect(() => {
     getFill.then((x: any) => {
       setImages(x)
+      const tempImg = Array.from({ length: x.length }, (v, k) => k).map((k) => ({
+        id: `${k}-${new Date().getTime()}`,
+        content: (
+          <Flex
+            width="100px"
+            height="100px"
+            borderRadius="5px"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Image src={x[k]["data_url"]} width="100px" height="100px" />
+          </Flex>
+        ),
+        data_url: x[k]["data_url"],
+        file: x[k].file,
+      }))
+      const fill = maxImages - x.length
+      const fillItems = getItems(fill, x.length)
+      const finalList = tempImg.concat(fillItems)
+      setImagesState({ items: finalList })
       setTimeout(() => {
         setImagesLoading(false)
+        setTimeout(() => {
+          setFinalImagesLoading(false)
+        }, 2000)
       }, 2000)
     })
   }, [imagesLoading])
@@ -199,13 +223,6 @@ const Settings: FC<Props> = ({
   const fillImagesState = fillOldImagesState.concat(fillNewImagesState)
   const [images, setImages] = useState([])
   const onChanges = (imageList) => {
-    // var count = 0
-    // imagesState.items.forEach((i) => {
-    //   if (!i.id.endsWith("item")) count++
-    // })
-    // if (count > imageList.length) {
-    //   setImagesState(imagesState.items.pop())
-    // }
     const tempImg = Array.from({ length: imageList.length }, (v, k) => k).map((k) => ({
       id: `${k}-${new Date().getTime()}`,
       content: (
@@ -225,10 +242,8 @@ const Settings: FC<Props> = ({
     const fill = maxImages - imageList.length
     const fillItems = getItems(fill, imageList.length)
     const finalList = tempImg.concat(fillItems)
-
     setImagesState({ items: finalList })
     setImages(imageList)
-    console.log("a", imageList, "b", finalList, "c", imagesState.items, "d", images)
   }
   const onErrors = (error) => {
     if (error.maxNumber) {
@@ -249,9 +264,7 @@ const Settings: FC<Props> = ({
     if (!result[startIndex].id.endsWith("item") && !result[endIndex].id.endsWith("item")) {
       const [removed] = result.splice(startIndex, 1)
       result.splice(endIndex, 0, removed)
-      // result.sort((a, b) => a.id[0] - b.id[0])
     }
-    console.log(result)
     return result
   }
   const [imagesState, setImagesState] = useState<any>({
@@ -277,89 +290,91 @@ const Settings: FC<Props> = ({
     setServiceDescription(value)
   }
   const uploadImages = (uploadUrl, e) => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       const oldImages = Array.from(serviceActiveImages, (v) => v).map((v) => v.carServiceImageId)
-      e.forEach(async (element, i) => {
-        const files = element.file
-        if (!files.size) {
-          console.log(files)
-          serviceActiveImages.forEach(async (element) => {
-            if (element.carServiceImageId === i) {
-              const data = new FormData()
-              const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
-              const timestamp = Math.round(new Date().getTime() / 1000)
-              const payloadToSign = `public_id=images/carServices/${uploadUrl}_${i}&timestamp=${timestamp}${apiSecret}`
-              const signature = sha1(payloadToSign)
-              data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-              data.append("public_id", "images/carServices/" + uploadUrl + "_" + i)
-              data.append("timestamp", timestamp.toString())
-              data.append("signature", signature)
-              const res = await fetch(
-                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/destroy`,
-                {
-                  method: "POST",
-                  body: data,
-                }
-              )
-              await res.json().then(async () => {
-                await deleteServiceImages({
-                  where: {
-                    carServiceImageId: i,
-                    carServiceId: activeService,
-                  },
-                })
-              })
-            } else return
-          })
-        } else {
-          const data = new FormData()
-          const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
-          const timestamp = Math.round(new Date().getTime() / 1000)
-          const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_IMAGES
-          const payloadToSign = `public_id=${uploadUrl}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
-          const signature = sha1(payloadToSign)
-          data.append("file", files)
-          data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
-          data.append("public_id", uploadUrl + "_" + i)
-          data.append("timestamp", timestamp.toString())
-          data.append("signature", signature)
-          data.append("upload_preset", preset!)
-          const res = await fetch(
-            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
-            {
-              method: "POST",
-              body: data,
-            }
-          )
-          await res.json().then(async (file) => {
-            var found = false
-            oldImages.forEach(async (element) => {
-              if (element === i) {
-                found = true
-                await updateServiceImages({
-                  where: {
-                    carServiceImageId: i,
-                    carServiceId: activeService,
-                  },
-                  data: {
-                    imageUrl: file.secure_url,
-                  },
+      await Promise.all(
+        e.map(async (element, i) => {
+          const files = element.file
+          if (!files.size) {
+            serviceActiveImages.forEach(async (element) => {
+              if (element.carServiceImageId === i) {
+                const data = new FormData()
+                const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+                const timestamp = Math.round(new Date().getTime() / 1000)
+                const payloadToSign = `public_id=images/carServices/${uploadUrl}_${i}&timestamp=${timestamp}${apiSecret}`
+                const signature = sha1(payloadToSign)
+                data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+                data.append("public_id", "images/carServices/" + uploadUrl + "_" + i)
+                data.append("timestamp", timestamp.toString())
+                data.append("signature", signature)
+                const res = await fetch(
+                  `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/destroy`,
+                  {
+                    method: "POST",
+                    body: data,
+                  }
+                )
+                await res.json().then(async () => {
+                  await deleteServiceImages({
+                    where: {
+                      carServiceImageId: i,
+                      carServiceId: activeService,
+                    },
+                  })
                 })
               } else return
             })
-            if (!found) {
-              await createServiceImages({
-                data: {
-                  imageUrl: file.secure_url,
-                  carServiceId: activeService,
-                  carServiceImageId: i,
-                },
+          } else {
+            const data = new FormData()
+            const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+            const timestamp = Math.round(new Date().getTime() / 1000)
+            const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_IMAGES
+            const payloadToSign = `public_id=${uploadUrl}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
+            const signature = sha1(payloadToSign)
+            data.append("file", files)
+            data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+            data.append("public_id", uploadUrl + "_" + i)
+            data.append("timestamp", timestamp.toString())
+            data.append("signature", signature)
+            data.append("upload_preset", preset!)
+            const res = await fetch(
+              `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+              {
+                method: "POST",
+                body: data,
+              }
+            )
+            await res.json().then(async (file) => {
+              var found = false
+              oldImages.forEach(async (element) => {
+                if (element === i) {
+                  found = true
+                  await updateServiceImages({
+                    where: {
+                      carServiceImageId: i,
+                      carServiceId: activeService,
+                    },
+                    data: {
+                      imageUrl: file.secure_url,
+                    },
+                  })
+                } else return
               })
-            }
-          })
-        }
+              if (!found) {
+                await createServiceImages({
+                  data: {
+                    imageUrl: file.secure_url,
+                    carServiceId: activeService,
+                    carServiceImageId: i,
+                  },
+                })
+              }
+            })
+          }
+        })
+      ).then(() => {
+        resolve(1)
       })
-      return resolve(1)
     })
   }
   const [changing, setChanging] = useState(false)
@@ -382,6 +397,7 @@ const Settings: FC<Props> = ({
           />
         ),
       })
+      setChanging(false)
     } else if (url != serviceUrl) {
       const data = new FormData()
       const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
@@ -429,33 +445,35 @@ const Settings: FC<Props> = ({
             />
           ),
         })
+        setChanging(false)
       })
     } else {
       console.log(imagesState.items)
-      await uploadImages(url, imagesState.items)
-      await updateServiceInfo({
-        where: {
-          id: activeService,
-        },
-        data: {
-          name: serviceName,
-          description: serviceDescription,
-        },
-      })
-      refetchOther()
-      refetch()
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <SuccessToast
-            heading="Pavyko!"
-            text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
-            id={toastIdRef.current}
-          />
-        ),
+      await uploadImages(url, imagesState.items).then(async () => {
+        await updateServiceInfo({
+          where: {
+            id: activeService,
+          },
+          data: {
+            name: serviceName,
+            description: serviceDescription,
+          },
+        })
+        refetchOther()
+        refetch()
+        toastIdRef.current = toast({
+          duration: 5000,
+          render: () => (
+            <SuccessToast
+              heading="Pavyko!"
+              text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+        setChanging(false)
       })
     }
-    setChanging(false)
   }
   return (
     <Box mr="70px" ml={isOpen ? "370px" : "170px"} transition="all 0.2s">
@@ -793,7 +811,7 @@ const Settings: FC<Props> = ({
                 </Box>
                 <Box width="696px">
                   <Flex direction="column" justifyContent="center" alignItems="center">
-                    {imagesLoading ? (
+                    {finalImagesLoading ? (
                       <Spinner
                         thickness="4px"
                         speed="0.65s"
@@ -822,7 +840,6 @@ const Settings: FC<Props> = ({
                                       dataURLKey="data_url"
                                     >
                                       {({
-                                        imageList,
                                         onImageUpload,
                                         onImageRemove,
                                         isDragging,
@@ -850,13 +867,13 @@ const Settings: FC<Props> = ({
                                                 height="20px"
                                                 onClick={() => {
                                                   onImageRemove(idx)
-                                                  imagesState.items.splice(idx, 1)
-                                                  imagesState.items.forEach((i, index) => {
-                                                    if (index < idx) return
-                                                    else i.id = index + i.id.substring(1)
-                                                  })
-                                                  imagesState.items.push(getItems(1, 5)[0])
-                                                  setImagesState({ items: imagesState.items })
+                                                  // imagesState.items.splice(idx, 1)
+                                                  // imagesState.items.forEach((i, index) => {
+                                                  //   if (index < idx) return
+                                                  //   else i.id = index + i.id.substring(1)
+                                                  // })
+                                                  // imagesState.items.push(getItems(1, 5)[0])
+                                                  // setImagesState({ items: imagesState.items })
                                                 }}
                                                 _hover={{ background: "#E3E3E3" }}
                                                 transition="all 0.2s"
