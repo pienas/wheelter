@@ -1,12 +1,12 @@
 import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input"
-import { Box, Divider, Flex, Heading, List, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
+import { Box, Divider, Flex, Heading, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
 import { TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/tabs"
 import { Textarea } from "@chakra-ui/textarea"
-import React, { FC, useRef, useState } from "react"
+import React, { FC, useEffect, useRef, useState } from "react"
 import CustomTabSettings from "./CustomTabSettings"
 import ImageUploading from "react-images-uploading"
 import ImageIcon from "./ImageIcon"
-import { Image } from "blitz"
+import { Image, useQuery } from "blitz"
 import { Button } from "@chakra-ui/button"
 import updateServiceAvatar from "app/partners/mutations/updateServiceAvatar"
 import { Spinner } from "@chakra-ui/spinner"
@@ -21,12 +21,20 @@ import PlusIcon from "./PlusIcon"
 import DropHereIcon from "./DropHereIcon"
 import { useToast } from "@chakra-ui/toast"
 import WarningToast from "../index/WarningToast"
+import sha1 from "sha1"
+import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
+import SuccessToast from "../index/SuccessToast"
+import checkServiceUrl from "app/partners/mutations/checkServiceUrl"
+import createServiceImages from "app/partners/mutations/createServiceImages"
+import updateServiceImages from "app/partners/mutations/updateServiceImages"
+import getServiceImages from "app/partners/queries/getServiceImages"
+import deleteServiceImages from "app/partners/mutations/deleteServiceImages"
 
 type Props = {
   isOpen: boolean
   activeService: number
   avatarUrl: string
-  refetch: () => void
+  refetchOther: () => void
   url: string
   name: string
   description: string
@@ -37,7 +45,7 @@ const Settings: FC<Props> = ({
   isOpen,
   activeService,
   avatarUrl,
-  refetch,
+  refetchOther,
   url,
   name,
   description,
@@ -52,12 +60,24 @@ const Settings: FC<Props> = ({
     setUploadState("UPLOADING")
     const files = e[0].file
     const data = new FormData()
+    const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+    const timestamp = Math.round(new Date().getTime() / 1000)
+    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET
+    const payloadToSign = `public_id=${url}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
+    const signature = sha1(payloadToSign)
     data.append("file", files)
-    data.append("upload_preset", "zfkkozzg")
-    const res = await fetch("https://api.cloudinary.com/v1_1/wheelter/image/upload", {
-      method: "POST",
-      body: data,
-    })
+    data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+    data.append("public_id", url)
+    data.append("timestamp", timestamp.toString())
+    data.append("signature", signature)
+    data.append("upload_preset", preset!)
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+      {
+        method: "POST",
+        body: data,
+      }
+    )
     await res.json().then(async (file) => {
       await updateServiceAvatar({
         where: {
@@ -68,51 +88,18 @@ const Settings: FC<Props> = ({
         },
       })
       setUploadState("UPLOADED")
-      refetch()
+      refetchOther()
     })
   }
   const maxImages = plan === "PREMIUM" ? 6 : 3
   const toast = useToast()
   const toastIdRef = useRef<any>()
-  const [images, setImages] = useState([])
-  const onChanges = (imageList, index) => {
-    const tempImg = Array.from({ length: imageList.length }, (v, k) => k).map((k) => ({
-      id: `${k}-${new Date().getTime()}`,
-      content: (
-        <Flex
-          width="100px"
-          height="100px"
-          borderRadius="5px"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Image src={imageList[k]["data_url"]} width="100px" height="100px" />
-        </Flex>
-      ),
-    }))
-    const fill = maxImages - imageList.length
-    const fillItems = getItems(fill)
-    const finalList = tempImg.concat(fillItems)
-    setImagesState({ items: finalList })
-    setImages(imageList)
-  }
-  const onErrors = (error) => {
-    if (error.maxNumber) {
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <WarningToast
-            heading="Kažkas netaip!"
-            text={`Jūs viršijote leistiną nuotraukų kiekį. Maksimalus jūsų planui galimas įkelti nuotraukų kiekis: ${maxImages}`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-    }
-  }
-  const getItems = (count) =>
+  const [serviceActiveImages, { refetch }] = useQuery(getServiceImages, {
+    where: { carServiceId: activeService },
+  })
+  const getItems = (count, start = 0) =>
     Array.from({ length: count }, (v, k) => k).map((k) => ({
-      id: `item-${k}-${new Date().getTime()}`,
+      id: `${k + start}-${new Date().getTime()}-item`,
       content: (
         <Flex
           width="100px"
@@ -143,50 +130,369 @@ const Settings: FC<Props> = ({
           </Flex>
         </Flex>
       ),
+      data_url: "",
+      file: new File([""], "item", { type: "image/png" }),
     }))
+  const getImageAsFile = async (fileUrl) => {
+    return new Promise(async (resolve) => {
+      await fetch(fileUrl)
+        .then((r) => r.blob())
+        .then((blobFile) => resolve(new File([blobFile], "file", { type: `image/png` })))
+    })
+  }
+  const getImageAsBlob = (fileUrl) => {
+    return new Promise(async (resolve, reject) => {
+      await fetch(fileUrl)
+        .then((r) => r.blob())
+        .then((blobFile) => {
+          const reader = new FileReader()
+          reader.onerror = reject
+          reader.onload = () => resolve(reader.result)
+          reader.readAsDataURL(blobFile)
+        })
+    })
+  }
+  const getFill = new Promise(async (resolve) => {
+    const fillImages = new Array()
+    await Promise.all(
+      serviceActiveImages.map(async (file) => {
+        const tempUrl = await getImageAsBlob(file.imageUrl)
+        const tempFile = await getImageAsFile(file.imageUrl)
+        fillImages.push({
+          data_url: tempUrl,
+          file: tempFile,
+        })
+      })
+    ).then(() => {
+      resolve(fillImages)
+    })
+  })
+  const [imagesLoading, setImagesLoading] = useState(true)
+  useEffect(() => {
+    getFill.then((x: any) => {
+      setImages(x)
+      setTimeout(() => {
+        setImagesLoading(false)
+      }, 2000)
+    })
+  }, [imagesLoading])
+  const fillOldImagesState: any = Array.from(serviceActiveImages, (v) => v).map((v, i) => ({
+    id: `${v.carServiceImageId}-${new Date().getTime()}`,
+    content: (
+      <Flex
+        width="100px"
+        height="100px"
+        borderRadius="5px"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Image src={v.imageUrl} width="100px" height="100px" />
+      </Flex>
+    ),
+    data_url: getImageAsBlob(v.imageUrl),
+    file: getImageAsFile(v.imageUrl),
+  }))
+  const fillNewImagesState: any = getItems(
+    maxImages - serviceActiveImages.length,
+    serviceActiveImages.length
+  )
+  const fillImagesState = fillOldImagesState.concat(fillNewImagesState)
+  const [images, setImages] = useState([])
+  const onChanges = (imageList) => {
+    // var count = 0
+    // imagesState.items.forEach((i) => {
+    //   if (!i.id.endsWith("item")) count++
+    // })
+    // if (count > imageList.length) {
+    //   setImagesState(imagesState.items.pop())
+    // }
+    const tempImg = Array.from({ length: imageList.length }, (v, k) => k).map((k) => ({
+      id: `${k}-${new Date().getTime()}`,
+      content: (
+        <Flex
+          width="100px"
+          height="100px"
+          borderRadius="5px"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Image src={imageList[k]["data_url"]} width="100px" height="100px" />
+        </Flex>
+      ),
+      data_url: imageList[k]["data_url"],
+      file: imageList[k].file,
+    }))
+    const fill = maxImages - imageList.length
+    const fillItems = getItems(fill, imageList.length)
+    const finalList = tempImg.concat(fillItems)
+
+    setImagesState({ items: finalList })
+    setImages(imageList)
+    console.log("a", imageList, "b", finalList, "c", imagesState.items, "d", images)
+  }
+  const onErrors = (error) => {
+    if (error.maxNumber) {
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <WarningToast
+            heading="Kažkas netaip!"
+            text={`Jūs viršijote leistiną nuotraukų kiekį. Maksimalus jūsų planui galimas įkelti nuotraukų kiekis: ${maxImages}`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+    }
+  }
   const reorder = (list, startIndex, endIndex) => {
-    const result = Array.from(list)
-    const [removed] = result.splice(startIndex, 1)
-    result.splice(endIndex, 0, removed)
+    const result: any = Array.from(list)
+    if (!result[startIndex].id.endsWith("item") && !result[endIndex].id.endsWith("item")) {
+      const [removed] = result.splice(startIndex, 1)
+      result.splice(endIndex, 0, removed)
+      // result.sort((a, b) => a.id[0] - b.id[0])
+    }
+    console.log(result)
     return result
   }
-  const [imagesState, setImagesState] = useState<any>({ items: getItems(maxImages) })
+  const [imagesState, setImagesState] = useState<any>({
+    items: fillImagesState.sort((a, b) => a.id[0] - b.id[0]),
+  })
   const onDragEnd = (result) => {
     if (!result.destination) return
     const items = reorder(imagesState.items, result.source.index, result.destination.index)
     setImagesState({ items })
+  }
+  const [serviceName, setServiceName] = useState(name)
+  const onServiceNameChange = (value) => {
+    setServiceName(value)
+  }
+  const [isInvalidUrl, setIsInvalidUrl] = useState(false)
+  const [serviceUrl, setServiceUrl] = useState(url)
+  const onServiceUrlChange = (value) => {
+    setServiceUrl(value)
+    setIsInvalidUrl(false)
+  }
+  const [serviceDescription, setServiceDescription] = useState(description)
+  const onServiceDescriptionChange = (value) => {
+    setServiceDescription(value)
+  }
+  const uploadImages = (uploadUrl, e) => {
+    return new Promise((resolve) => {
+      const oldImages = Array.from(serviceActiveImages, (v) => v).map((v) => v.carServiceImageId)
+      e.forEach(async (element, i) => {
+        const files = element.file
+        if (!files.size) {
+          console.log(files)
+          serviceActiveImages.forEach(async (element) => {
+            if (element.carServiceImageId === i) {
+              const data = new FormData()
+              const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+              const timestamp = Math.round(new Date().getTime() / 1000)
+              const payloadToSign = `public_id=images/carServices/${uploadUrl}_${i}&timestamp=${timestamp}${apiSecret}`
+              const signature = sha1(payloadToSign)
+              data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+              data.append("public_id", "images/carServices/" + uploadUrl + "_" + i)
+              data.append("timestamp", timestamp.toString())
+              data.append("signature", signature)
+              const res = await fetch(
+                `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/destroy`,
+                {
+                  method: "POST",
+                  body: data,
+                }
+              )
+              await res.json().then(async () => {
+                await deleteServiceImages({
+                  where: {
+                    carServiceImageId: i,
+                    carServiceId: activeService,
+                  },
+                })
+              })
+            } else return
+          })
+        } else {
+          const data = new FormData()
+          const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+          const timestamp = Math.round(new Date().getTime() / 1000)
+          const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_IMAGES
+          const payloadToSign = `public_id=${uploadUrl}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
+          const signature = sha1(payloadToSign)
+          data.append("file", files)
+          data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+          data.append("public_id", uploadUrl + "_" + i)
+          data.append("timestamp", timestamp.toString())
+          data.append("signature", signature)
+          data.append("upload_preset", preset!)
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+            {
+              method: "POST",
+              body: data,
+            }
+          )
+          await res.json().then(async (file) => {
+            var found = false
+            oldImages.forEach(async (element) => {
+              if (element === i) {
+                found = true
+                await updateServiceImages({
+                  where: {
+                    carServiceImageId: i,
+                    carServiceId: activeService,
+                  },
+                  data: {
+                    imageUrl: file.secure_url,
+                  },
+                })
+              } else return
+            })
+            if (!found) {
+              await createServiceImages({
+                data: {
+                  imageUrl: file.secure_url,
+                  carServiceId: activeService,
+                  carServiceImageId: i,
+                },
+              })
+            }
+          })
+        }
+      })
+      return resolve(1)
+    })
+  }
+  const [changing, setChanging] = useState(false)
+  const onChanging = async () => {
+    const urlCount = await checkServiceUrl({
+      where: {
+        url: serviceUrl,
+      },
+    })
+    setChanging(true)
+    if (urlCount && serviceUrl !== url) {
+      setIsInvalidUrl(true)
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <WarningToast
+            heading="Kažkas netaip!"
+            text={`Tokia partnerio profilio nuoruoda jau egzistuoja. Pamėginkite kitą nuoruodą.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+    } else if (url != serviceUrl) {
+      const data = new FormData()
+      const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+      const timestamp = Math.round(new Date().getTime() / 1000)
+      const payloadToSign = `from_public_id=avatars/carServices/${url}&overwrite=true&timestamp=${timestamp}&to_public_id=avatars/carServices/${serviceUrl}${apiSecret}`
+      const signature = sha1(payloadToSign)
+      data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+      data.append("from_public_id", "avatars/carServices/" + url)
+      data.append("to_public_id", "avatars/carServices/" + serviceUrl)
+      data.append("overwrite", "true")
+      data.append("timestamp", timestamp.toString())
+      data.append("signature", signature)
+      await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/rename`,
+        {
+          method: "POST",
+          mode: "no-cors",
+          body: data,
+        }
+      ).then(async () => {
+        await uploadImages(serviceUrl, imagesState.items)
+        await updateServiceInfo({
+          where: {
+            id: activeService,
+          },
+          data: {
+            url: serviceUrl,
+            name: serviceName,
+            description: serviceDescription,
+            avatarUrl:
+              avatarUrl.substring(0, avatarUrl.length - 4 - url.length) +
+              serviceUrl +
+              avatarUrl.substring(avatarUrl.length - 4),
+          },
+        })
+        refetchOther()
+        refetch()
+        toastIdRef.current = toast({
+          duration: 5000,
+          render: () => (
+            <SuccessToast
+              heading="Pavyko!"
+              text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+      })
+    } else {
+      console.log(imagesState.items)
+      await uploadImages(url, imagesState.items)
+      await updateServiceInfo({
+        where: {
+          id: activeService,
+        },
+        data: {
+          name: serviceName,
+          description: serviceDescription,
+        },
+      })
+      refetchOther()
+      refetch()
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <SuccessToast
+            heading="Pavyko!"
+            text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+    }
+    setChanging(false)
   }
   return (
     <Box mr="70px" ml={isOpen ? "370px" : "170px"} transition="all 0.2s">
       <Heading as="h1">Nustatymai</Heading>
       <Box mt="30px">
         <Tabs variant="unstyled">
-          <TabList>
-            <CustomTabSettings>
-              <InfoIcon boxSize={4} transition="all 0.2s" mr={2} />
+          <TabList width="1400px" justifyContent="space-between">
+            <CustomTabSettings
+              icon={<InfoIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
               Pagrindinė informacija
             </CustomTabSettings>
-            <CustomTabSettings>
-              <EmployeesIcon boxSize={4} transition="all 0.2s" mr={2} />
+            <CustomTabSettings
+              icon={<EmployeesIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
               Darbuotojai
             </CustomTabSettings>
-            <CustomTabSettings>
-              <NotificationsIcon boxSize={4} transition="all 0.2s" mr={2} />
+            <CustomTabSettings
+              icon={<NotificationsIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
               Pranešimų nustatymai
             </CustomTabSettings>
-            <CustomTabSettings>
-              <SubscriptionIcon boxSize={4} transition="all 0.2s" mr={2} />
+            <CustomTabSettings
+              icon={<SubscriptionIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
               Prenumerata
             </CustomTabSettings>
-            <CustomTabSettings>
-              <ContactsIcon boxSize={4} transition="all 0.2s" mr={2} />
+            <CustomTabSettings
+              icon={<ContactsIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
               Kontaktinė informacija
             </CustomTabSettings>
           </TabList>
           <TabPanels>
-            <TabPanel>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
-              <Flex justifyContent="space-between" width="1200px">
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Flex justifyContent="space-between" width="1400px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Pavadinimas
@@ -204,7 +510,8 @@ const Settings: FC<Props> = ({
                     borderStyle="solid"
                     borderColor="#E0E3EF"
                     mb="20px"
-                    value={name}
+                    value={serviceName}
+                    onChange={(e) => onServiceNameChange(e.target.value)}
                   />
                   <InputGroup>
                     <InputLeftAddon
@@ -223,13 +530,15 @@ const Settings: FC<Props> = ({
                       borderWidth="1px"
                       borderStyle="solid"
                       borderColor="#E0E3EF"
-                      value={url}
+                      value={serviceUrl}
+                      onChange={(e) => onServiceUrlChange(e.target.value)}
+                      isInvalid={isInvalidUrl}
                     />
                   </InputGroup>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
-              <Flex justifyContent="space-between" width="1200px">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Flex justifyContent="space-between" width="1400px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Aprašymas
@@ -248,12 +557,13 @@ const Settings: FC<Props> = ({
                     borderWidth="1px"
                     borderStyle="solid"
                     borderColor="#E0E3EF"
-                    value={description ? description : ""}
+                    value={serviceDescription}
+                    onChange={(e) => onServiceDescriptionChange(e.target.value)}
                   />
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
-              <Flex justifyContent="space-between" width="1200px">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Flex justifyContent="space-between" width="1400px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Profilio nuotrauka
@@ -407,7 +717,7 @@ const Settings: FC<Props> = ({
                                 color: "#0B132A",
                               },
                               ":hover > div": {
-                                background: "#E3E3E3",
+                                background: "#E0E3EF",
                               },
                             }}
                           >
@@ -456,8 +766,8 @@ const Settings: FC<Props> = ({
                   </ImageUploading>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
-              <Flex justifyContent="space-between" width="1200px">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Flex justifyContent="space-between" width="1400px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Nuotraukos
@@ -482,51 +792,51 @@ const Settings: FC<Props> = ({
                   </UnorderedList>
                 </Box>
                 <Box width="696px">
-                  {/* <Button
-                    onClick={() => {
-                      setImagesState([...imagesState, []])
-                    }}
-                  >
-                    Add new group
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setImagesState([...imagesState, getItems(1)])
-                    }}
-                  >
-                    Add new item
-                  </Button> */}
-                  <Flex direction="column">
-                    <DragDropContext onDragEnd={onDragEnd}>
-                      <Droppable droppableId="droppable" direction="horizontal">
-                        {(provided) => (
-                          <Flex
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            justifyContent="flex-end"
-                          >
-                            {imagesState.items.map((item, idx) => (
-                              <Draggable key={item.id} draggableId={item.id} index={idx}>
-                                {(provided) => (
-                                  <ImageUploading
-                                    multiple
-                                    value={images}
-                                    onChange={onChanges}
-                                    onError={onErrors}
-                                    maxNumber={maxImages}
-                                    dataURLKey="data_url"
-                                  >
-                                    {({ onImageUpload, onImageRemove, isDragging, dragProps }) => (
-                                      <Box
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        padding={2}
-                                        position="relative"
-                                      >
-                                        {item.content.props.children.type.name === "Image" ? (
-                                          <Box>
-                                            <>
+                  <Flex direction="column" justifyContent="center" alignItems="center">
+                    {imagesLoading ? (
+                      <Spinner
+                        thickness="4px"
+                        speed="0.65s"
+                        emptyColor="#EFF0F3"
+                        color="#6500E6"
+                        size="xl"
+                      />
+                    ) : (
+                      <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable droppableId="droppable" direction="horizontal">
+                          {(provided) => (
+                            <Flex
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                              justifyContent="flex-end"
+                            >
+                              {imagesState.items.map((item, idx) => (
+                                <Draggable key={item.id} draggableId={item.id} index={idx}>
+                                  {(provided) => (
+                                    <ImageUploading
+                                      multiple
+                                      value={images}
+                                      onChange={onChanges}
+                                      onError={onErrors}
+                                      maxNumber={maxImages}
+                                      dataURLKey="data_url"
+                                    >
+                                      {({
+                                        imageList,
+                                        onImageUpload,
+                                        onImageRemove,
+                                        isDragging,
+                                        dragProps,
+                                      }) => (
+                                        <Box
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          padding={2}
+                                          position="relative"
+                                        >
+                                          {item.content.props.children.type.name === "Image" ? (
+                                            <Box>
                                               {item.content}
                                               <Flex
                                                 position="absolute"
@@ -541,7 +851,11 @@ const Settings: FC<Props> = ({
                                                 onClick={() => {
                                                   onImageRemove(idx)
                                                   imagesState.items.splice(idx, 1)
-                                                  imagesState.items.push(getItems(1)[0])
+                                                  imagesState.items.forEach((i, index) => {
+                                                    if (index < idx) return
+                                                    else i.id = index + i.id.substring(1)
+                                                  })
+                                                  imagesState.items.push(getItems(1, 5)[0])
                                                   setImagesState({ items: imagesState.items })
                                                 }}
                                                 _hover={{ background: "#E3E3E3" }}
@@ -560,87 +874,93 @@ const Settings: FC<Props> = ({
                                                   x
                                                 </Text>
                                               </Flex>
-                                            </>
-                                          </Box>
-                                        ) : (
-                                          <Box onClick={onImageUpload} {...dragProps}>
-                                            <Flex
-                                              width="100px"
-                                              height="100px"
-                                              border="1px solid #E0E3EF"
-                                              borderRadius="5px"
-                                              alignItems="center"
-                                              justifyContent="center"
-                                              sx={{
-                                                ":hover > div svg": {
-                                                  color: "#0B132A",
-                                                },
-                                                ":hover > div": {
-                                                  background: "#E3E3E3",
-                                                },
-                                              }}
-                                            >
+                                            </Box>
+                                          ) : (
+                                            <Box onClick={onImageUpload} {...dragProps}>
                                               <Flex
-                                                width="32px"
-                                                height="32px"
-                                                background="#EFF0F3"
+                                                width="100px"
+                                                height="100px"
+                                                border="1px solid #E0E3EF"
+                                                borderRadius="5px"
                                                 alignItems="center"
                                                 justifyContent="center"
-                                                borderRadius="full"
-                                                transition="all 0.2s"
+                                                sx={{
+                                                  ":hover > div svg": {
+                                                    color: "#0B132A",
+                                                  },
+                                                  ":hover > div": {
+                                                    background: "#E0E3EF",
+                                                  },
+                                                }}
                                               >
-                                                {isDragging ? (
-                                                  <DropHereIcon
-                                                    boxSize={3}
-                                                    transition="all 0.2s"
-                                                    color="#787E97"
-                                                  />
-                                                ) : (
-                                                  <PlusIcon
-                                                    boxSize={3}
-                                                    transition="all 0.2s"
-                                                    color="#787E97"
-                                                  />
-                                                )}
+                                                <Flex
+                                                  width="32px"
+                                                  height="32px"
+                                                  background="#EFF0F3"
+                                                  alignItems="center"
+                                                  justifyContent="center"
+                                                  borderRadius="full"
+                                                  transition="all 0.2s"
+                                                >
+                                                  {isDragging ? (
+                                                    <DropHereIcon
+                                                      boxSize={3}
+                                                      transition="all 0.2s"
+                                                      color="#787E97"
+                                                    />
+                                                  ) : (
+                                                    <PlusIcon
+                                                      boxSize={3}
+                                                      transition="all 0.2s"
+                                                      color="#787E97"
+                                                    />
+                                                  )}
+                                                </Flex>
                                               </Flex>
-                                            </Flex>
-                                          </Box>
-                                        )}
-                                      </Box>
-                                    )}
-                                  </ImageUploading>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </Flex>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                                            </Box>
+                                          )}
+                                        </Box>
+                                      )}
+                                    </ImageUploading>
+                                  )}
+                                </Draggable>
+                              ))}
+                              {provided.placeholder}
+                            </Flex>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+                    )}
                   </Flex>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
-              <Flex justifyContent="center" width="1200px" mb="70px">
-                <Button background="#EFF0F3" _hover={{ background: "#E0E3EF" }}>
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Flex justifyContent="center" width="1400px" mb="70px">
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="150px"
+                  onClick={onChanging}
+                >
                   Atnaujinti
                 </Button>
               </Flex>
             </TabPanel>
-            <TabPanel>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
               Darbuotojai
             </TabPanel>
-            <TabPanel>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
               Pranešimų nustatymai
             </TabPanel>
-            <TabPanel>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
               Prenumerata
             </TabPanel>
-            <TabPanel>
-              <Divider color="#E0E3EF" my="30px" width="1200px" />
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
               Kontaktinė informacija
             </TabPanel>
           </TabPanels>

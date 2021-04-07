@@ -43,6 +43,7 @@
     "date-fns": "2.17.0",
     "final-form": "4.20.1",
     "framer-motion": "3.2.0",
+    "fs": "0.0.1-security",
     "prisma": "~2.16",
     "react": "0.0.0-experimental-3310209d0",
     "react-beautiful-dnd": "13.1.0",
@@ -57,7 +58,9 @@
     "react-phone-input-2": "2.13.9",
     "react-scrollbars-custom": "4.0.25",
     "react-slick": "0.28.1",
+    "sha1": "1.1.1",
     "typescript": "4.1.5",
+    "use-promise-state": "0.0.1",
     "use-sound": "2.0.1",
     "zod": "1.11.11"
   },

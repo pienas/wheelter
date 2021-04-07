@@ -359,8 +359,9 @@ model Notification {
 }
 
 model Image {
-  id           Int         @id @default(autoincrement())
-  imageUrl     String
-  carService   CarService? @relation(fields: [carServiceId], references: [id])
-  carServiceId Int?
+  id                Int         @id @default(autoincrement())
+  imageUrl          String
+  carServiceImageId Int?
+  carService        CarService? @relation(fields: [carServiceId], references: [id])
+  carServiceId      Int?
 }

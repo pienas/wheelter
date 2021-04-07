@@ -84,10 +84,13 @@ const DashboardMenu = () => {
   const currentUser = useCurrentUser()
   const [carServices] = useQuery(getUsersServices, null)
   const services = carServices!
-  const service = Router.query.activeService
+  const selectedService = Router.query.activeService
     ? parseInt(Router.query.activeService as string)
-    : carServices![0].carServiceId
-  const [activeService, setActiveService] = useState(service)
+    : parseInt(localStorage.getItem("selectedService") as string) || carServices![0].carServiceId
+  // const service = Router.query.activeService
+  //   ? parseInt(Router.query.activeService as string)
+  //   : carServices![0].carServiceId
+  const [activeService, setActiveService] = useState<number>(selectedService)
   const [activeCarService, { refetch }] = useQuery(getUsersActiveService, activeService)
   const { isOpen, onToggle } = useDisclosure({
     defaultIsOpen: ((Router.query.isOpen as string) === "true" ? true : false) ?? false,
@@ -860,8 +863,10 @@ const DashboardMenu = () => {
                         _hover={{ background: "#F8F8F8" }}
                         key={service?.carServiceId}
                         onClick={() => {
+                          localStorage.setItem("selectedService", service?.carServiceId.toString())
                           setActiveService(service?.carServiceId)
                           setLastNofiticationCount(undefined)
+                          Router.reload()
                         }}
                       >
                         <Avatar
@@ -1035,11 +1040,11 @@ const DashboardMenu = () => {
               isOpen={isOpen}
               activeService={activeService}
               avatarUrl={activeCarService?.carService.avatarUrl!}
-              refetch={() => refetch()}
               url={activeCarService?.carService.url!}
               name={activeCarService?.carService.name!}
               description={activeCarService?.carService.description!}
               plan={activeCarService?.carService.plan!}
+              refetchOther={() => refetch()}
             />
           )}
         </Box>
