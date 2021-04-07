@@ -35,6 +35,7 @@ import Quickhelp from "./Quickhelp"
 import Settings from "./Settings"
 import NotesIcon from "./NotesIcon"
 import Notes from "./Notes"
+import { Tooltip } from "@chakra-ui/tooltip"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -263,399 +264,515 @@ const DashboardMenu = () => {
             href={{ pathname: "/partners/dashboard", query: { isOpen, activeService } }}
             as="/partners/dashboard"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/dashboard" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/dashboard" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Suvestinė"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <DashboardIcon
-                boxSize={7}
-                color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/dashboard" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/dashboard" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/dashboard" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <DashboardIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                >
-                  Suvestinė
-                </Text>
-              )}
-            </Flex>
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/dashboard" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Suvestinė
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/stats", query: { isOpen, activeService } }}
             as="/partners/stats"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/stats" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/stats" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Statistika"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <StatsIcon
-                boxSize={7}
-                color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/stats" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/stats" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/stats" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <StatsIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                >
-                  Statistika
-                </Text>
-              )}
-            </Flex>
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/stats" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Statistika
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/calendar", query: { isOpen, activeService } }}
             as="/partners/calendar"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/calendar" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/calendar" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Kalendorius"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <CalendarIcon
-                boxSize={7}
-                color={Router.route === "/partners/calendar" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/calendar" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/calendar" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/calendar" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <CalendarIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/calendar" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                >
-                  Kalendorius
-                </Text>
-              )}
-            </Flex>
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/calendar" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Kalendorius
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/orders", query: { isOpen, activeService } }}
             as="/partners/orders"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/orders" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/orders" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Užsakymai"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <OrdersIcon
-                boxSize={7}
-                color={Router.route === "/partners/orders" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/orders" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/orders" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/orders" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <OrdersIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/orders" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                >
-                  Užsakymai
-                </Text>
-              )}
-              {(newOrders > 0 || lateOrdersCount > 0) && (
-                <Flex
-                  justifyContent="center"
-                  alignItems="center"
-                  background="#FF5454"
-                  width="18px"
-                  height="18px"
-                  borderRadius="100%"
-                  ml={isOpen ? "10px" : "-15px"}
-                  mt={isOpen ? "0" : "-15px"}
-                  transition="all 0.2s"
-                >
-                  <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                    {newOrders + lateOrdersCount > 9 ? "9+" : newOrders + lateOrdersCount}
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/orders" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Užsakymai
                   </Text>
-                </Flex>
-              )}
-            </Flex>
+                )}
+                {(newOrders > 0 || lateOrdersCount > 0) && (
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    background="#FF5454"
+                    width="18px"
+                    height="18px"
+                    borderRadius="100%"
+                    ml={isOpen ? "10px" : "-15px"}
+                    mt={isOpen ? "0" : "-15px"}
+                    transition="all 0.2s"
+                  >
+                    <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
+                      {newOrders + lateOrdersCount > 9 ? "9+" : newOrders + lateOrdersCount}
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/services", query: { isOpen, activeService } }}
             as="/partners/services"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/services" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/services" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Paslaugos"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <ServicesIcon
-                boxSize={7}
-                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/services" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/services" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/services" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <ServicesIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                >
-                  Paslaugos
-                </Text>
-              )}
-            </Flex>
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/services" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Paslaugos
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/quickhelp", query: { isOpen, activeService } }}
             as="/partners/quickhelp"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/quickhelp" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/quickhelp" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Greita pagalba"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <QuickhelpIcon
-                boxSize={7}
-                color={Router.route === "/partners/quickhelp" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/quickhelp" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/quickhelp" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/quickhelp" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <QuickhelpIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/quickhelp" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                  whiteSpace="nowrap"
-                >
-                  Greita pagalba
-                </Text>
-              )}
-              {quickHelpOrders > 0 && (
-                <Flex
-                  justifyContent="center"
-                  alignItems="center"
-                  background="#FF5454"
-                  width="18px"
-                  height="18px"
-                  borderRadius="100%"
-                  ml={isOpen ? "10px" : "-15px"}
-                  mt={isOpen ? "0" : "-15px"}
-                  transition="all 0.2s"
-                >
-                  <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                    {quickHelpOrders > 9 ? "9+" : quickHelpOrders}
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/quickhelp" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                    whiteSpace="nowrap"
+                  >
+                    Greita pagalba
                   </Text>
-                </Flex>
-              )}
-            </Flex>
+                )}
+                {quickHelpOrders > 0 && (
+                  <Flex
+                    justifyContent="center"
+                    alignItems="center"
+                    background="#FF5454"
+                    width="18px"
+                    height="18px"
+                    borderRadius="100%"
+                    ml={isOpen ? "10px" : "-15px"}
+                    mt={isOpen ? "0" : "-15px"}
+                    transition="all 0.2s"
+                  >
+                    <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
+                      {quickHelpOrders > 9 ? "9+" : quickHelpOrders}
+                    </Text>
+                  </Flex>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/notes", query: { isOpen, activeService } }}
             as="/partners/notes"
           >
-            <Flex
-              justifyContent="flex-start"
-              alignItems="center"
-              height="50px"
-              cursor="pointer"
-              transition="all 0.2s"
-              background={Router.route === "/partners/notes" ? "#FDF9FF" : "transparent"}
-              _hover={{ background: "#FDF9FF" }}
-              sx={{
-                ":hover > svg": {
-                  color: "#6500E6",
-                },
-                ":hover > p": {
-                  color: "#0B132A",
-                },
-              }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/notes" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
+            <Tooltip
+              label="Užrašinė"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
             >
-              <NotesIcon
-                boxSize={7}
-                color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
                 transition="all 0.2s"
-              />
-              {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/notes" ? "#0B132A" : "#A8A8A8"}
+                background={Router.route === "/partners/notes" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/notes" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <NotesIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
                   transition="all 0.2s"
-                  whiteSpace="nowrap"
-                >
-                  Užrašinė
-                </Text>
-              )}
-            </Flex>
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/notes" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                    whiteSpace="nowrap"
+                  >
+                    Užrašinė
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
           </Link>
           <Link
             href={{ pathname: "/partners/settings", query: { isOpen, activeService } }}
             as="/partners/settings"
           >
+            <Tooltip
+              label="Nustatymai"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
+            >
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
+                transition="all 0.2s"
+                background={Router.route === "/partners/settings" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/settings" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <SettingsIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/settings" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
+                  transition="all 0.2s"
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/settings" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Nustatymai
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
+          </Link>
+          <Tooltip
+            label="Dalintis"
+            placement="right"
+            background="#EFF0F3"
+            color="black"
+            isDisabled={isOpen}
+          >
             <Flex
               justifyContent="flex-start"
               alignItems="center"
               height="50px"
               cursor="pointer"
               transition="all 0.2s"
-              background={Router.route === "/partners/settings" ? "#FDF9FF" : "transparent"}
               _hover={{ background: "#FDF9FF" }}
               sx={{
                 ":hover > svg": {
@@ -665,65 +782,21 @@ const DashboardMenu = () => {
                   color: "#0B132A",
                 },
               }}
-              position="relative"
-              _before={{
-                content: '""',
-                borderRadius: "0 50px 50px 0",
-                width: "6px",
-                height: "100%",
-                background: Router.route === "/partners/settings" ? "#6500E6" : "transparent",
-                position: "absolute",
-                left: "0",
-              }}
             >
-              <SettingsIcon
+              <ShareIcon
                 boxSize={7}
-                color={Router.route === "/partners/settings" ? "#6500E6" : "#A8A8A8"}
+                color="#A8A8A8"
                 mr={isOpen ? "20px" : "0"}
                 ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
               />
               {isOpen && (
-                <Text
-                  fontWeight="600"
-                  fontSize="sm"
-                  color={Router.route === "/partners/settings" ? "#0B132A" : "#A8A8A8"}
-                  transition="all 0.2s"
-                >
-                  Nustatymai
+                <Text fontWeight="600" fontSize="sm" color="#A8A8A8" transition="all 0.2s">
+                  Dalintis
                 </Text>
               )}
             </Flex>
-          </Link>
-          <Flex
-            justifyContent="flex-start"
-            alignItems="center"
-            height="50px"
-            cursor="pointer"
-            transition="all 0.2s"
-            _hover={{ background: "#FDF9FF" }}
-            sx={{
-              ":hover > svg": {
-                color: "#6500E6",
-              },
-              ":hover > p": {
-                color: "#0B132A",
-              },
-            }}
-          >
-            <ShareIcon
-              boxSize={7}
-              color="#A8A8A8"
-              mr={isOpen ? "20px" : "0"}
-              ml={isOpen ? "70px" : "34px"}
-              transition="all 0.2s"
-            />
-            {isOpen && (
-              <Text fontWeight="600" fontSize="sm" color="#A8A8A8" transition="all 0.2s">
-                Dalintis
-              </Text>
-            )}
-          </Flex>
+          </Tooltip>
           <Text
             fontWeight="600"
             fontSize="xs"
@@ -735,70 +808,86 @@ const DashboardMenu = () => {
           >
             PAGALBA
           </Text>
-          <Flex
-            justifyContent="flex-start"
-            alignItems="center"
-            height="50px"
-            cursor="pointer"
-            transition="all 0.2s"
-            _hover={{ background: "#FDF9FF" }}
-            sx={{
-              ":hover > svg": {
-                color: "#6500E6",
-              },
-              ":hover > p": {
-                color: "#0B132A",
-              },
-            }}
+          <Tooltip
+            label="Instrukcija"
+            placement="right"
+            background="#EFF0F3"
+            color="black"
+            isDisabled={isOpen}
           >
-            <InstructionsIcon
-              boxSize={7}
-              color="#A8A8A8"
-              mr={isOpen ? "20px" : "0"}
-              ml={isOpen ? "70px" : "34px"}
+            <Flex
+              justifyContent="flex-start"
+              alignItems="center"
+              height="50px"
+              cursor="pointer"
               transition="all 0.2s"
-            />
-            {isOpen && (
-              <Text fontWeight="600" fontSize="sm" color="#A8A8A8" transition="all 0.2s">
-                Instrukcija
-              </Text>
-            )}
-          </Flex>
-          <Flex
-            justifyContent="flex-start"
-            alignItems="center"
-            height="50px"
-            cursor="pointer"
-            transition="all 0.2s"
-            _hover={{ background: "#FDF9FF" }}
-            sx={{
-              ":hover > svg": {
-                color: "#6500E6",
-              },
-              ":hover > p": {
-                color: "#0B132A",
-              },
-            }}
-          >
-            <SupportIcon
-              boxSize={7}
-              color="#A8A8A8"
-              mr={isOpen ? "20px" : "0"}
-              ml={isOpen ? "70px" : "34px"}
-              transition="all 0.2s"
-            />
-            {isOpen && (
-              <Text
-                fontWeight="600"
-                fontSize="sm"
+              _hover={{ background: "#FDF9FF" }}
+              sx={{
+                ":hover > svg": {
+                  color: "#6500E6",
+                },
+                ":hover > p": {
+                  color: "#0B132A",
+                },
+              }}
+            >
+              <InstructionsIcon
+                boxSize={7}
                 color="#A8A8A8"
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                whiteSpace="nowrap"
-              >
-                Pagalbos centras
-              </Text>
-            )}
-          </Flex>
+              />
+              {isOpen && (
+                <Text fontWeight="600" fontSize="sm" color="#A8A8A8" transition="all 0.2s">
+                  Instrukcija
+                </Text>
+              )}
+            </Flex>
+          </Tooltip>
+          <Tooltip
+            label="Pagalbos centras"
+            placement="right"
+            background="#EFF0F3"
+            color="black"
+            isDisabled={isOpen}
+          >
+            <Flex
+              justifyContent="flex-start"
+              alignItems="center"
+              height="50px"
+              cursor="pointer"
+              transition="all 0.2s"
+              _hover={{ background: "#FDF9FF" }}
+              sx={{
+                ":hover > svg": {
+                  color: "#6500E6",
+                },
+                ":hover > p": {
+                  color: "#0B132A",
+                },
+              }}
+            >
+              <SupportIcon
+                boxSize={7}
+                color="#A8A8A8"
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
+                transition="all 0.2s"
+              />
+              {isOpen && (
+                <Text
+                  fontWeight="600"
+                  fontSize="sm"
+                  color="#A8A8A8"
+                  transition="all 0.2s"
+                  whiteSpace="nowrap"
+                >
+                  Pagalbos centras
+                </Text>
+              )}
+            </Flex>
+          </Tooltip>
           <Box position="absolute" bottom="0" width="100%">
             <Menu placement="top">
               <MenuButton
@@ -859,88 +948,107 @@ const DashboardMenu = () => {
                 {services.map((service) => {
                   if (service?.carServiceId !== activeService) {
                     return (
-                      <MenuItem
-                        _hover={{ background: "#F8F8F8" }}
-                        key={service?.carServiceId}
-                        onClick={() => {
-                          localStorage.setItem("selectedService", service?.carServiceId.toString())
-                          setActiveService(service?.carServiceId)
-                          setLastNofiticationCount(undefined)
-                          Router.reload()
-                        }}
+                      <Tooltip
+                        label={service?.carService.name}
+                        placement="right"
+                        background="#EFF0F3"
+                        color="black"
+                        isDisabled={isOpen}
                       >
-                        <Avatar
-                          size="sm"
-                          name={service?.carService.name}
-                          src={service?.carService.avatarUrl!}
-                          border="2px solid #6500E6"
-                          transition="all 0.2s"
-                        />
-                        {isOpen && (
-                          <Flex
-                            flexDirection="column"
-                            ml="15px"
+                        <MenuItem
+                          _hover={{ background: "#F8F8F8" }}
+                          key={service?.carServiceId}
+                          onClick={() => {
+                            localStorage.setItem(
+                              "selectedService",
+                              service?.carServiceId.toString()
+                            )
+                            setActiveService(service?.carServiceId)
+                            setLastNofiticationCount(undefined)
+                            Router.reload()
+                          }}
+                        >
+                          <Avatar
+                            size="sm"
+                            name={service?.carService.name}
+                            src={service?.carService.avatarUrl!}
+                            border="2px solid #6500E6"
                             transition="all 0.2s"
-                            width="100%"
-                            alignItems="center"
-                          >
-                            <Heading
-                              as="h5"
-                              fontSize="sm"
-                              fontWeight="600"
-                              color="#4F5665"
-                              textAlign="center"
+                          />
+                          {isOpen && (
+                            <Flex
+                              flexDirection="column"
+                              ml="15px"
                               transition="all 0.2s"
-                              whiteSpace="nowrap"
+                              width="100%"
+                              alignItems="center"
                             >
-                              {service?.carService.name}
-                            </Heading>
-                            <Text
-                              fontWeight="400"
-                              color="#A8A8A8"
-                              textAlign="center"
-                              fontSize="xs"
-                              whiteSpace="nowrap"
-                              transition="all 0.2s"
-                            >
-                              {service?.userRole}
-                            </Text>
-                          </Flex>
-                        )}
-                      </MenuItem>
+                              <Heading
+                                as="h5"
+                                fontSize="sm"
+                                fontWeight="600"
+                                color="#4F5665"
+                                textAlign="center"
+                                transition="all 0.2s"
+                                whiteSpace="nowrap"
+                              >
+                                {service?.carService.name}
+                              </Heading>
+                              <Text
+                                fontWeight="400"
+                                color="#A8A8A8"
+                                textAlign="center"
+                                fontSize="xs"
+                                whiteSpace="nowrap"
+                                transition="all 0.2s"
+                              >
+                                {service?.userRole}
+                              </Text>
+                            </Flex>
+                          )}
+                        </MenuItem>
+                      </Tooltip>
                     )
                   }
                 })}
-                <MenuItem
-                  _hover={{ background: "#F8F8F8" }}
-                  key="new"
-                  onClick={() => {
-                    console.log("create new car service")
-                  }}
+                <Tooltip
+                  label="Naujas servisas"
+                  placement="right"
+                  background="#EFF0F3"
+                  color="black"
+                  isDisabled={isOpen}
                 >
-                  <Avatar size="sm" name="+" bg="#d8d8d8" transition="all 0.2s" color="black" />
-                  {isOpen && (
-                    <Flex
-                      flexDirection="column"
-                      ml="15px"
-                      transition="all 0.2s"
-                      width="100%"
-                      alignItems="center"
-                    >
-                      <Heading
-                        as="h5"
-                        fontSize="sm"
-                        fontWeight="600"
-                        color="#4F5665"
-                        textAlign="center"
+                  <MenuItem
+                    _hover={{ background: "#F8F8F8" }}
+                    key="new"
+                    onClick={() => {
+                      console.log("create new car service")
+                    }}
+                  >
+                    <Avatar size="sm" name="+" bg="#d8d8d8" transition="all 0.2s" color="black" />
+                    {isOpen && (
+                      <Flex
+                        flexDirection="column"
+                        ml="15px"
                         transition="all 0.2s"
-                        whiteSpace="nowrap"
+                        width="100%"
+                        alignItems="center"
                       >
-                        Sukurti naują servisą
-                      </Heading>
-                    </Flex>
-                  )}
-                </MenuItem>
+                        <Heading
+                          as="h5"
+                          fontSize="sm"
+                          fontWeight="600"
+                          color="#4F5665"
+                          textAlign="center"
+                          transition="all 0.2s"
+                          whiteSpace="nowrap"
+                        >
+                          Sukurti naują servisą
+                        </Heading>
+                      </Flex>
+                    )}
+                  </MenuItem>
+                </Tooltip>
               </MenuList>
             </Menu>
             <Divider borderColor="#EFEFEF" mb="20px" />
