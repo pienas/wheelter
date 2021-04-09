@@ -1,13 +1,12 @@
 import { Head, Router, useMutation, useQuery } from "blitz"
 import { Avatar } from "@chakra-ui/avatar"
 import { useDisclosure } from "@chakra-ui/hooks"
-import { Box, Divider, Flex, Heading, Text } from "@chakra-ui/layout"
+import { Box, Divider, Flex, Heading, Link, Text } from "@chakra-ui/layout"
 import { Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/menu"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getUsersActiveService from "app/partners/queries/getUsersActiveService"
 import getUsersServices from "app/partners/queries/getUsersServices"
-import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import QuickhelpIcon from "./QuickhelpIcon"
 import CalendarIcon from "./CalendarIcon"
 import StatsIcon from "./StatsIcon"
@@ -36,6 +35,10 @@ import Settings from "./Settings"
 import NotesIcon from "./NotesIcon"
 import Notes from "./Notes"
 import { Tooltip } from "@chakra-ui/tooltip"
+import { Button } from "@chakra-ui/button"
+import { useToast } from "@chakra-ui/toast"
+import SuccessToast from "../index/SuccessToast"
+import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -88,9 +91,6 @@ const DashboardMenu = () => {
   const selectedService = Router.query.activeService
     ? parseInt(Router.query.activeService as string)
     : parseInt(localStorage.getItem("selectedService") as string) || carServices![0].carServiceId
-  // const service = Router.query.activeService
-  //   ? parseInt(Router.query.activeService as string)
-  //   : carServices![0].carServiceId
   const [activeService, setActiveService] = useState<number>(selectedService)
   const [activeCarService, { refetch }] = useQuery(getUsersActiveService, activeService)
   const { isOpen, onToggle } = useDisclosure({
@@ -148,6 +148,9 @@ const DashboardMenu = () => {
       },
     }
   )
+  const toast = useToast()
+  const toastIdRef = useRef<any>()
+  const [buttonLoading, setButtonLoading] = useState(false)
   return (
     <>
       {Router.route === "/partners/dashboard" && (
@@ -222,13 +225,127 @@ const DashboardMenu = () => {
           )}
         </Head>
       )}
+      {!activeCarService?.carService.isReviewed ? (
+        <Flex
+          alignItems="center"
+          justifyContent="center"
+          width="100vw"
+          height="40px"
+          background="brand.500"
+          position="fixed"
+          zIndex={12}
+        >
+          <Text fontSize="sm" color="white" fontWeight="500">
+            {activeCarService?.carService.isUnderReview
+              ? "Jūsų partnerio paskyra yra peržiūrima mūsų administratoriaus"
+              : "Jūsų partnerio paskyra dar nepatvirtinta"}
+          </Text>
+          <Button
+            disabled={activeCarService?.carService.isUnderReview}
+            height="70%"
+            fontWeight="500"
+            fontSize="sm"
+            borderRadius="0"
+            background="brand.600"
+            color="white"
+            ml="20px"
+            px="20px"
+            isLoading={buttonLoading}
+            _focus={{ boxShadow: "none" }}
+            _hover={{ opacity: "0.8" }}
+            onClick={async () => {
+              setButtonLoading(true)
+              await updateServiceInfo({
+                where: {
+                  id: activeService,
+                },
+                data: {
+                  isUnderReview: true,
+                },
+              })
+              setTimeout(() => {
+                setButtonLoading(false)
+                refetch()
+                toastIdRef.current = toast({
+                  duration: 5000,
+                  render: () => (
+                    <SuccessToast
+                      heading="Pavyko!"
+                      text={`Jūsų užklausa peržiūrėti jūsų partnerio paskyrą sėkmingai išsiųsta. Jūsų partnerio paskyrą per 24 valandas peržiūrės mūsų administratorius.`}
+                      id={toastIdRef.current}
+                    />
+                  ),
+                })
+              }, 2000)
+            }}
+          >
+            Prašyti patvirtinimo
+          </Button>
+        </Flex>
+      ) : (
+        !activeCarService?.carService.isActive && (
+          <Flex
+            alignItems="center"
+            justifyContent="center"
+            width="100vw"
+            height="40px"
+            background="brand.500"
+            position="fixed"
+            zIndex={12}
+          >
+            <Text fontSize="sm" color="white" fontWeight="500">
+              Jūsų partnerio paskyra yra laikinai nematoma
+            </Text>
+            <Button
+              height="70%"
+              fontWeight="500"
+              fontSize="sm"
+              borderRadius="0"
+              background="brand.600"
+              color="white"
+              ml="20px"
+              px="20px"
+              isLoading={buttonLoading}
+              _focus={{ boxShadow: "none" }}
+              _hover={{ opacity: "0.8" }}
+              onClick={async () => {
+                setButtonLoading(true)
+                await updateServiceInfo({
+                  where: {
+                    id: activeService,
+                  },
+                  data: {
+                    isActive: true,
+                  },
+                })
+                setTimeout(() => {
+                  setButtonLoading(false)
+                  refetch()
+                  toastIdRef.current = toast({
+                    duration: 5000,
+                    render: () => (
+                      <SuccessToast
+                        heading="Pavyko!"
+                        text={`Jūsų partnerio paskyra vėl matoma klientams.`}
+                        id={toastIdRef.current}
+                      />
+                    ),
+                  })
+                }, 2000)
+              }}
+            >
+              Padaryti matomą
+            </Button>
+          </Flex>
+        )
+      )}
       <Flex width="100vw" minHeight="100vh">
         <Flex
           direction="column"
           background="white"
           height="100vh"
           minWidth={isOpen ? "300px" : "100px"}
-          zIndex={10}
+          zIndex={13}
           transition="all 0.2s"
           position="fixed"
         >
@@ -241,7 +358,7 @@ const DashboardMenu = () => {
             transition="all 0.2s"
             width={isOpen ? "155px" : "40px"}
           >
-            <Link href="/" passHref>
+            <Link href="/">
               <Flex alignItems="center">
                 <Logo boxSize={10} transition="all 0.2s" />
                 {isOpen && (
@@ -260,10 +377,7 @@ const DashboardMenu = () => {
               </Flex>
             </Link>
           </Box>
-          <Link
-            href={{ pathname: "/partners/dashboard", query: { isOpen, activeService } }}
-            as="/partners/dashboard"
-          >
+          <Link href="/partners/dashboard">
             <Tooltip
               label="Suvestinė"
               placement="right"
@@ -318,10 +432,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/stats", query: { isOpen, activeService } }}
-            as="/partners/stats"
-          >
+          <Link href="/partners/stats">
             <Tooltip
               label="Statistika"
               placement="right"
@@ -376,10 +487,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/calendar", query: { isOpen, activeService } }}
-            as="/partners/calendar"
-          >
+          <Link href="/partners/calendar">
             <Tooltip
               label="Kalendorius"
               placement="right"
@@ -434,10 +542,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/orders", query: { isOpen, activeService } }}
-            as="/partners/orders"
-          >
+          <Link href="/partners/orders">
             <Tooltip
               label="Užsakymai"
               placement="right"
@@ -509,10 +614,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/services", query: { isOpen, activeService } }}
-            as="/partners/services"
-          >
+          <Link href="/partners/services">
             <Tooltip
               label="Paslaugos"
               placement="right"
@@ -567,10 +669,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/quickhelp", query: { isOpen, activeService } }}
-            as="/partners/quickhelp"
-          >
+          <Link href="/partners/quickhelp">
             <Tooltip
               label="Greita pagalba"
               placement="right"
@@ -643,10 +742,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/notes", query: { isOpen, activeService } }}
-            as="/partners/notes"
-          >
+          <Link href="/partners/notes">
             <Tooltip
               label="Užrašinė"
               placement="right"
@@ -702,10 +798,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link
-            href={{ pathname: "/partners/settings", query: { isOpen, activeService } }}
-            as="/partners/settings"
-          >
+          <Link href="/partners/settings">
             <Tooltip
               label="Nustatymai"
               placement="right"
@@ -954,6 +1047,7 @@ const DashboardMenu = () => {
                         background="#EFF0F3"
                         color="black"
                         isDisabled={isOpen}
+                        key={service?.carServiceId}
                       >
                         <MenuItem
                           _hover={{ background: "#F8F8F8" }}
@@ -1063,7 +1157,16 @@ const DashboardMenu = () => {
             </Text>
           </Box>
         </Flex>
-        <Box background="#F8F8F8" minHeight="100vh" width="100%">
+        <Box
+          background="#F8F8F8"
+          minHeight="100vh"
+          width="100%"
+          mt={
+            !activeCarService?.carService.isReviewed || !activeCarService?.carService.isActive
+              ? "40px"
+              : 0
+          }
+        >
           <Flex
             mt="50px"
             mb="30px"
@@ -1075,7 +1178,7 @@ const DashboardMenu = () => {
           >
             <Box
               top="50px"
-              zIndex={10}
+              zIndex={11}
               cursor="pointer"
               transition="all 0.4s"
               sx={{
@@ -1145,7 +1248,7 @@ const DashboardMenu = () => {
           )}
           {Router.route === "/partners/settings" && (
             <Settings
-              isOpen={isOpen}
+              isMenuOpen={isOpen}
               activeService={activeService}
               avatarUrl={activeCarService?.carService.avatarUrl!}
               url={activeCarService?.carService.url!}

@@ -29,9 +29,10 @@ import createServiceImages from "app/partners/mutations/createServiceImages"
 import updateServiceImages from "app/partners/mutations/updateServiceImages"
 import getServiceImages from "app/partners/queries/getServiceImages"
 import deleteServiceImages from "app/partners/mutations/deleteServiceImages"
+import OtherIcon from "./OtherIcon"
 
 type Props = {
-  isOpen: boolean
+  isMenuOpen: boolean
   activeService: number
   avatarUrl: string
   refetchOther: () => void
@@ -42,7 +43,7 @@ type Props = {
 }
 
 const Settings: FC<Props> = ({
-  isOpen,
+  isMenuOpen,
   activeService,
   avatarUrl,
   refetchOther,
@@ -56,6 +57,8 @@ const Settings: FC<Props> = ({
     setImage(imageList)
   }
   const [uploadState, setUploadState] = useState("NONE")
+  const changesArray = [false, false, false, false]
+  const [changes, setChanges] = useState(changesArray)
   const uploadImage = async (e) => {
     setUploadState("UPLOADING")
     const files = e[0].file
@@ -182,7 +185,7 @@ const Settings: FC<Props> = ({
             alignItems="center"
             justifyContent="center"
           >
-            <Image src={x[k]["data_url"]} width="100px" height="100px" />
+            <Image src={x[k]["data_url"]} width="100px" height="100px" objectFit="cover" />
           </Flex>
         ),
         data_url: x[k]["data_url"],
@@ -210,7 +213,7 @@ const Settings: FC<Props> = ({
         alignItems="center"
         justifyContent="center"
       >
-        <Image src={v.imageUrl} width="100px" height="100px" />
+        <Image src={v.imageUrl} width="100px" height="100px" objectFit="cover" />
       </Flex>
     ),
     data_url: getImageAsBlob(v.imageUrl),
@@ -233,7 +236,7 @@ const Settings: FC<Props> = ({
           alignItems="center"
           justifyContent="center"
         >
-          <Image src={imageList[k]["data_url"]} width="100px" height="100px" />
+          <Image src={imageList[k]["data_url"]} width="100px" height="100px" objectFit="cover" />
         </Flex>
       ),
       data_url: imageList[k]["data_url"],
@@ -242,6 +245,8 @@ const Settings: FC<Props> = ({
     const fill = maxImages - imageList.length
     const fillItems = getItems(fill, imageList.length)
     const finalList = tempImg.concat(fillItems)
+    changesArray.splice(3, 1, true)
+    setChanges(changesArray)
     setImagesState({ items: finalList })
     setImages(imageList)
   }
@@ -276,17 +281,43 @@ const Settings: FC<Props> = ({
     setImagesState({ items })
   }
   const [serviceName, setServiceName] = useState(name)
+  const [isInvalidName, setIsInvalidName] = useState(false)
+  const format = /[a-zA-Z0-9]/u
   const onServiceNameChange = (value) => {
+    changesArray.splice(0, 1, true)
+    setChanges(changesArray)
     setServiceName(value)
+    setIsInvalidName(false)
   }
-  const [isInvalidUrl, setIsInvalidUrl] = useState(false)
   const [serviceUrl, setServiceUrl] = useState(url)
+  const [isInvalidUrl, setIsInvalidUrl] = useState(false)
   const onServiceUrlChange = (value) => {
-    setServiceUrl(value)
-    setIsInvalidUrl(false)
+    if (!format.test(value.charAt(value.length - 1))) {
+      setIsInvalidUrl(true)
+      toastIdRef.current = toast({
+        duration: 3000,
+        render: () => (
+          <WarningToast
+            heading="Kažkas netaip!"
+            text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+      setTimeout(() => {
+        setIsInvalidUrl(false)
+      }, 3000)
+    } else {
+      changesArray.splice(1, 1, true)
+      setChanges(changesArray)
+      setServiceUrl(value)
+      setIsInvalidUrl(false)
+    }
   }
   const [serviceDescription, setServiceDescription] = useState(description)
   const onServiceDescriptionChange = (value) => {
+    changesArray.splice(2, 1, true)
+    setChanges(changesArray)
     setServiceDescription(value)
   }
   const uploadImages = (e) => {
@@ -379,56 +410,101 @@ const Settings: FC<Props> = ({
   }
   const [changing, setChanging] = useState(false)
   const onChanging = async () => {
-    const urlCount = await checkServiceUrl({
-      where: {
-        url: serviceUrl,
-      },
-    })
-    setChanging(true)
-    if (urlCount && serviceUrl !== url) {
-      setIsInvalidUrl(true)
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <WarningToast
-            heading="Kažkas netaip!"
-            text={`Tokia partnerio profilio nuoruoda jau egzistuoja. Pamėginkite kitą nuoruodą.`}
-            id={toastIdRef.current}
-          />
-        ),
+    const isChanged = changes.includes(true)
+    if (isChanged) {
+      const urlCount = await checkServiceUrl({
+        where: {
+          url: serviceUrl,
+        },
       })
-      setChanging(false)
-    } else {
-      console.log(imagesState.items)
-      await uploadImages(imagesState.items).then(async () => {
-        await updateServiceInfo({
-          where: {
-            id: activeService,
-          },
-          data: {
-            url: serviceUrl,
-            name: serviceName,
-            description: serviceDescription,
-          },
-        })
-        refetchOther()
-        refetch()
+      setChanging(true)
+      if (urlCount && serviceUrl !== url) {
+        setIsInvalidUrl(true)
         toastIdRef.current = toast({
           duration: 5000,
           render: () => (
-            <SuccessToast
-              heading="Pavyko!"
-              text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Tokia partnerio profilio nuoruoda jau egzistuoja. Pamėginkite kitą nuoruodą.`}
               id={toastIdRef.current}
             />
           ),
         })
         setChanging(false)
+      } else {
+        if (changes[3]) {
+          await uploadImages(imagesState.items).then(async () => {
+            await updateServiceInfo({
+              where: {
+                id: activeService,
+              },
+              data: {
+                url: serviceUrl,
+                name: serviceName,
+                description: serviceDescription,
+              },
+            })
+            refetchOther()
+            refetch()
+            toastIdRef.current = toast({
+              duration: 5000,
+              render: () => (
+                <SuccessToast
+                  heading="Pavyko!"
+                  text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+                  id={toastIdRef.current}
+                />
+              ),
+            })
+            setChanging(false)
+          })
+        } else {
+          await updateServiceInfo({
+            where: {
+              id: activeService,
+            },
+            data: {
+              url: serviceUrl,
+              name: serviceName,
+              description: serviceDescription,
+            },
+          })
+          refetchOther()
+          refetch()
+          toastIdRef.current = toast({
+            duration: 5000,
+            render: () => (
+              <SuccessToast
+                heading="Pavyko!"
+                text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+                id={toastIdRef.current}
+              />
+            ),
+          })
+          setChanging(false)
+        }
+      }
+    } else {
+      setChanging(true)
+      refetchOther()
+      refetch()
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <SuccessToast
+            heading="Pavyko!"
+            text={`Jūsų partnerio profilio puslapio informacija sėkmingai atnaujinta.`}
+            id={toastIdRef.current}
+          />
+        ),
       })
+      setChanging(false)
     }
+    changesArray.splice(0, 4, false, false, false, false)
+    setChanges(changesArray)
   }
   return (
-    <Box mr="70px" ml={isOpen ? "370px" : "170px"} transition="all 0.2s">
+    <Box mr="70px" ml={isMenuOpen ? "370px" : "170px"} transition="all 0.2s">
       <Heading as="h1">Nustatymai</Heading>
       <Box mt="30px">
         <Tabs variant="unstyled">
@@ -458,6 +534,11 @@ const Settings: FC<Props> = ({
             >
               Kontaktinė informacija
             </CustomTabSettings>
+            <CustomTabSettings
+              icon={<OtherIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+            >
+              Kiti nustatymai
+            </CustomTabSettings>
           </TabList>
           <TabPanels>
             <TabPanel padding="0">
@@ -472,7 +553,7 @@ const Settings: FC<Props> = ({
                     būsimi klientai
                   </Text>
                 </Box>
-                <Box width="500px">
+                <Box width="700px">
                   <Input
                     placeholder="Pavadinimas"
                     borderRadius="5px"
@@ -481,7 +562,9 @@ const Settings: FC<Props> = ({
                     borderColor="#E0E3EF"
                     mb="20px"
                     value={serviceName}
+                    isInvalid={isInvalidName}
                     onChange={(e) => onServiceNameChange(e.target.value)}
+                    focusBorderColor={isInvalidName ? "red" : "brand.500"}
                   />
                   <InputGroup>
                     <InputLeftAddon
@@ -503,6 +586,7 @@ const Settings: FC<Props> = ({
                       value={serviceUrl}
                       onChange={(e) => onServiceUrlChange(e.target.value)}
                       isInvalid={isInvalidUrl}
+                      focusBorderColor={isInvalidUrl ? "red" : "brand.500"}
                     />
                   </InputGroup>
                 </Box>
@@ -518,7 +602,7 @@ const Settings: FC<Props> = ({
                     klientams, kokias paslaugas teikiate
                   </Text>
                 </Box>
-                <Box width="500px">
+                <Box width="700px">
                   <Textarea
                     placeholder="Aprašymas"
                     resize="none"
@@ -529,6 +613,8 @@ const Settings: FC<Props> = ({
                     borderColor="#E0E3EF"
                     value={serviceDescription}
                     onChange={(e) => onServiceDescriptionChange(e.target.value)}
+                    focusBorderColor="brand.500"
+                    whiteSpace="pre-wrap"
                   />
                 </Box>
               </Flex>
@@ -558,7 +644,7 @@ const Settings: FC<Props> = ({
                     </ListItem>
                   </UnorderedList>
                 </Box>
-                <Box width="500px">
+                <Box width="700px">
                   <ImageUploading
                     value={image}
                     onChange={onChange}
@@ -589,7 +675,7 @@ const Settings: FC<Props> = ({
                             />
                           ) : (
                             <Avatar
-                              size="xl"
+                              size="2xl"
                               name={name}
                               src={avatarUrl ? avatarUrl : ""}
                               transition="all 0.2s"
@@ -619,7 +705,7 @@ const Settings: FC<Props> = ({
                               borderWidth="1px"
                               borderStyle="solid"
                               borderColor="#E0E3EF"
-                              width="350px"
+                              width="500px"
                               height="250px"
                               alignItems="center"
                               justifyContent="center"
@@ -673,7 +759,7 @@ const Settings: FC<Props> = ({
                             borderWidth="1px"
                             borderStyle="solid"
                             borderColor="#E0E3EF"
-                            width="350px"
+                            width="500px"
                             height="250px"
                             alignItems="center"
                             justifyContent="center"
@@ -762,7 +848,10 @@ const Settings: FC<Props> = ({
                   </UnorderedList>
                 </Box>
                 <Box width="696px">
-                  <Flex direction="column" justifyContent="center" alignItems="center">
+                  <Flex
+                    justifyContent={finalImagesLoading ? "center" : "flex-end"}
+                    alignItems="center"
+                  >
                     {finalImagesLoading ? (
                       <Spinner
                         thickness="4px"
@@ -804,7 +893,7 @@ const Settings: FC<Props> = ({
                                           padding={2}
                                           position="relative"
                                         >
-                                          {item.content.props.children.type.name === "Image" ? (
+                                          {item.data_url.length ? (
                                             <Box>
                                               {item.content}
                                               <Flex
@@ -819,15 +908,8 @@ const Settings: FC<Props> = ({
                                                 height="20px"
                                                 onClick={() => {
                                                   onImageRemove(idx)
-                                                  // imagesState.items.splice(idx, 1)
-                                                  // imagesState.items.forEach((i, index) => {
-                                                  //   if (index < idx) return
-                                                  //   else i.id = index + i.id.substring(1)
-                                                  // })
-                                                  // imagesState.items.push(getItems(1, 5)[0])
-                                                  // setImagesState({ items: imagesState.items })
                                                 }}
-                                                _hover={{ background: "#E3E3E3" }}
+                                                _hover={{ background: "#E0E3EF" }}
                                                 transition="all 0.2s"
                                                 sx={{
                                                   ":hover > p": {
@@ -931,6 +1013,10 @@ const Settings: FC<Props> = ({
             <TabPanel padding="0">
               <Divider color="#E0E3EF" my="30px" width="1400px" />
               Kontaktinė informacija
+            </TabPanel>
+            <TabPanel padding="0">
+              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              Kiti nustatymai
             </TabPanel>
           </TabPanels>
         </Tabs>

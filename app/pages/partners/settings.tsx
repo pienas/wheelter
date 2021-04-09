@@ -10,6 +10,15 @@ const PartnersDashboard: BlitzPage = () => {
       <Scrollbar style={{ height: "100vh" }} noScrollX>
         <DashboardMenu />
         <style jsx global>{`
+          #wizard {
+            padding: 0;
+          }
+          #wizard:focus {
+            box-shadow: none;
+          }
+          .chakra-modal__overlay {
+            opacity: 0.3 !important;
+          }
           .ScrollbarsCustom-TrackY {
             width: 6px !important;
             top: 0 !important;

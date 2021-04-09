@@ -168,6 +168,7 @@ model CarService {
   viewCount              Int                      @default(0)
   isActive               Boolean                  @default(false)
   isReviewed             Boolean                  @default(false)
+  isUnderReview          Boolean                  @default(false)
   avatarUrl              String?
   changes                Change[]
   orders                 Order[]
