@@ -1,5 +1,5 @@
 import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input"
-import { Box, Divider, Flex, Heading, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
+import { Box, Divider, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
 import { TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/tabs"
 import { Textarea } from "@chakra-ui/textarea"
 import React, { FC, useEffect, useRef, useState } from "react"
@@ -30,6 +30,25 @@ import updateServiceImages from "app/partners/mutations/updateServiceImages"
 import getServiceImages from "app/partners/queries/getServiceImages"
 import deleteServiceImages from "app/partners/mutations/deleteServiceImages"
 import OtherIcon from "./OtherIcon"
+import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table"
+import EditIcon from "./EditIcon"
+import DeleteIcon from "./DeleteIcon"
+import AddIcon from "./AddIcon"
+import getEmployees from "app/partners/queries/getEmployees"
+import { useDisclosure } from "@chakra-ui/hooks"
+import {
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/modal"
+import createEmployee from "app/partners/mutations/createEmployee"
+import deleteEmployee from "app/partners/mutations/deleteEmployee"
+import updateEmployee from "app/partners/mutations/updateEmployee"
+import { CircularProgress } from "@chakra-ui/progress"
 
 type Props = {
   isMenuOpen: boolean
@@ -97,7 +116,7 @@ const Settings: FC<Props> = ({
   const maxImages = plan === "PREMIUM" ? 6 : 3
   const toast = useToast()
   const toastIdRef = useRef<any>()
-  const [serviceActiveImages, { refetch }] = useQuery(getServiceImages, {
+  const [serviceActiveImages] = useQuery(getServiceImages, {
     where: { carServiceId: activeService },
   })
   const getItems = (count, start = 0) =>
@@ -320,6 +339,49 @@ const Settings: FC<Props> = ({
     setChanges(changesArray)
     setServiceDescription(value)
   }
+  const [employeeName, setEmployeeName] = useState("")
+  const onEmployeeNameChange = (value) => {
+    setEmployeeName(value)
+  }
+  const [employeeSurname, setEmployeeSurname] = useState("")
+  const onEmployeeSurnameChange = (value) => {
+    setEmployeeSurname(value)
+  }
+  const [employeePosition, setEmployeePosition] = useState("")
+  const onEmployeePositionChange = (value) => {
+    if (value.length) {
+      var firstLetter = value[0]
+      if (isNaN(firstLetter)) {
+        if (firstLetter.toUpperCase() + value.substring(1) !== "Savininkas") {
+          setEmployeePosition(value)
+        } else {
+          toastIdRef.current = toast({
+            duration: 5000,
+            render: () => (
+              <WarningToast
+                heading="Kažkas netaip!"
+                text={`Pridėti papildomą savininką draudžiama. Jei norite pakeisti savininką, susisiekite su mumis per pagalbos centrą arba pagalba@wheelter.lt`}
+                id={toastIdRef.current}
+              />
+            ),
+          })
+        }
+      } else {
+        toastIdRef.current = toast({
+          duration: 5000,
+          render: () => (
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Pareigos negali prasidėti skaitmeniu.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+      }
+    } else {
+      setEmployeePosition(value)
+    }
+  }
   const uploadImages = (e) => {
     return new Promise(async (resolve) => {
       const oldImages = Array.from(serviceActiveImages, (v) => v).map((v) => v.carServiceImageId)
@@ -445,7 +507,6 @@ const Settings: FC<Props> = ({
               },
             })
             refetchOther()
-            refetch()
             toastIdRef.current = toast({
               duration: 5000,
               render: () => (
@@ -470,7 +531,6 @@ const Settings: FC<Props> = ({
             },
           })
           refetchOther()
-          refetch()
           toastIdRef.current = toast({
             duration: 5000,
             render: () => (
@@ -487,7 +547,6 @@ const Settings: FC<Props> = ({
     } else {
       setChanging(true)
       refetchOther()
-      refetch()
       toastIdRef.current = toast({
         duration: 5000,
         render: () => (
@@ -503,12 +562,96 @@ const Settings: FC<Props> = ({
     changesArray.splice(0, 4, false, false, false, false)
     setChanges(changesArray)
   }
+  const [employees, { refetch }] = useQuery(getEmployees, activeService)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isCreatingNewEmployee, setIsCreatingNewEmployee] = useState(false)
+  const [updatingEmployeeId, setUpdatingEmployeeId] = useState(-1)
+  const onCreateEmployee = async () => {
+    if (!employeeName.length || !employeePosition.length) {
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <WarningToast
+            heading="Kažkas netaip!"
+            text={`Norėdami pridėti naują darbuotoją, užpildykite visus privalomus laukus.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+    } else {
+      await createEmployee({
+        data: {
+          carServiceId: activeService,
+          name: employeeName,
+          surname: employeeSurname,
+          position: employeePosition,
+        },
+      })
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <SuccessToast
+            heading="Pavyko!"
+            text={`Darbuotojas sėkmingai pridėtas.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+      refetch()
+      onClose()
+      setEmployeeName("")
+      setEmployeeSurname("")
+      setEmployeePosition("")
+      setIsCreatingNewEmployee(false)
+    }
+  }
+  const onUpdateEmployee = async (employeeId) => {
+    if (!employeeName.length || !employeePosition.length) {
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <WarningToast
+            heading="Kažkas netaip!"
+            text={`Norėdami pakeisti darbuotojo informaciją, užpildykite visus privalomus laukus.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+    } else {
+      await updateEmployee({
+        where: {
+          id: employeeId,
+        },
+        data: {
+          name: employeeName,
+          surname: employeeSurname,
+          position: employeePosition,
+        },
+      })
+      toastIdRef.current = toast({
+        duration: 5000,
+        render: () => (
+          <SuccessToast
+            heading="Pavyko!"
+            text={`Darbuotojo informacija sėkmingai atnaujinta.`}
+            id={toastIdRef.current}
+          />
+        ),
+      })
+      refetch()
+      onClose()
+      setEmployeeName("")
+      setEmployeeSurname("")
+      setEmployeePosition("")
+      setIsCreatingNewEmployee(false)
+    }
+  }
   return (
     <Box mr="70px" ml={isMenuOpen ? "370px" : "170px"} transition="all 0.2s">
       <Heading as="h1">Nustatymai</Heading>
       <Box mt="30px">
         <Tabs variant="unstyled">
-          <TabList width="1400px" justifyContent="space-between">
+          <TabList width="100%" maxWidth="1920px" minWidth="1350px" justifyContent="space-between">
             <CustomTabSettings
               icon={<InfoIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
@@ -542,8 +685,8 @@ const Settings: FC<Props> = ({
           </TabList>
           <TabPanels>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              <Flex justifyContent="space-between" width="1400px">
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Pavadinimas
@@ -591,8 +734,8 @@ const Settings: FC<Props> = ({
                   </InputGroup>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              <Flex justifyContent="space-between" width="1400px">
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Aprašymas
@@ -618,8 +761,8 @@ const Settings: FC<Props> = ({
                   />
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              <Flex justifyContent="space-between" width="1400px">
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Profilio nuotrauka
@@ -666,13 +809,7 @@ const Settings: FC<Props> = ({
                       <Flex justifyContent="space-between">
                         <Flex direction="column" justifyContent="center">
                           {uploadState === "UPLOADING" ? (
-                            <Spinner
-                              thickness="4px"
-                              speed="0.65s"
-                              emptyColor="#EFF0F3"
-                              color="#6500E6"
-                              size="xl"
-                            />
+                            <CircularProgress isIndeterminate color="#6500E6" size="xl" />
                           ) : (
                             <Avatar
                               size="2xl"
@@ -822,8 +959,8 @@ const Settings: FC<Props> = ({
                   </ImageUploading>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              <Flex justifyContent="space-between" width="1400px">
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
                 <Box width="450px">
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Nuotraukos
@@ -985,38 +1122,427 @@ const Settings: FC<Props> = ({
                   </Flex>
                 </Box>
               </Flex>
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              <Flex justifyContent="center" width="1400px" mb="70px">
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+              >
                 <Button
                   background="#EFF0F3"
                   _hover={{ background: "#E0E3EF" }}
                   isLoading={changing}
-                  width="150px"
+                  width="200px"
                   onClick={onChanging}
                 >
-                  Atnaujinti
+                  Tvirtinti pakeitimus
                 </Button>
               </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
-              Darbuotojai
+              <Divider color="#E0E3EF" mt="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Table variant="unstyled" width="100%" maxWidth="1920px" minWidth="1350px">
+                <Thead>
+                  <Tr borderBottom="1px solid #E0E3EF">
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Darbuotojas
+                    </Th>
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Pareigos
+                    </Th>
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Atlikti darbai
+                    </Th>
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Uždirbta suma
+                    </Th>
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Įvertinimas
+                    </Th>
+                    <Th
+                      textTransform="none"
+                      fontWeight="500"
+                      fontSize="md"
+                      letterSpacing="0"
+                      height="100px"
+                    >
+                      Priskirti darbai
+                    </Th>
+                    <Th display="flex" justifyContent="flex-end" alignItems="center" height="100px">
+                      <Flex
+                        justifyContent="center"
+                        alignItems="center"
+                        background="#EFF0F3"
+                        borderRadius="5px"
+                        height="40px"
+                        px="15px"
+                        cursor="pointer"
+                        maxWidth="200px"
+                        sx={{
+                          ":hover > svg": {
+                            color: "brand.500",
+                          },
+                          ":hover > p": {
+                            color: "brand.500",
+                          },
+                        }}
+                        onClick={() => {
+                          setIsCreatingNewEmployee(true)
+                          onOpen()
+                        }}
+                      >
+                        <AddIcon boxSize={5} transition="all 0.2s" mr="10px" />
+                        <Text
+                          fontWeight="500"
+                          transition="all 0.2s"
+                          textTransform="none"
+                          fontSize="sm"
+                          letterSpacing="0"
+                        >
+                          Pridėti darbuotoją
+                        </Text>
+                      </Flex>
+                    </Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {employees.map((employee) => {
+                    var employeeProfit = 0
+                    var employeeRating = 0
+                    var employeeOrdersCount = 0
+                    employee.orders.forEach((order) => {
+                      employeeProfit += order.price
+                      if (order.review?.isReviewed) {
+                        employeeRating += order.review?.rating
+                        employeeOrdersCount++
+                      }
+                    })
+                    employeeRating /= employeeOrdersCount
+                    return (
+                      <Tr
+                        transition="all 0.2s"
+                        cursor="pointer"
+                        _hover={{
+                          background: "white",
+                          boxShadow: "0px 5px 20px 0px rgba(0, 0, 0, 0.03)",
+                        }}
+                        _notLast={{ borderBottom: "1px solid #E0E3EF" }}
+                        key={employee.id}
+                      >
+                        <Td height="100px">
+                          <Text>
+                            {employee.name} {employee.surname}
+                          </Text>
+                        </Td>
+                        <Td height="100px">
+                          <Text>{employee.position}</Text>
+                        </Td>
+                        <Td height="100px">
+                          <Text>{employee.completedOrders}</Text>
+                        </Td>
+                        <Td height="100px">
+                          <Text>{employeeProfit} €</Text>
+                        </Td>
+                        <Td height="100px">
+                          <Text>{employeeRating > 0 ? employeeRating.toFixed(2) : "0.00"}</Text>
+                        </Td>
+                        <Td height="100px">
+                          <Link
+                            color="brand.500"
+                            textDecoration="none !important"
+                            _hover={{ color: "brand.200" }}
+                            transition="all 0.2s"
+                          >
+                            Peržiūrėti darbus
+                          </Link>
+                        </Td>
+                        <Td height="100px" textAlign="end">
+                          <EditIcon
+                            boxSize={6}
+                            transition="all 0.2s"
+                            cursor="pointer"
+                            _hover={{ color: "brand.500" }}
+                            onClick={() => {
+                              setEmployeeName(employee.name)
+                              setEmployeeSurname(employee.surname ? employee.surname : "")
+                              setEmployeePosition(employee.position)
+                              setIsCreatingNewEmployee(false)
+                              setUpdatingEmployeeId(employee.id)
+                              onOpen()
+                            }}
+                          />
+                          {employee.position !== "Savininkas" && (
+                            <DeleteIcon
+                              boxSize={6}
+                              transition="all 0.2s"
+                              ml="15px"
+                              cursor="pointer"
+                              _hover={{ color: "brand.500" }}
+                              onClick={async () => {
+                                await deleteEmployee({
+                                  where: {
+                                    id: employee.id,
+                                  },
+                                })
+                                toastIdRef.current = toast({
+                                  duration: 5000,
+                                  render: () => (
+                                    <SuccessToast
+                                      heading="Pavyko!"
+                                      text={`Darbuotojas sėkmingai pašalintas.`}
+                                      id={toastIdRef.current}
+                                    />
+                                  ),
+                                })
+                                refetch()
+                              }}
+                            />
+                          )}
+                        </Td>
+                      </Tr>
+                    )
+                  })}
+                </Tbody>
+              </Table>
+              <Modal
+                isOpen={isOpen}
+                isCentered
+                onClose={onClose}
+                size="lg"
+                onEsc={() => {
+                  setEmployeeName("")
+                  setEmployeeSurname("")
+                  setEmployeePosition("")
+                  setIsCreatingNewEmployee(false)
+                  setUpdatingEmployeeId(-1)
+                }}
+                onOverlayClick={() => {
+                  setEmployeeName("")
+                  setEmployeeSurname("")
+                  setEmployeePosition("")
+                  setIsCreatingNewEmployee(false)
+                  setUpdatingEmployeeId(-1)
+                }}
+              >
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Pridėti darbuotoją</ModalHeader>
+                  <ModalCloseButton
+                    onClick={() => {
+                      setEmployeeName("")
+                      setEmployeeSurname("")
+                      setEmployeePosition("")
+                      setIsCreatingNewEmployee(false)
+                      setUpdatingEmployeeId(-1)
+                    }}
+                  />
+                  <ModalBody>
+                    <Input
+                      placeholder="Vardas *"
+                      borderRadius="5px"
+                      borderWidth="1px"
+                      borderStyle="solid"
+                      borderColor="#E0E3EF"
+                      mb="20px"
+                      value={employeeName}
+                      onChange={(e) => onEmployeeNameChange(e.target.value)}
+                      required
+                    />
+                    <Input
+                      placeholder="Pavardė"
+                      borderRadius="5px"
+                      borderWidth="1px"
+                      borderStyle="solid"
+                      borderColor="#E0E3EF"
+                      mb="20px"
+                      value={employeeSurname}
+                      onChange={(e) => onEmployeeSurnameChange(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Pareigos *"
+                      borderRadius="5px"
+                      borderWidth="1px"
+                      borderStyle="solid"
+                      borderColor="#E0E3EF"
+                      mb="20px"
+                      value={employeePosition}
+                      onChange={(e) => onEmployeePositionChange(e.target.value)}
+                      required
+                      disabled={employeePosition === "Savininkas"}
+                    />
+                  </ModalBody>
+                  <ModalFooter>
+                    {isCreatingNewEmployee ? (
+                      <Button
+                        background="#EFF0F3"
+                        _hover={{ background: "#E0E3EF" }}
+                        mr={3}
+                        onClick={onCreateEmployee}
+                      >
+                        Pridėti
+                      </Button>
+                    ) : (
+                      <Button
+                        background="#EFF0F3"
+                        _hover={{ background: "#E0E3EF" }}
+                        mr={3}
+                        onClick={() => {
+                          onUpdateEmployee(updatingEmployeeId)
+                        }}
+                      >
+                        Atnaujinti
+                      </Button>
+                    )}
+                    <Button
+                      onClick={() => {
+                        onClose()
+                        setEmployeeName("")
+                        setEmployeeSurname("")
+                        setEmployeePosition("")
+                        setIsCreatingNewEmployee(false)
+                        setUpdatingEmployeeId(-1)
+                      }}
+                    >
+                      Atšaukti
+                    </Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+                mt="30px"
+              >
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="200px"
+                  onClick={onChanging}
+                >
+                  Tvirtinti pakeitimus
+                </Button>
+              </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               Pranešimų nustatymai
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+              >
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="200px"
+                  onClick={onChanging}
+                >
+                  Tvirtinti pakeitimus
+                </Button>
+              </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               Prenumerata
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+              >
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="200px"
+                  onClick={onChanging}
+                >
+                  Tvirtinti pakeitimus
+                </Button>
+              </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               Kontaktinė informacija
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+              >
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="200px"
+                  onClick={onChanging}
+                >
+                  Tvirtinti pakeitimus
+                </Button>
+              </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="1400px" />
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               Kiti nustatymai
+              <Flex
+                justifyContent="center"
+                width="100%"
+                maxWidth="1920px"
+                minWidth="1400px"
+                mb="70px"
+              >
+                <Button
+                  background="#EFF0F3"
+                  _hover={{ background: "#E0E3EF" }}
+                  isLoading={changing}
+                  width="200px"
+                  onClick={onChanging}
+                >
+                  Tvirtinti pakeitimus
+                </Button>
+              </Flex>
             </TabPanel>
           </TabPanels>
         </Tabs>

@@ -1,7 +1,7 @@
 import { Ctx } from "blitz"
 import db, { Prisma } from "db"
 
-export default async function getServiceNotificationsCount(
+export default async function getUserNotificationsCount(
   input: Prisma.NotificationCountArgs,
   ctx: Ctx
 ) {

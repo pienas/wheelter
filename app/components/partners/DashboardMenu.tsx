@@ -19,7 +19,6 @@ import ServicesIcon from "./ServicesIcon"
 import SettingsIcon from "./SettingsIcon"
 import ShareIcon from "./ShareIcon"
 import InstructionsIcon from "./InstructionsIcon"
-import getServiceNotificationsCount from "app/partners/queries/getServiceNotificationsCount"
 import useSound from "use-sound"
 import MenuIcon from "./MenuIcon"
 import NotificationsIcon from "./NotificationsIcon"
@@ -39,11 +38,13 @@ import { Button } from "@chakra-ui/button"
 import { useToast } from "@chakra-ui/toast"
 import SuccessToast from "../index/SuccessToast"
 import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
+import getUserNotificationsCount from "app/partners/queries/getUserNotificationsCount"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
   const name = currentUser?.name + " " + currentUser?.surname
   const [logoutMutation] = useMutation(logout)
+  const avatarSrc = currentUser?.avatarUrl ? currentUser?.avatarUrl : ""
   return (
     <Menu>
       <MenuButton
@@ -59,7 +60,7 @@ const UserInfo = () => {
         }}
       >
         <Flex alignItems="center">
-          <Avatar size="sm" name={name} src={currentUser?.avatarUrl!} />
+          <Avatar size="sm" name={name} src={avatarSrc} />
           <Text fontWeight="500" mx="10px" transition="all 0.2s">
             {name}
           </Text>
@@ -132,8 +133,8 @@ const DashboardMenu = () => {
   )
   const [lastNotificationsCount, setLastNofiticationCount] = useState<any>()
   const [notificationSound] = useSound("/notification.mp3")
-  const [notifications] = useQuery(
-    getServiceNotificationsCount,
+  const [notificationsCount] = useQuery(
+    getUserNotificationsCount,
     {
       where: { carServiceUserId: currentUser?.id, seen: false },
     },
@@ -155,8 +156,10 @@ const DashboardMenu = () => {
     <>
       {Router.route === "/partners/dashboard" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Suvestinė ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Suvestinė ・ Wheelter
+            </title>
           ) : (
             <title>Suvestinė ・ Wheelter</title>
           )}
@@ -164,8 +167,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/stats" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Statistika ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Statistika ・ Wheelter
+            </title>
           ) : (
             <title>Statistika ・ Wheelter</title>
           )}
@@ -173,8 +178,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/calendar" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Kalendorius ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Kalendorius ・ Wheelter
+            </title>
           ) : (
             <title>Kalendorius ・ Wheelter</title>
           )}
@@ -182,8 +189,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/orders" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Užsakymai ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Užsakymai ・ Wheelter
+            </title>
           ) : (
             <title>Užsakymai ・ Wheelter</title>
           )}
@@ -191,8 +200,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/services" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Paslaugos ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Paslaugos ・ Wheelter
+            </title>
           ) : (
             <title>Paslaugos ・ Wheelter</title>
           )}
@@ -200,8 +211,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/quickhelp" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Greita pagalba ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Greita pagalba ・ Wheelter
+            </title>
           ) : (
             <title>Greita pagalba ・ Wheelter</title>
           )}
@@ -209,8 +222,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/notes" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Užrašinė ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Užrašinė ・ Wheelter
+            </title>
           ) : (
             <title>Užrašinė ・ Wheelter</title>
           )}
@@ -218,8 +233,10 @@ const DashboardMenu = () => {
       )}
       {Router.route === "/partners/settings" && (
         <Head>
-          {notifications ? (
-            <title>({notifications > 9 ? "9+" : notifications}) Nustatymai ・ Wheelter</title>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Nustatymai ・ Wheelter
+            </title>
           ) : (
             <title>Nustatymai ・ Wheelter</title>
           )}
@@ -377,7 +394,7 @@ const DashboardMenu = () => {
               </Flex>
             </Link>
           </Box>
-          <Link href="/partners/dashboard">
+          <Link href="/partners/dashboard" textDecoration="none !important">
             <Tooltip
               label="Suvestinė"
               placement="right"
@@ -432,7 +449,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/stats">
+          <Link href="/partners/stats" textDecoration="none !important">
             <Tooltip
               label="Statistika"
               placement="right"
@@ -487,7 +504,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/calendar">
+          <Link href="/partners/calendar" textDecoration="none !important">
             <Tooltip
               label="Kalendorius"
               placement="right"
@@ -542,7 +559,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/orders">
+          <Link href="/partners/orders" textDecoration="none !important">
             <Tooltip
               label="Užsakymai"
               placement="right"
@@ -614,7 +631,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/services">
+          <Link href="/partners/services" textDecoration="none !important">
             <Tooltip
               label="Paslaugos"
               placement="right"
@@ -669,7 +686,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/quickhelp">
+          <Link href="/partners/quickhelp" textDecoration="none !important">
             <Tooltip
               label="Greita pagalba"
               placement="right"
@@ -742,7 +759,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/notes">
+          <Link href="/partners/notes" textDecoration="none !important">
             <Tooltip
               label="Užrašinė"
               placement="right"
@@ -798,7 +815,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/settings">
+          <Link href="/partners/settings" textDecoration="none !important">
             <Tooltip
               label="Nustatymai"
               placement="right"
@@ -1200,7 +1217,7 @@ const DashboardMenu = () => {
                 }}
               >
                 <NotificationsIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
-                {notifications > 0 && (
+                {notificationsCount > 0 && (
                   <Flex
                     justifyContent="center"
                     alignItems="center"
@@ -1212,7 +1229,7 @@ const DashboardMenu = () => {
                     transition="all 0.2s"
                   >
                     <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                      {notifications > 9 ? "9+" : notifications}
+                      {notificationsCount > 9 ? "9+" : notificationsCount}
                     </Text>
                   </Flex>
                 )}

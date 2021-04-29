@@ -187,12 +187,13 @@ model CarService {
 }
 
 model CarServiceUserRelation {
-  id           Int            @id @default(autoincrement())
-  carService   CarService     @relation(fields: [carServiceId], references: [id])
-  carServiceId Int
-  user         CarServiceUser @relation(fields: [userId], references: [id])
-  userId       Int
-  userRole     String         @default("Darbuotojas")
+  id              Int            @id @default(autoincrement())
+  carService      CarService     @relation(fields: [carServiceId], references: [id])
+  carServiceId    Int
+  user            CarServiceUser @relation(fields: [userId], references: [id])
+  userId          Int
+  userRole        String         @default("Darbuotojas")
+  completedOrders Int            @default(0)
 }
 
 model Change {
@@ -273,14 +274,16 @@ model Service {
 }
 
 model Employee {
-  id           Int         @id @default(autoincrement())
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  name         String
-  surname      String?
-  orders       Order[]
-  carService   CarService? @relation(fields: [carServiceId], references: [id])
-  carServiceId Int?
+  id              Int         @id @default(autoincrement())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  name            String
+  surname         String?
+  position        String
+  completedOrders Int         @default(0)
+  orders          Order[]
+  carService      CarService? @relation(fields: [carServiceId], references: [id])
+  carServiceId    Int?
 }
 
 model Setting {
