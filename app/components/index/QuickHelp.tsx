@@ -86,7 +86,7 @@ const QuickHelp = () => {
           onSubmit={onSubmit}
           initialValues={{ phone: "" }}
           render={({ handleSubmit, submitting }) => (
-            <form onSubmit={handleSubmit} className="form">
+            <form onSubmit={handleSubmit} className="formQuickHelp">
               <div className="inputGroup">
                 <Field
                   name="phone"

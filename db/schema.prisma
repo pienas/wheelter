@@ -160,9 +160,9 @@ model CarService {
   url                    String                   @unique
   name                   String
   description            String?
-  email                  String                   @unique
+  email                  String
   emailVerifiedAt        DateTime?
-  phone                  String                   @unique
+  phone                  String
   income                 Float                    @default(0.0)
   expenses               Float                    @default(0.0)
   viewCount              Int                      @default(0)
@@ -329,13 +329,12 @@ model Address {
   id           Int         @id @default(autoincrement())
   city         String
   street       String
-  house        Int
-  appartment   Int?
+  house        String
   postCode     Int
   coordinateX  Float?
   coordinateY  Float?
   carService   CarService? @relation(fields: [carServiceId], references: [id])
-  carServiceId Int?
+  carServiceId Int?        @unique
 }
 
 model Goal {

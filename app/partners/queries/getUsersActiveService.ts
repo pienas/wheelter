@@ -6,7 +6,6 @@ export default async function getUsersActiveService(input: number, ctx: Ctx) {
   return await db.carServiceUserRelation.findFirst({
     where: { carServiceId: input },
     select: {
-      userRole: true,
       carService: {
         select: {
           url: true,
@@ -18,6 +17,14 @@ export default async function getUsersActiveService(input: number, ctx: Ctx) {
           isActive: true,
           isReviewed: true,
           isUnderReview: true,
+          email: true,
+          phone: true,
+          address: {
+            select: {
+              city: true,
+              street: true,
+            },
+          },
         },
       },
     },

@@ -49,6 +49,7 @@ import createEmployee from "app/partners/mutations/createEmployee"
 import deleteEmployee from "app/partners/mutations/deleteEmployee"
 import updateEmployee from "app/partners/mutations/updateEmployee"
 import { CircularProgress } from "@chakra-ui/progress"
+import updateServiceAddress from "app/partners/mutations/updateServiceAddress"
 
 type Props = {
   isMenuOpen: boolean
@@ -59,6 +60,12 @@ type Props = {
   name: string
   description: string
   plan: string
+  email: string
+  phone: string
+  city: string
+  street: string
+  house: string
+  postcode: number
 }
 
 const Settings: FC<Props> = ({
@@ -70,6 +77,12 @@ const Settings: FC<Props> = ({
   name,
   description,
   plan,
+  email,
+  phone,
+  city,
+  street,
+  house,
+  postcode,
 }: Props) => {
   const [image, setImage] = useState([])
   const onChange = (imageList) => {
@@ -299,33 +312,41 @@ const Settings: FC<Props> = ({
     const items = reorder(imagesState.items, result.source.index, result.destination.index)
     setImagesState({ items })
   }
+  const format = /[a-zA-Z0-9-_]/
+  const formatHouse = /[a-zA-Z0-9]/
+  const formatPostcode = /[0-9]/
+  const formatUrlFinal = /^(?!-.*$)(?!_.*$)([A-Za-z0-9-_](?!\-$)(?!\_$))+$/gm
   const [serviceName, setServiceName] = useState(name)
-  const [isInvalidName, setIsInvalidName] = useState(false)
-  const format = /[a-zA-Z0-9]/u
   const onServiceNameChange = (value) => {
     changesArray.splice(0, 1, true)
     setChanges(changesArray)
     setServiceName(value)
-    setIsInvalidName(false)
   }
   const [serviceUrl, setServiceUrl] = useState(url)
   const [isInvalidUrl, setIsInvalidUrl] = useState(false)
   const onServiceUrlChange = (value) => {
-    if (!format.test(value.charAt(value.length - 1))) {
-      setIsInvalidUrl(true)
-      toastIdRef.current = toast({
-        duration: 3000,
-        render: () => (
-          <WarningToast
-            heading="Kažkas netaip!"
-            text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-      setTimeout(() => {
+    if (value.length) {
+      if (!format.test(value.charAt(value.length - 1))) {
+        setIsInvalidUrl(true)
+        toastIdRef.current = toast({
+          duration: 3000,
+          render: () => (
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+        setTimeout(() => {
+          setIsInvalidUrl(false)
+        }, 3000)
+      } else {
+        changesArray.splice(1, 1, true)
+        setChanges(changesArray)
+        setServiceUrl(value)
         setIsInvalidUrl(false)
-      }, 3000)
+      }
     } else {
       changesArray.splice(1, 1, true)
       setChanges(changesArray)
@@ -338,6 +359,94 @@ const Settings: FC<Props> = ({
     changesArray.splice(2, 1, true)
     setChanges(changesArray)
     setServiceDescription(value)
+  }
+  const [serviceEmail, setServiceEmail] = useState(email)
+  const onServiceEmailChange = (value) => {
+    changesArray.splice(4, 1, true)
+    setChanges(changesArray)
+    setServiceEmail(value)
+  }
+  const [servicePhone, setServicePhone] = useState(phone)
+  const onServicePhoneChange = (value) => {
+    changesArray.splice(5, 1, true)
+    setChanges(changesArray)
+    setServicePhone(value)
+  }
+  const [serviceCity, setServiceCity] = useState(city)
+  const onServiceCityChange = (value) => {
+    changesArray.splice(6, 1, true)
+    setChanges(changesArray)
+    setServiceCity(value)
+  }
+  const [serviceStreet, setServiceStreet] = useState(street)
+  const onServiceStreetChange = (value) => {
+    changesArray.splice(7, 1, true)
+    setChanges(changesArray)
+    setServiceStreet(value)
+  }
+  const [serviceHouse, setServiceHouse] = useState(house)
+  const [isInvalidHouse, setIsInvalidHouse] = useState(false)
+  const onServiceHouseChange = (value) => {
+    if (value.length) {
+      if (!formatHouse.test(value.charAt(value.length - 1))) {
+        setIsInvalidHouse(true)
+        toastIdRef.current = toast({
+          duration: 3000,
+          render: () => (
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+        setTimeout(() => {
+          setIsInvalidHouse(false)
+        }, 3000)
+      } else {
+        changesArray.splice(8, 1, true)
+        setChanges(changesArray)
+        setServiceHouse(value)
+        setIsInvalidHouse(false)
+      }
+    } else {
+      changesArray.splice(8, 1, true)
+      setChanges(changesArray)
+      setServiceHouse(value)
+      setIsInvalidHouse(false)
+    }
+  }
+  const [servicePostcode, setServicePostcode] = useState(postcode)
+  const [isInvalidPostcode, setIsInvalidPostcode] = useState(false)
+  const onServicePostcodeChange = (value) => {
+    if (value.length) {
+      if (!formatPostcode.test(value.charAt(value.length - 1))) {
+        setIsInvalidPostcode(true)
+        toastIdRef.current = toast({
+          duration: 3000,
+          render: () => (
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+        setTimeout(() => {
+          setIsInvalidPostcode(false)
+        }, 3000)
+      } else {
+        changesArray.splice(9, 1, true)
+        setChanges(changesArray)
+        setServicePostcode(value)
+        setIsInvalidPostcode(false)
+      }
+    } else {
+      changesArray.splice(9, 1, true)
+      setChanges(changesArray)
+      setServicePostcode(value)
+      setIsInvalidPostcode(false)
+    }
   }
   const [employeeName, setEmployeeName] = useState("")
   const onEmployeeNameChange = (value) => {
@@ -480,14 +589,30 @@ const Settings: FC<Props> = ({
         },
       })
       setChanging(true)
-      if (urlCount && serviceUrl !== url) {
+      if (!formatUrlFinal.test(serviceUrl)) {
+        setIsInvalidUrl(true)
+        toastIdRef.current = toast({
+          duration: 3000,
+          render: () => (
+            <WarningToast
+              heading="Kažkas netaip!"
+              text={`Nuoroda negali prasidėti ir/ar baigtis simboliu.`}
+              id={toastIdRef.current}
+            />
+          ),
+        })
+        setTimeout(() => {
+          setIsInvalidUrl(false)
+        }, 3000)
+        setChanging(false)
+      } else if (urlCount && serviceUrl !== url) {
         setIsInvalidUrl(true)
         toastIdRef.current = toast({
           duration: 5000,
           render: () => (
             <WarningToast
               heading="Kažkas netaip!"
-              text={`Tokia partnerio profilio nuoruoda jau egzistuoja. Pamėginkite kitą nuoruodą.`}
+              text={`Tokia partnerio profilio nuoroda jau egzistuoja. Pamėginkite kitą nuorodą.`}
               id={toastIdRef.current}
             />
           ),
@@ -504,6 +629,19 @@ const Settings: FC<Props> = ({
                 url: serviceUrl,
                 name: serviceName,
                 description: serviceDescription,
+                email: serviceEmail,
+                phone: servicePhone,
+              },
+            })
+            await updateServiceAddress({
+              where: {
+                carServiceId: activeService,
+              },
+              data: {
+                city: serviceCity,
+                street: serviceStreet,
+                house: serviceHouse,
+                postCode: servicePostcode,
               },
             })
             refetchOther()
@@ -528,6 +666,19 @@ const Settings: FC<Props> = ({
               url: serviceUrl,
               name: serviceName,
               description: serviceDescription,
+              email: serviceEmail,
+              phone: servicePhone,
+            },
+          })
+          await updateServiceAddress({
+            where: {
+              carServiceId: activeService,
+            },
+            data: {
+              city: serviceCity,
+              street: serviceStreet,
+              house: serviceHouse,
+              postCode: servicePostcode,
             },
           })
           refetchOther()
@@ -559,7 +710,7 @@ const Settings: FC<Props> = ({
       })
       setChanging(false)
     }
-    changesArray.splice(0, 4, false, false, false, false)
+    changesArray.splice(0, 10, false, false, false, false, false, false, false, false, false, false)
     setChanges(changesArray)
   }
   const [employees, { refetch }] = useQuery(getEmployees, activeService)
@@ -705,9 +856,8 @@ const Settings: FC<Props> = ({
                     borderColor="#E0E3EF"
                     mb="20px"
                     value={serviceName}
-                    isInvalid={isInvalidName}
                     onChange={(e) => onServiceNameChange(e.target.value)}
-                    focusBorderColor={isInvalidName ? "red" : "brand.500"}
+                    focusBorderColor="brand.500"
                   />
                   <InputGroup>
                     <InputLeftAddon
@@ -1504,7 +1654,100 @@ const Settings: FC<Props> = ({
             </TabPanel>
             <TabPanel padding="0">
               <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              Kontaktinė informacija
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
+                <Box width="450px">
+                  <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
+                    Kontaktai
+                  </Heading>
+                  <Text color="#787E97">
+                    Pakeiskite savo el. paštą ir telefono numerį, kad jūsų klientai visada galėtų su
+                    jumis susisiekti
+                  </Text>
+                </Box>
+                <Box width="700px">
+                  <Input
+                    placeholder="El. paštas"
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    mb="20px"
+                    value={serviceEmail}
+                    onChange={(e) => onServiceEmailChange(e.target.value)}
+                    focusBorderColor="brand.500"
+                  />
+                  <Input
+                    placeholder="Tel. nr."
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    value={servicePhone}
+                    onChange={(e) => onServicePhoneChange(e.target.value)}
+                    focusBorderColor="brand.500"
+                  />
+                </Box>
+              </Flex>
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
+              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
+                <Box width="450px">
+                  <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
+                    Adresas
+                  </Heading>
+                  <Text color="#787E97">
+                    Pakeiskite savo adresą ir patikslinkite vietą žemėlapyje, kad klientams nekiltų
+                    problemų jus randant
+                  </Text>
+                </Box>
+                <Box width="700px">
+                  <Input
+                    placeholder="Gyvenvietė"
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    mb="20px"
+                    value={serviceCity}
+                    onChange={(e) => onServiceCityChange(e.target.value)}
+                    focusBorderColor="brand.500"
+                  />
+                  <Input
+                    placeholder="Gatvė"
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    mb="20px"
+                    value={serviceStreet}
+                    onChange={(e) => onServiceStreetChange(e.target.value)}
+                    focusBorderColor="brand.500"
+                  />
+                  <Input
+                    placeholder="Namo numeris"
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    mb="20px"
+                    value={serviceHouse}
+                    isInvalid={isInvalidHouse}
+                    onChange={(e) => onServiceHouseChange(e.target.value)}
+                    focusBorderColor={isInvalidHouse ? "red" : "brand.500"}
+                  />
+                  <Input
+                    placeholder="Pašto kodas"
+                    borderRadius="5px"
+                    borderWidth="1px"
+                    borderStyle="solid"
+                    borderColor="#E0E3EF"
+                    value={servicePostcode}
+                    isInvalid={isInvalidPostcode}
+                    onChange={(e) => onServicePostcodeChange(e.target.value)}
+                    focusBorderColor={isInvalidPostcode ? "red" : "brand.500"}
+                  />
+                </Box>
+              </Flex>
+              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               <Flex
                 justifyContent="center"
                 width="100%"

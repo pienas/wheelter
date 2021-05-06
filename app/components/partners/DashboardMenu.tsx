@@ -39,6 +39,7 @@ import { useToast } from "@chakra-ui/toast"
 import SuccessToast from "../index/SuccessToast"
 import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
 import getUserNotificationsCount from "app/partners/queries/getUserNotificationsCount"
+import getServiceAddress from "app/partners/queries/getServiceAddress"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -94,8 +95,22 @@ const DashboardMenu = () => {
     : parseInt(localStorage.getItem("selectedService") as string) || carServices![0].carServiceId
   const [activeService, setActiveService] = useState<number>(selectedService)
   const [activeCarService, { refetch }] = useQuery(getUsersActiveService, activeService)
+  const [address] = useQuery(
+    getServiceAddress,
+    {
+      where: { carServiceId: activeService },
+    },
+    {
+      refetchInterval: 60000,
+    }
+  )
   const { isOpen, onToggle } = useDisclosure({
-    defaultIsOpen: ((Router.query.isOpen as string) === "true" ? true : false) ?? false,
+    defaultIsOpen:
+      (Router.query.isOpen as string) === "true"
+        ? true
+        : (localStorage.getItem("isOpen") as string) === "true"
+        ? true
+        : false,
   })
   const [newOrders] = useQuery(
     getServiceOrdersCount,
@@ -246,11 +261,13 @@ const DashboardMenu = () => {
         <Flex
           alignItems="center"
           justifyContent="center"
-          width="100vw"
           height="40px"
           background="brand.500"
           position="fixed"
           zIndex={12}
+          width={isOpen ? "calc(100vw - 300px)" : "calc(100vw - 100px)"}
+          ml={isOpen ? "300px" : "100px"}
+          transition="all 0.2s"
         >
           <Text fontSize="sm" color="white" fontWeight="500">
             {activeCarService?.carService.isUnderReview
@@ -304,7 +321,9 @@ const DashboardMenu = () => {
           <Flex
             alignItems="center"
             justifyContent="center"
-            width="100vw"
+            width={isOpen ? "calc(100vw - 300px)" : "calc(100vw - 100px)"}
+            ml={isOpen ? "300px" : "100px"}
+            transition="all 0.2s"
             height="40px"
             background="brand.500"
             position="fixed"
@@ -1042,7 +1061,7 @@ const DashboardMenu = () => {
                         whiteSpace="nowrap"
                         transition="all 0.2s"
                       >
-                        {activeCarService?.userRole}
+                        {`${activeCarService?.carService.address[0].street}, ${activeCarService?.carService.address[0].city}`}
                       </Text>
                     </Flex>
                   )}
@@ -1113,7 +1132,7 @@ const DashboardMenu = () => {
                                 whiteSpace="nowrap"
                                 transition="all 0.2s"
                               >
-                                {service?.userRole}
+                                {`${service?.carService.address[0].street}, ${service?.carService.address[0].city}`}
                               </Text>
                             </Flex>
                           )}
@@ -1205,7 +1224,16 @@ const DashboardMenu = () => {
               }}
               justifySelf="flex-start"
             >
-              <MenuIcon boxSize={6} color="black" transition="all 0.2s" onClick={onToggle} />
+              <MenuIcon
+                boxSize={6}
+                color="black"
+                transition="all 0.2s"
+                onClick={() => {
+                  onToggle()
+                  if (isOpen) localStorage.setItem("isOpen", "false")
+                  else localStorage.setItem("isOpen", "true")
+                }}
+              />
             </Box>
             <Flex alignItems="center">
               <Flex
@@ -1272,6 +1300,12 @@ const DashboardMenu = () => {
               name={activeCarService?.carService.name!}
               description={activeCarService?.carService.description!}
               plan={activeCarService?.carService.plan!}
+              email={activeCarService?.carService.email!}
+              phone={activeCarService?.carService.phone!}
+              city={address?.city!}
+              street={address?.street!}
+              house={address?.house!}
+              postcode={address?.postCode!}
               refetchOther={() => refetch()}
             />
           )}

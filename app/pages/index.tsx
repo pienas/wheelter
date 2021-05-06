@@ -128,19 +128,21 @@ const Home: BlitzPage = () => {
             border-top-right-radius: 0 !important;
             border-bottom-right-radius: 0 !important;
           }
-          .form {
+          .formQuickHelp {
             display: grid;
             grid-gap: 2.5rem;
             grid-template-columns: 3.9fr 2.2fr;
           }
-          .form button {
+          .form button,
+          .formQuickHelp button {
             background-color: #a18fff;
             color: #f4f8f8;
             border-radius: 10px;
             font-weight: 500;
             transition: all 250ms;
           }
-          .form button:hover {
+          .form button:hover,
+          .formQuickHelp button:hover {
             background-color: #7e1aff;
           }
         `}</style>

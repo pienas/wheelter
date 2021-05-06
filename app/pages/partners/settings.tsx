@@ -19,6 +19,9 @@ const PartnersDashboard: BlitzPage = () => {
           .chakra-modal__overlay {
             opacity: 0.3 !important;
           }
+          a:hover {
+            text-decoration: none !important;
+          }
           .ScrollbarsCustom-TrackY {
             width: 6px !important;
             top: 0 !important;

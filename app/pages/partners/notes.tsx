@@ -22,6 +22,9 @@ const PartnersDashboard: BlitzPage = () => {
           #wizard:not([aria-selected="true"]):hover p {
             color: #0b132a;
           }
+          a:hover {
+            text-decoration: none !important;
+          }
           .ScrollbarsCustom-TrackY {
             width: 6px !important;
             top: 0 !important;

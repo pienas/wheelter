@@ -196,7 +196,7 @@ const Main = () => {
               </Box>
             </Box>
           </Box>
-          <Box alignSelf="center" justifySelf="center">
+          <Box alignSelf="flex-end" justifySelf="center">
             <Image
               src="/illustration-main.svg"
               width="700px"

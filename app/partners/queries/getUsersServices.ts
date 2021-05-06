@@ -10,9 +10,17 @@ export default async function getUsersServices(_ = null, { session }: Ctx) {
     },
     select: {
       carServiceId: true,
-      userRole: true,
       carService: {
-        select: { name: true, avatarUrl: true },
+        select: {
+          name: true,
+          avatarUrl: true,
+          address: {
+            select: {
+              city: true,
+              street: true,
+            },
+          },
+        },
       },
     },
     orderBy: { carService: { name: "asc" } },
