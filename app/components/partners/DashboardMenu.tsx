@@ -705,7 +705,7 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
-          <Link href="/partners/quickhelp" textDecoration="none !important">
+          {/* <Link href="/partners/quickhelp" textDecoration="none !important">
             <Tooltip
               label="Greita pagalba"
               placement="right"
@@ -777,7 +777,7 @@ const DashboardMenu = () => {
                 )}
               </Flex>
             </Tooltip>
-          </Link>
+          </Link> */}
           <Link href="/partners/notes" textDecoration="none !important">
             <Tooltip
               label="Užrašinė"

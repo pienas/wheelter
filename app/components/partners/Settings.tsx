@@ -2,7 +2,7 @@ import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input"
 import { Box, Divider, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
 import { TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/tabs"
 import { Textarea } from "@chakra-ui/textarea"
-import React, { FC, useEffect, useRef, useState } from "react"
+import React, { FC, useCallback, useEffect, useRef, useState } from "react"
 import CustomTabSettings from "./CustomTabSettings"
 import ImageUploading from "react-images-uploading"
 import ImageIcon from "./ImageIcon"
@@ -50,6 +50,7 @@ import deleteEmployee from "app/partners/mutations/deleteEmployee"
 import updateEmployee from "app/partners/mutations/updateEmployee"
 import { CircularProgress } from "@chakra-ui/progress"
 import updateServiceAddress from "app/partners/mutations/updateServiceAddress"
+import MapGL, { Marker, NavigationControl } from "react-map-gl"
 
 type Props = {
   isMenuOpen: boolean
@@ -67,7 +68,67 @@ type Props = {
   house: string
   postcode: number
 }
+const Pin = (props) => {
+  const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z`
+  const pinStyle = {
+    fill: "#d00",
+    stroke: "none",
+  }
+  const { size = 20 } = props
+  return (
+    <svg height={size} viewBox="0 0 24 24" style={pinStyle}>
+      <path d={ICON} />
+    </svg>
+  )
+}
+const Map = () => {
+  const [viewport, setViewport] = useState({
+    latitude: 55.32953572348781,
+    longitude: 23.905501899207678,
+    zoom: 6.5,
+    bearing: 0,
+    pitch: 0,
+  })
+  const [marker, setMarker] = useState({
+    latitude: 55.32953572348781,
+    longitude: 23.905501899207678,
+  })
+  const onMarkerDragEnd = useCallback((event) => {
+    setMarker({
+      longitude: event.lngLat[0],
+      latitude: event.lngLat[1],
+    })
+  }, [])
+  return (
+    <Box height="300px" mt="30px">
+      <MapGL
+        {...viewport}
+        width="100%"
+        height="100%"
+        mapStyle="mapbox://styles/y3llow/ckodau4t60mk417ol99dbzqmi"
+        onViewportChange={setViewport}
+        mapboxApiAccessToken="pk.eyJ1IjoieTNsbG93IiwiYSI6ImNrb2Q3dnpiZDB4dGEycW9keHN3eXJrc2EifQ.gw7Yw_7SqFWl45iGXvSuPQ"
+      >
+        <Marker
+          longitude={marker.longitude}
+          latitude={marker.latitude}
+          offsetTop={-20}
+          offsetLeft={-10}
+          draggable
+          onDragEnd={onMarkerDragEnd}
+        >
+          <Pin size={20} />
+        </Marker>
 
+        <div className="nav">
+          <NavigationControl />
+        </div>
+      </MapGL>
+    </Box>
+  )
+}
 const Settings: FC<Props> = ({
   isMenuOpen,
   activeService,
@@ -959,7 +1020,7 @@ const Settings: FC<Props> = ({
                       <Flex justifyContent="space-between">
                         <Flex direction="column" justifyContent="center">
                           {uploadState === "UPLOADING" ? (
-                            <CircularProgress isIndeterminate color="#6500E6" size="xl" />
+                            <CircularProgress isIndeterminate color="#6500E6" />
                           ) : (
                             <Avatar
                               size="2xl"
@@ -1590,7 +1651,7 @@ const Settings: FC<Props> = ({
                   </ModalFooter>
                 </ModalContent>
               </Modal>
-
+              <Divider color="#E0E3EF" mb="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               <Flex
                 justifyContent="center"
                 width="100%"
@@ -1745,6 +1806,7 @@ const Settings: FC<Props> = ({
                     onChange={(e) => onServicePostcodeChange(e.target.value)}
                     focusBorderColor={isInvalidPostcode ? "red" : "brand.500"}
                   />
+                  <Map />
                 </Box>
               </Flex>
               <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />

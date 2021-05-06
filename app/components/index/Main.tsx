@@ -205,9 +205,9 @@ const Main = () => {
             />
           </Box>
         </Grid>
-        <Suspense fallback="Kraunama...">
+        {/* <Suspense fallback="Kraunama...">
           <QuickHelp />
-        </Suspense>
+        </Suspense> */}
       </Box>
       <Grid
         templateColumns="1fr 1fr 1fr"
