@@ -9,7 +9,6 @@ import ImageIcon from "./ImageIcon"
 import { Image, useQuery } from "blitz"
 import { Button } from "@chakra-ui/button"
 import updateServiceAvatar from "app/partners/mutations/updateServiceAvatar"
-import { Spinner } from "@chakra-ui/spinner"
 import NotificationsIcon from "./NotificationsIcon"
 import InfoIcon from "./InfoIcon"
 import EmployeesIcon from "./EmployeesIcon"
@@ -50,7 +49,9 @@ import deleteEmployee from "app/partners/mutations/deleteEmployee"
 import updateEmployee from "app/partners/mutations/updateEmployee"
 import { CircularProgress } from "@chakra-ui/progress"
 import updateServiceAddress from "app/partners/mutations/updateServiceAddress"
-import MapGL, { Marker, NavigationControl } from "react-map-gl"
+import MapGL, { FlyToInterpolator, Marker } from "react-map-gl"
+import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css"
+import Geocoder from "react-map-gl-geocoder"
 
 type Props = {
   isMenuOpen: boolean
@@ -66,14 +67,16 @@ type Props = {
   city: string
   street: string
   house: string
-  postcode: number
+  latitude: number
+  longitude: number
 }
+
 const Pin = (props) => {
   const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
   c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
   C20.1,15.8,20.2,15.8,20.2,15.7z`
   const pinStyle = {
-    fill: "#d00",
+    fill: "#6500e6",
     stroke: "none",
   }
   const { size = 20 } = props
@@ -83,34 +86,157 @@ const Pin = (props) => {
     </svg>
   )
 }
-const Map = () => {
+const Map = ({ address, changes, onChanges, onAddressChange, city, street, house }) => {
+  const handleChanges = useCallback(() => {
+    changes.splice(6, 1, true)
+    onChanges(changes)
+  }, [onChanges])
+  const handleAddressChange = useCallback(
+    (newAddress) => {
+      onAddressChange(newAddress)
+    },
+    [onAddressChange]
+  )
   const [viewport, setViewport] = useState({
-    latitude: 55.32953572348781,
-    longitude: 23.905501899207678,
-    zoom: 6.5,
+    latitude: address.latitude,
+    longitude: address.longitude,
+    zoom:
+      address.latitude == 55.32953572348781 && address.longitude == 23.905501899207678 ? 6.5 : 18,
     bearing: 0,
     pitch: 0,
   })
   const [marker, setMarker] = useState({
-    latitude: 55.32953572348781,
-    longitude: 23.905501899207678,
+    latitude: address.latitude,
+    longitude: address.longitude,
   })
-  const onMarkerDragEnd = useCallback((event) => {
+  const [addressTemp, setAddressTemp] = useState({
+    city: "",
+    street: "",
+    house: "",
+    latitude: marker.latitude,
+    longitude: marker.longitude,
+  })
+  const onMarkerDragEnd = useCallback(
+    (event) => {
+      setMarker({
+        longitude: event.lngLat[0],
+        latitude: event.lngLat[1],
+      })
+      handleChanges()
+      if (addressTemp.city.length) {
+        handleAddressChange({
+          ...addressTemp,
+          latitude: event.lngLat[1],
+          longitude: event.lngLat[0],
+        })
+      } else {
+        handleAddressChange({
+          ...address,
+          latitude: event.lngLat[1],
+          longitude: event.lngLat[0],
+        })
+      }
+    },
+    [addressTemp]
+  )
+  const mapRef = useRef(null)
+  const handleViewportChange = useCallback((newViewport) => {
+    setViewport(newViewport)
+    handleChanges()
+  }, [])
+  useEffect(() => {
+    handleViewportChange({
+      latitude: addressTemp.latitude,
+      longitude: addressTemp.longitude,
+      transitionDuration: 1000,
+      transitionInterpolator: new FlyToInterpolator(),
+      zoom: 18,
+    })
     setMarker({
-      longitude: event.lngLat[0],
-      latitude: event.lngLat[1],
+      latitude: addressTemp.latitude,
+      longitude: addressTemp.longitude,
+    })
+  }, [addressTemp])
+  const handleQuery = useCallback((result) => {
+    handleChanges()
+    const tempAddress = result.result.place_name.split(/[\s, ]+/)
+    handleAddressChange({
+      city:
+        tempAddress[
+          tempAddress.findIndex(
+            (string) => parseInt(string) >= 10000 && parseInt(string) <= 99999
+          ) - 1
+        ],
+      street:
+        tempAddress[tempAddress.findIndex((string) => string === "g." || string === "G.") - 1] +
+        " g.",
+      house: tempAddress[2].match(/^\d/) ? tempAddress[2] : "",
+      latitude: result.result.center[1],
+      longitude: result.result.center[0],
+    })
+    setAddressTemp({
+      city:
+        tempAddress[
+          tempAddress.findIndex(
+            (string) => parseInt(string) >= 10000 && parseInt(string) <= 99999
+          ) - 1
+        ],
+      street:
+        tempAddress[tempAddress.findIndex((string) => string === "g." || string === "G.") - 1] +
+        " g.",
+      house: tempAddress[2].match(/^\d/) ? tempAddress[2] : "",
+      latitude: result.result.center[1],
+      longitude: result.result.center[0],
     })
   }, [])
+  const handleResult = useCallback(
+    (result) => {
+      return handleQuery(result)
+    },
+    [handleQuery]
+  )
+  const handleInitilisation = useCallback((event) => {
+    setTimeout(() => {
+      event._inputEl.parentElement.children[2].children[0].style.display = "none"
+    }, 500)
+  }, [])
+  const handleInit = useCallback(
+    (event) => {
+      return handleInitilisation(event)
+    },
+    [handleInitilisation]
+  )
   return (
-    <Box height="300px" mt="30px">
+    <Box height="300px">
       <MapGL
         {...viewport}
+        ref={mapRef}
         width="100%"
         height="100%"
         mapStyle="mapbox://styles/y3llow/ckodau4t60mk417ol99dbzqmi"
         onViewportChange={setViewport}
-        mapboxApiAccessToken="pk.eyJ1IjoieTNsbG93IiwiYSI6ImNrb2Q3dnpiZDB4dGEycW9keHN3eXJrc2EifQ.gw7Yw_7SqFWl45iGXvSuPQ"
+        mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        minZoom={6}
+        attributionControl={false}
       >
+        <Geocoder
+          mapRef={mapRef}
+          mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          position="top-left"
+          marker={false}
+          reverseGeocode={true}
+          onResult={handleResult}
+          onInit={handleInit}
+          limit={3}
+          language="lt"
+          countries="lt"
+          zoom={18}
+          placeholder="Įveskite adresą"
+          minLength={4}
+          inputValue={
+            street.length && city.length ? `${street} ${house}, ${city}` : city.length ? city : ""
+          }
+        />
         <Marker
           longitude={marker.longitude}
           latitude={marker.latitude}
@@ -121,10 +247,6 @@ const Map = () => {
         >
           <Pin size={20} />
         </Marker>
-
-        <div className="nav">
-          <NavigationControl />
-        </div>
       </MapGL>
     </Box>
   )
@@ -143,14 +265,28 @@ const Settings: FC<Props> = ({
   city,
   street,
   house,
-  postcode,
+  latitude,
+  longitude,
 }: Props) => {
+  const [isMapLoading, setIsMapLoading] = useState(true)
+  useEffect(() => {
+    setTimeout(() => {
+      setIsMapLoading(false)
+    }, 7000)
+  }, [])
+  const [address, setAddress] = useState({
+    city: city,
+    street: street,
+    house: house,
+    latitude: latitude != null ? latitude : 55.32953572348781,
+    longitude: longitude != null ? longitude : 23.905501899207678,
+  })
   const [image, setImage] = useState([])
   const onChange = (imageList) => {
     setImage(imageList)
   }
   const [uploadState, setUploadState] = useState("NONE")
-  const changesArray = [false, false, false, false]
+  const changesArray = [false, false, false, false, false, false, false]
   const [changes, setChanges] = useState(changesArray)
   const uploadImage = async (e) => {
     setUploadState("UPLOADING")
@@ -374,8 +510,6 @@ const Settings: FC<Props> = ({
     setImagesState({ items })
   }
   const format = /[a-zA-Z0-9-_]/
-  const formatHouse = /[a-zA-Z0-9]/
-  const formatPostcode = /[0-9]/
   const formatUrlFinal = /^(?!-.*$)(?!_.*$)([A-Za-z0-9-_](?!\-$)(?!\_$))+$/gm
   const [serviceName, setServiceName] = useState(name)
   const onServiceNameChange = (value) => {
@@ -432,82 +566,6 @@ const Settings: FC<Props> = ({
     changesArray.splice(5, 1, true)
     setChanges(changesArray)
     setServicePhone(value)
-  }
-  const [serviceCity, setServiceCity] = useState(city)
-  const onServiceCityChange = (value) => {
-    changesArray.splice(6, 1, true)
-    setChanges(changesArray)
-    setServiceCity(value)
-  }
-  const [serviceStreet, setServiceStreet] = useState(street)
-  const onServiceStreetChange = (value) => {
-    changesArray.splice(7, 1, true)
-    setChanges(changesArray)
-    setServiceStreet(value)
-  }
-  const [serviceHouse, setServiceHouse] = useState(house)
-  const [isInvalidHouse, setIsInvalidHouse] = useState(false)
-  const onServiceHouseChange = (value) => {
-    if (value.length) {
-      if (!formatHouse.test(value.charAt(value.length - 1))) {
-        setIsInvalidHouse(true)
-        toastIdRef.current = toast({
-          duration: 3000,
-          render: () => (
-            <WarningToast
-              heading="Kažkas netaip!"
-              text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
-              id={toastIdRef.current}
-            />
-          ),
-        })
-        setTimeout(() => {
-          setIsInvalidHouse(false)
-        }, 3000)
-      } else {
-        changesArray.splice(8, 1, true)
-        setChanges(changesArray)
-        setServiceHouse(value)
-        setIsInvalidHouse(false)
-      }
-    } else {
-      changesArray.splice(8, 1, true)
-      setChanges(changesArray)
-      setServiceHouse(value)
-      setIsInvalidHouse(false)
-    }
-  }
-  const [servicePostcode, setServicePostcode] = useState(postcode)
-  const [isInvalidPostcode, setIsInvalidPostcode] = useState(false)
-  const onServicePostcodeChange = (value) => {
-    if (value.length) {
-      if (!formatPostcode.test(value.charAt(value.length - 1))) {
-        setIsInvalidPostcode(true)
-        toastIdRef.current = toast({
-          duration: 3000,
-          render: () => (
-            <WarningToast
-              heading="Kažkas netaip!"
-              text={`Simbolis, kurį bandėte panaudoti, yra neleistinas.`}
-              id={toastIdRef.current}
-            />
-          ),
-        })
-        setTimeout(() => {
-          setIsInvalidPostcode(false)
-        }, 3000)
-      } else {
-        changesArray.splice(9, 1, true)
-        setChanges(changesArray)
-        setServicePostcode(value)
-        setIsInvalidPostcode(false)
-      }
-    } else {
-      changesArray.splice(9, 1, true)
-      setChanges(changesArray)
-      setServicePostcode(value)
-      setIsInvalidPostcode(false)
-    }
   }
   const [employeeName, setEmployeeName] = useState("")
   const onEmployeeNameChange = (value) => {
@@ -699,10 +757,11 @@ const Settings: FC<Props> = ({
                 carServiceId: activeService,
               },
               data: {
-                city: serviceCity,
-                street: serviceStreet,
-                house: serviceHouse,
-                postCode: servicePostcode,
+                city: address.city,
+                street: address.street,
+                house: address.house,
+                coordinateX: address.longitude,
+                coordinateY: address.latitude,
               },
             })
             refetchOther()
@@ -736,10 +795,11 @@ const Settings: FC<Props> = ({
               carServiceId: activeService,
             },
             data: {
-              city: serviceCity,
-              street: serviceStreet,
-              house: serviceHouse,
-              postCode: servicePostcode,
+              city: address.city,
+              street: address.street,
+              house: address.house,
+              coordinateX: address.longitude,
+              coordinateY: address.latitude,
             },
           })
           refetchOther()
@@ -771,7 +831,7 @@ const Settings: FC<Props> = ({
       })
       setChanging(false)
     }
-    changesArray.splice(0, 10, false, false, false, false, false, false, false, false, false, false)
+    changesArray.splice(0, 7, false, false, false, false, false, false, false)
     setChanges(changesArray)
   }
   const [employees, { refetch }] = useQuery(getEmployees, activeService)
@@ -1201,13 +1261,7 @@ const Settings: FC<Props> = ({
                     alignItems="center"
                   >
                     {finalImagesLoading ? (
-                      <Spinner
-                        thickness="4px"
-                        speed="0.65s"
-                        emptyColor="#EFF0F3"
-                        color="#6500E6"
-                        size="xl"
-                      />
+                      <CircularProgress isIndeterminate color="#6500E6" />
                     ) : (
                       <DragDropContext onDragEnd={onDragEnd}>
                         <Droppable droppableId="droppable" direction="horizontal">
@@ -1755,59 +1809,44 @@ const Settings: FC<Props> = ({
                   <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
                     Adresas
                   </Heading>
-                  <Text color="#787E97">
+                  <Text color="#787E97" mb="20px">
                     Pakeiskite savo adresą ir patikslinkite vietą žemėlapyje, kad klientams nekiltų
                     problemų jus randant
                   </Text>
+                  <Text color="#787E97" display="inline">
+                    Nerandate savo adreso?
+                  </Text>
+                  <Link
+                    href="/partners/support"
+                    textDecoration="none !important"
+                    color="#6500e6"
+                    display="inline"
+                    ml="5px"
+                    _hover={{ opacity: 0.8 }}
+                  >
+                    Susisiekite su mumis
+                  </Link>
                 </Box>
-                <Box width="700px">
-                  <Input
-                    placeholder="Gyvenvietė"
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    mb="20px"
-                    value={serviceCity}
-                    onChange={(e) => onServiceCityChange(e.target.value)}
-                    focusBorderColor="brand.500"
+                <Box width="700px" display={isMapLoading ? "none" : "block"}>
+                  <Map
+                    address={address}
+                    changes={changesArray}
+                    onChanges={setChanges}
+                    onAddressChange={setAddress}
+                    city={city}
+                    street={street}
+                    house={house}
                   />
-                  <Input
-                    placeholder="Gatvė"
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    mb="20px"
-                    value={serviceStreet}
-                    onChange={(e) => onServiceStreetChange(e.target.value)}
-                    focusBorderColor="brand.500"
-                  />
-                  <Input
-                    placeholder="Namo numeris"
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    mb="20px"
-                    value={serviceHouse}
-                    isInvalid={isInvalidHouse}
-                    onChange={(e) => onServiceHouseChange(e.target.value)}
-                    focusBorderColor={isInvalidHouse ? "red" : "brand.500"}
-                  />
-                  <Input
-                    placeholder="Pašto kodas"
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    value={servicePostcode}
-                    isInvalid={isInvalidPostcode}
-                    onChange={(e) => onServicePostcodeChange(e.target.value)}
-                    focusBorderColor={isInvalidPostcode ? "red" : "brand.500"}
-                  />
-                  <Map />
                 </Box>
+                <Flex
+                  width="700px"
+                  height="300px"
+                  justifyContent="center"
+                  alignItems="center"
+                  display={isMapLoading ? "flex" : "none"}
+                >
+                  <CircularProgress isIndeterminate color="#6500E6" />
+                </Flex>
               </Flex>
               <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
               <Flex
