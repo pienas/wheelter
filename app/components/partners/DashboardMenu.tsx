@@ -40,6 +40,8 @@ import SuccessToast from "../index/SuccessToast"
 import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
 import getUserNotificationsCount from "app/partners/queries/getUserNotificationsCount"
 import getServiceAddress from "app/partners/queries/getServiceAddress"
+import DiscountsIcon from "./DiscountsIcon"
+import Discounts from "./Discounts"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -95,15 +97,9 @@ const DashboardMenu = () => {
     : parseInt(localStorage.getItem("selectedService") as string) || carServices![0].carServiceId
   const [activeService, setActiveService] = useState<number>(selectedService)
   const [activeCarService, { refetch }] = useQuery(getUsersActiveService, activeService)
-  const [address] = useQuery(
-    getServiceAddress,
-    {
-      where: { carServiceId: activeService },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
+  const [address] = useQuery(getServiceAddress, {
+    where: { carServiceId: activeService },
+  })
   const { isOpen, onToggle } = useDisclosure({
     defaultIsOpen:
       (Router.query.isOpen as string) === "true"
@@ -137,15 +133,15 @@ const DashboardMenu = () => {
       refetchInterval: 60000,
     }
   )
-  const [quickHelpOrders] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: { carServiceId: activeService, status: "QUICK" },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
+  // const [quickHelpOrders] = useQuery(
+  //   getServiceOrdersCount,
+  //   {
+  //     where: { carServiceId: activeService, status: "QUICK" },
+  //   },
+  //   {
+  //     refetchInterval: 60000,
+  //   }
+  // )
   const [lastNotificationsCount, setLastNofiticationCount] = useState<any>()
   const [notificationSound] = useSound("/notification.mp3")
   const [notificationsCount] = useQuery(
@@ -154,7 +150,7 @@ const DashboardMenu = () => {
       where: { carServiceUserId: currentUser?.id, seen: false },
     },
     {
-      refetchInterval: 10000,
+      refetchInterval: 60000,
       refetchIntervalInBackground: true,
       onSuccess: (count) => {
         if (count > lastNotificationsCount) {
@@ -224,17 +220,6 @@ const DashboardMenu = () => {
           )}
         </Head>
       )}
-      {Router.route === "/partners/quickhelp" && (
-        <Head>
-          {notificationsCount ? (
-            <title>
-              ({notificationsCount > 9 ? "9+" : notificationsCount}) Greita pagalba ・ Wheelter
-            </title>
-          ) : (
-            <title>Greita pagalba ・ Wheelter</title>
-          )}
-        </Head>
-      )}
       {Router.route === "/partners/notes" && (
         <Head>
           {notificationsCount ? (
@@ -243,6 +228,17 @@ const DashboardMenu = () => {
             </title>
           ) : (
             <title>Užrašinė ・ Wheelter</title>
+          )}
+        </Head>
+      )}
+      {Router.route === "/partners/discounts" && (
+        <Head>
+          {notificationsCount ? (
+            <title>
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Akcijos ・ Wheelter
+            </title>
+          ) : (
+            <title>Akcijos ・ Wheelter</title>
           )}
         </Head>
       )}
@@ -834,6 +830,61 @@ const DashboardMenu = () => {
               </Flex>
             </Tooltip>
           </Link>
+          <Link href="/partners/discounts" textDecoration="none !important">
+            <Tooltip
+              label="Akcijos"
+              placement="right"
+              background="#EFF0F3"
+              color="black"
+              isDisabled={isOpen}
+            >
+              <Flex
+                justifyContent="flex-start"
+                alignItems="center"
+                height="50px"
+                cursor="pointer"
+                transition="all 0.2s"
+                background={Router.route === "/partners/discounts" ? "#FDF9FF" : "transparent"}
+                _hover={{ background: "#FDF9FF" }}
+                sx={{
+                  ":hover > svg": {
+                    color: "#6500E6",
+                  },
+                  ":hover > p": {
+                    color: "#0B132A",
+                  },
+                }}
+                position="relative"
+                _before={{
+                  content: '""',
+                  borderRadius: "0 50px 50px 0",
+                  width: "6px",
+                  height: "100%",
+                  background: Router.route === "/partners/discounts" ? "#6500E6" : "transparent",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                <DiscountsIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/discounts" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
+                  transition="all 0.2s"
+                />
+                {isOpen && (
+                  <Text
+                    fontWeight="600"
+                    fontSize="sm"
+                    color={Router.route === "/partners/discounts" ? "#0B132A" : "#A8A8A8"}
+                    transition="all 0.2s"
+                  >
+                    Akcijos
+                  </Text>
+                )}
+              </Flex>
+            </Tooltip>
+          </Link>
           <Link href="/partners/settings" textDecoration="none !important">
             <Tooltip
               label="Nustatymai"
@@ -1285,11 +1336,11 @@ const DashboardMenu = () => {
           {Router.route === "/partners/services" && (
             <Services isOpen={isOpen} activeService={activeService} />
           )}
-          {Router.route === "/partners/quickhelp" && (
-            <Quickhelp isOpen={isOpen} activeService={activeService} />
-          )}
           {Router.route === "/partners/notes" && (
             <Notes isOpen={isOpen} activeService={activeService} />
+          )}
+          {Router.route === "/partners/discounts" && (
+            <Discounts isOpen={isOpen} activeService={activeService} />
           )}
           {Router.route === "/partners/settings" && (
             <Settings
@@ -1305,7 +1356,8 @@ const DashboardMenu = () => {
               city={address?.city!}
               street={address?.street!}
               house={address?.house!}
-              postcode={address?.postCode!}
+              latitude={address?.coordinateY!}
+              longitude={address?.coordinateX!}
               refetchOther={() => refetch()}
             />
           )}

@@ -6,6 +6,7 @@
     "build": "blitz build",
     "start": "blitz start",
     "studio": "blitz prisma studio",
+    "migrate": "blitz prisma migrate dev --preview-feature",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test": "jest",
     "test:watch": "jest --watch"
@@ -49,6 +50,7 @@
     "react-final-form-html5-validation": "1.1.0",
     "react-images-uploading": "3.1.2",
     "react-map-gl": "6.1.13",
+    "react-map-gl-geocoder": "2.1.6",
     "react-phone-input-2": "2.13.9",
     "react-pose": "4.0.10",
     "react-router-dom": "5.2.0",

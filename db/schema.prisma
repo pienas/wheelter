@@ -330,7 +330,6 @@ model Address {
   city         String
   street       String
   house        String
-  postCode     Int
   coordinateX  Float?
   coordinateY  Float?
   carService   CarService? @relation(fields: [carServiceId], references: [id])

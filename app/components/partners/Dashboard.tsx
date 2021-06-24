@@ -75,111 +75,75 @@ const Dashboard: FC<Props> = ({
   activeCarServiceIncome,
   newOrders,
 }: Props) => {
-  const [activeOrders] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: { carServiceId: activeService, status: "ACTIVE" },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [doneOrders] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: { carServiceId: activeService, status: "DONE" },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [cancelledOrders] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: { carServiceId: activeService, status: "CANCELLED" },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [allOrders] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: { carServiceId: activeService },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
+  const [activeOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "ACTIVE" },
+  })
+  const [doneOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "DONE" },
+  })
+  const [cancelledOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService, status: "CANCELLED" },
+  })
+  const [allOrders] = useQuery(getServiceOrdersCount, {
+    where: { carServiceId: activeService },
+  })
   const panelOrdersCount = activeOrders + doneOrders + cancelledOrders
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
   const todayEnd = new Date()
   todayEnd.setHours(23, 59, 59, 999)
-  const [todaysOrdersCount] = useQuery(
-    getServiceOrdersCount,
-    {
-      where: {
-        carServiceId: activeService,
-        AND: [
-          {
-            startsAt: {
-              gte: todayStart,
-            },
+  const [todaysOrdersCount] = useQuery(getServiceOrdersCount, {
+    where: {
+      carServiceId: activeService,
+      AND: [
+        {
+          startsAt: {
+            gte: todayStart,
           },
-          {
-            startsAt: {
-              lte: todayEnd,
-            },
+        },
+        {
+          startsAt: {
+            lte: todayEnd,
           },
-        ],
-      },
+        },
+      ],
     },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [todaysOrders] = useQuery(
-    getServiceOrders,
-    {
-      where: {
-        carServiceId: activeService,
-        NOT: [
-          {
-            status: "NEW",
+  })
+  const [todaysOrders] = useQuery(getServiceOrders, {
+    where: {
+      carServiceId: activeService,
+      NOT: [
+        {
+          status: "NEW",
+        },
+      ],
+      AND: [
+        {
+          startsAt: {
+            gte: todayStart,
           },
-        ],
-        AND: [
-          {
-            startsAt: {
-              gte: todayStart,
-            },
+        },
+        {
+          startsAt: {
+            lte: todayEnd,
           },
-          {
-            startsAt: {
-              lte: todayEnd,
-            },
-          },
-        ],
-      },
-      select: {
-        id: true,
-        clientId: true,
-        employeeId: true,
-        startsAt: true,
-        status: true,
-        employee: { select: { name: true, surname: true } },
-        client: { select: { name: true, surname: true } },
-        service: { select: { name: true, price: true, duration: true } },
-      },
-      orderBy: {
-        startsAt: "asc",
-      },
+        },
+      ],
     },
-    {
-      refetchInterval: 60000,
-    }
-  )
+    select: {
+      id: true,
+      clientId: true,
+      employeeId: true,
+      startsAt: true,
+      status: true,
+      employee: { select: { name: true, surname: true } },
+      client: { select: { name: true, surname: true } },
+      service: { select: { name: true, price: true, duration: true } },
+    },
+    orderBy: {
+      startsAt: "asc",
+    },
+  })
   // const [serviceOrders] = useQuery(
   //   getServiceOrders,
   //   {
@@ -199,35 +163,17 @@ const Dashboard: FC<Props> = ({
   //     refetchInterval: 60000,
   //   }
   // )
-  const [allReviews] = useQuery(
-    getServiceReviewsCount,
-    {
-      where: { carServiceId: activeService },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [serviceRating] = useQuery(
-    getServiceRating,
-    {
-      avg: { rating: true },
-      where: { carServiceId: activeService },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
-  const [serviceIncome] = useQuery(
-    getServiceIncome,
-    {
-      sum: { price: true },
-      where: { carServiceId: activeService, status: "DONE" },
-    },
-    {
-      refetchInterval: 60000,
-    }
-  )
+  const [allReviews] = useQuery(getServiceReviewsCount, {
+    where: { carServiceId: activeService },
+  })
+  const [serviceRating] = useQuery(getServiceRating, {
+    avg: { rating: true },
+    where: { carServiceId: activeService },
+  })
+  const [serviceIncome] = useQuery(getServiceIncome, {
+    sum: { price: true },
+    where: { carServiceId: activeService, status: "DONE" },
+  })
   const backgroundActive = panelOrdersCount
     ? `linear-gradient(90deg, #6500E6 ${(activeOrders / panelOrdersCount) * 100}%, #E5E5E5 ${
         (activeOrders / panelOrdersCount) * 100
