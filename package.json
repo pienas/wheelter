@@ -5,7 +5,7 @@
     "dev": "blitz dev",
     "build": "blitz build",
     "start": "blitz start",
-    "studio": "dotenv -e .env.local blitz prisma studio",
+    "studio": "blitz prisma studio",
     "migrate": "blitz prisma migrate dev --preview-feature",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts,.tsx .",
     "test": "jest",
