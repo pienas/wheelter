@@ -30,7 +30,7 @@ Ensure the `.env.test.local` file has required environment variables:
 DATABASE_URL=postgresql://<YOUR_DB_USERNAME>@localhost:5432/wheelter_test
 ```
 
-Next run app in development mode.
+Run app in development mode.
 
 ```
 blitz dev
@@ -38,6 +38,11 @@ blitz dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Run Prisma Studio for easy-access database.
+
+```
+blitz prisma studio
+```
 ## Commands
 
 Blitz comes with a powerful CLI that is designed to make development easy and fast. You can install it with `npm i -g blitz`
