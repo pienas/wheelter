@@ -4,7 +4,7 @@ import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
 import DashboardMenu from "app/components/partners/DashboardMenu"
 
-const PartnersDashboard: BlitzPage = () => {
+const PartnersStats: BlitzPage = () => {
   return (
     <Suspense fallback="Kraunama...">
       <Scrollbar style={{ height: "100vh" }} noScrollX>
@@ -42,8 +42,8 @@ const PartnersDashboard: BlitzPage = () => {
   )
 }
 
-PartnersDashboard.authenticate = { redirectTo: "/login" }
-PartnersDashboard.suppressFirstRenderFlicker = true
-PartnersDashboard.getLayout = (page) => <Layout title="Statistika ・ Wheelter">{page}</Layout>
+PartnersStats.authenticate = { redirectTo: "/login" }
+PartnersStats.suppressFirstRenderFlicker = true
+PartnersStats.getLayout = (page) => <Layout title="Statistika ・ Wheelter">{page}</Layout>
 
-export default PartnersDashboard
+export default PartnersStats

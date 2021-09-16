@@ -4,7 +4,7 @@ import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
 import DashboardMenu from "app/components/partners/DashboardMenu"
 
-const PartnersDashboard: BlitzPage = () => {
+const PartnersCalendar: BlitzPage = () => {
   return (
     <Suspense fallback="Kraunama...">
       <Scrollbar style={{ height: "100vh" }} noScrollX>
@@ -42,8 +42,8 @@ const PartnersDashboard: BlitzPage = () => {
   )
 }
 
-PartnersDashboard.authenticate = { redirectTo: "/login" }
-PartnersDashboard.suppressFirstRenderFlicker = true
-PartnersDashboard.getLayout = (page) => <Layout title="Kalendorius ・ Wheelter">{page}</Layout>
+PartnersCalendar.authenticate = { redirectTo: "/login" }
+PartnersCalendar.suppressFirstRenderFlicker = true
+PartnersCalendar.getLayout = (page) => <Layout title="Kalendorius ・ Wheelter">{page}</Layout>
 
-export default PartnersDashboard
+export default PartnersCalendar

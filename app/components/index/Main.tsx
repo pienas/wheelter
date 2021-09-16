@@ -28,6 +28,7 @@ import InstagramIcon from "./InstagramIcon"
 import DownIcon from "../partners/ArrowIcon"
 import getServicesCount from "app/partners/queries/getServicesCount"
 import SearchIcon from "./SearchIcon"
+import BrandText from "./BrandText"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -150,7 +151,7 @@ const Main = () => {
             <Box>
               <Heading size="2xl" fontWeight="500" lineHeight="1.4">
                 Rinkitės praktiškumą, <br />
-                registruokitės su <b>Wheelter.</b>
+                registruokitės su <BrandText>Wheelter</BrandText>.
               </Heading>
               <Heading
                 as="h2"
@@ -161,7 +162,8 @@ const Main = () => {
                 fontWeight="400"
                 lineHeight="2"
               >
-                Registracija autopaslaugoms su <b>Wheelter</b> tapo daug paprastesnė. <br />
+                Registracija autopaslaugoms su <BrandText>Wheelter</BrandText> tapo daug
+                paprastesnė. <br />
                 Rezervuokite laiką dabar. Atsiskaitykite vietoje.
               </Heading>
             </Box>
