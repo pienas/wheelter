@@ -1,6 +1,6 @@
 {
   "name": "wheelter",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "scripts": {
     "dev": "blitz dev",
     "build": "blitz build",
