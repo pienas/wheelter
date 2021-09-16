@@ -74,7 +74,7 @@ const Tabs = () => {
               top="10px"
               left="10%"
             >
-              PASLAUGOS PAVADINIMAS
+              PASLAUGA
             </FormLabel>
             <Select
               icon={<></>}
@@ -92,7 +92,6 @@ const Tabs = () => {
               placeholder="Pasirinkite paslaugą"
               fontWeight="600"
               fontSize="16px"
-              dir="rtl"
               height="2rem"
               _hover={{ cursor: "pointer", borderColor: "brand.500" }}
             >
@@ -124,10 +123,9 @@ const Tabs = () => {
               mb="25px"
               focusBorderColor="text"
               _focus={{ boxShadow: "none", borderBottom: "1px solid #cbd5e0" }}
-              placeholder="Pasirinkite rajoną"
+              placeholder="Pasirinkite miestą"
               fontWeight="600"
               fontSize="16px"
-              dir="rtl"
               height="2rem"
               _hover={{ cursor: "pointer", borderColor: "brand.500" }}
             >

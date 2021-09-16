@@ -1,7 +1,7 @@
 import { Head, Router, useMutation, useQuery } from "blitz"
 import { Avatar } from "@chakra-ui/avatar"
 import { useDisclosure } from "@chakra-ui/hooks"
-import { Box, Divider, Flex, Heading, Link, Text } from "@chakra-ui/layout"
+import { Box, Divider, Flex, Heading, Link, Text } from "@chakra-ui/react"
 import { Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/menu"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getUsersActiveService from "app/partners/queries/getUsersActiveService"

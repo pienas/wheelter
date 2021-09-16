@@ -1,5 +1,5 @@
 import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input"
-import { Box, Divider, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/layout"
+import { Box, Divider, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/react"
 import { TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/tabs"
 import { Textarea } from "@chakra-ui/textarea"
 import React, { FC, useCallback, useEffect, useRef, useState } from "react"

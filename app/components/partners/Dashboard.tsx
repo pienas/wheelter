@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/layout"
+import { Box, Flex, Heading, Text } from "@chakra-ui/react"
 import { TabList, Tabs } from "@chakra-ui/tabs"
 import { useQuery } from "blitz"
 import React, { FC } from "react"

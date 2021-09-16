@@ -145,6 +145,13 @@ const Home: BlitzPage = () => {
           .formQuickHelp button:hover {
             background-color: #7e1aff;
           }
+          select {
+            text-align: right;
+            text-align-last: right;
+          }
+          option {
+            text-align: left;
+          }
         `}</style>
       </Scrollbar>
     </Suspense>
