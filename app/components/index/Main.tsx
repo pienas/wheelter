@@ -107,7 +107,7 @@ const Main = () => {
   })
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
-      <Box ml="15vw" mr="15vw" width="70vw" mt="30px" overflow="hidden" id="menu">
+      <Box mx="15vw" width="70vw" mt="30px" overflow="hidden" id="menu">
         <Flex alignItems="center">
           <Box mr="80px" height="41px" cursor="pointer">
             <Link href="/" passHref>
@@ -184,13 +184,11 @@ const Main = () => {
                   variant="solid"
                   size="md"
                   width="80%"
-                  ml="10%"
-                  mr="10%"
+                  mx="10%"
                   borderRadius="10px"
                   backgroundColor="brand.500"
                   color="white"
-                  mt="30px"
-                  mb="30px"
+                  my="30px"
                   _hover={{ backgroundColor: "brand.400" }}
                 >
                   Ieškoti
@@ -233,7 +231,7 @@ const Main = () => {
           <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
             <FastIcon boxSize={8} color="white" />
           </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" mt="1.5rem" mb="1.5rem">
+          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
             Greičiau
           </Heading>
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
@@ -267,7 +265,7 @@ const Main = () => {
           <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
             <ReliableIcon boxSize={8} color="white" />
           </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" mt="1.5rem" mb="1.5rem">
+          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
             Patogiau
           </Heading>
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
@@ -301,7 +299,7 @@ const Main = () => {
           <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
             <TrustworthyIcon boxSize={8} color="white" />
           </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" mt="1.5rem" mb="1.5rem">
+          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
             Patikimiau
           </Heading>
           <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
@@ -323,7 +321,7 @@ const Main = () => {
         </Box>
       </Grid>
       <Box mx="15vw" width="70vw" my={12}>
-        <Heading fontSize="4xl" as="h2" fontWeight="700" mt="1.5rem" mb="1.5rem" textAlign="center">
+        <Heading fontSize="4xl" as="h2" fontWeight="700" my="1.5rem" textAlign="center">
           Daugiau nei{" "}
           <Text fontSize="6xl" fontWeight="700" display="inline" color="brand.500">
             {Math.floor(servicesCount / 10) * 10}

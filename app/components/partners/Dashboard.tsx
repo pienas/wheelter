@@ -167,11 +167,11 @@ const Dashboard: FC<Props> = ({
     where: { carServiceId: activeService },
   })
   const [serviceRating] = useQuery(getServiceRating, {
-    avg: { rating: true },
+    _avg: { rating: true },
     where: { carServiceId: activeService },
   })
   const [serviceIncome] = useQuery(getServiceIncome, {
-    sum: { price: true },
+    _sum: { price: true },
     where: { carServiceId: activeService, status: "DONE" },
   })
   const backgroundActive = panelOrdersCount
@@ -262,7 +262,7 @@ const Dashboard: FC<Props> = ({
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
           <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-            {serviceIncome.sum?.price! + activeCarServiceIncome} €
+            {serviceIncome._sum?.price! + activeCarServiceIncome} €
           </Text>
           <Text fontSize="xl" color="#A8A8A8">
             <b>Visos</b> pajamos
@@ -349,7 +349,7 @@ const Dashboard: FC<Props> = ({
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
           <Text fontWeight="500" fontSize="4xl" lineHeight="1">
-            {serviceRating.avg?.rating?.toFixed(1)}
+            {serviceRating._avg?.rating?.toFixed(1)}
           </Text>
           <Text fontSize="xl" color="#A8A8A8">
             <b>Vidutinis</b> įvertinimas
