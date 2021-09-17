@@ -1,25 +1,27 @@
-import React, { Suspense } from "react"
-import { Link, useMutation, Image, useQuery } from "blitz"
+import React from "react"
+import { Link, useMutation, Image, useQuery, Routes } from "blitz"
 import {
   Container,
   Flex,
-  Box,
   Link as ChakraLink,
   Button,
-  Grid,
   Heading,
   Text,
   Avatar,
   Menu,
+  Box,
   MenuButton,
   MenuList,
   MenuItem,
+  MenuItemOption,
   MenuDivider,
+  MenuOptionGroup,
+  Grid,
 } from "@chakra-ui/react"
+import { ChevronDownIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
 import Tabs from "app/components/index/Tabs"
-import QuickHelp from "./QuickHelp"
 import TrustworthyIcon from "./TrustworthyIcon"
 import FastIcon from "./FastIcon"
 import ReliableIcon from "./ReliableIcon"
@@ -27,8 +29,10 @@ import FacebookIcon from "./FacebookIcon"
 import InstagramIcon from "./InstagramIcon"
 import DownIcon from "../partners/ArrowIcon"
 import getServicesCount from "app/partners/queries/getServicesCount"
-import SearchIcon from "./SearchIcon"
 import BrandText from "./BrandText"
+import ServicesIcon from "./ServicesIcon"
+import LocationIcon from "./LocationIcon"
+import CalendarIcon from "./CalendarIcon"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -80,26 +84,34 @@ const UserInfo = () => {
     return (
       <>
         <Link href="/login" passHref>
-          <Button
-            variant="solid"
-            size="md"
-            backgroundColor="brand.500"
-            color="white"
-            width="150px"
-            height="41px"
-            borderRadius="50px"
-            fontWeight="500"
-            _hover={{ backgroundColor: "brand.400" }}
+          <ChakraLink
+            sx={{
+              ":hover": {
+                textDecoration: "none",
+              },
+            }}
           >
-            Prisijungti
-          </Button>
+            <Button
+              variant="solid"
+              backgroundColor="brand.500"
+              color="white"
+              width={48}
+              height={14}
+              borderRadius="10px"
+              fontWeight="600"
+              boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
+              _hover={{ backgroundColor: "brand.400" }}
+            >
+              Prisijungti
+            </Button>
+          </ChakraLink>
         </Link>
       </>
     )
   }
 }
 
-const Main = () => {
+const MainNew = () => {
   const [servicesCount] = useQuery(getServicesCount, {
     where: {
       isReviewed: true,
@@ -107,220 +119,245 @@ const Main = () => {
   })
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
-      <Box mx="15vw" width="70vw" mt="30px" overflow="hidden" id="menu">
+      <Flex px="200px" pt="30px" pb="50px" overflow="hidden" justifyContent="space-between">
         <Flex alignItems="center">
-          <Box mr="80px" height="41px" cursor="pointer">
-            <Link href="/" passHref>
-              <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
-            </Link>
-          </Box>
-          <Grid templateColumns="2fr 1fr" width="calc(100% - 238px)">
-            <Flex alignItems="center">
-              <ChakraLink mr="30px" color="text">
-                Važiuoklė
-              </ChakraLink>
-              <ChakraLink mr="30px" color="text">
-                Kėbulas
-              </ChakraLink>
-              <ChakraLink mr="30px" color="text">
-                Variklis
-              </ChakraLink>
-              <ChakraLink mr="30px" color="text">
-                Modifikavimas
-              </ChakraLink>
-              <ChakraLink mr="30px" color="text">
-                Priežiūra
-              </ChakraLink>
-              <ChakraLink mr="30px" color="text">
-                Ratai
-              </ChakraLink>
-              <ChakraLink color="text">Kita</ChakraLink>
-            </Flex>
-            <Flex justifySelf="flex-end" alignItems="center">
-              <ChakraLink mr="30px" fontWeight="500" href="/partners/dashboard">
-                Paslaugų teikėjams
-              </ChakraLink>
-              <UserInfo />
-            </Flex>
-          </Grid>
-        </Flex>
-      </Box>
-      <Box ml="15vw" width="85vw" id="main" mt="60px">
-        <Grid mb="50px" templateColumns="1.4fr 2fr">
-          <Box>
-            <Box>
-              <Heading size="2xl" fontWeight="500" lineHeight="1.4">
-                Rinkitės praktiškumą, <br />
-                registruokitės su <BrandText>Wheelter</BrandText>.
-              </Heading>
-              <Heading
-                as="h2"
-                fontSize="md"
-                mt="1rem"
-                color="text"
-                mb="20px"
-                fontWeight="400"
-                lineHeight="2"
-              >
-                Registracija autopaslaugoms su <BrandText>Wheelter</BrandText> tapo daug
-                paprastesnė. <br />
-                Rezervuokite laiką dabar. Atsiskaitykite vietoje.
-              </Heading>
-            </Box>
-            <Box>
-              <Flex alignItems="center" justifyContent="center" mb="15px">
-                <SearchIcon w={9} h={9} />
-                <Heading as="h3" fontSize="3xl" ml="15px" fontWeight="500">
-                  Paieška
-                </Heading>
+          <Link href={Routes.Home()} passHref>
+            <ChakraLink
+              sx={{
+                ":hover": {
+                  textDecoration: "none",
+                },
+              }}
+            >
+              <Flex alignItems="center" mr="50px" cursor="pointer">
+                <Image src="/logo.svg" alt="Wheelter logo" width="70px" height="62px" />
+                <Heading fontSize="2xl">Wheelter</Heading>
               </Flex>
-              <Box
-                backgroundColor="#fff"
-                boxShadow="0px 0px 40px 0px rgba(0, 0, 0, 0.08);"
-                borderRadius="10px"
-              >
-                <Tabs />
-                <Button
-                  variant="solid"
-                  size="md"
-                  width="80%"
-                  mx="10%"
-                  borderRadius="10px"
-                  backgroundColor="brand.500"
-                  color="white"
-                  my="30px"
-                  _hover={{ backgroundColor: "brand.400" }}
-                >
-                  Ieškoti
-                </Button>
-              </Box>
+            </ChakraLink>
+          </Link>
+          <ChakraLink mr="20px" color="text">
+            Važiuoklė
+          </ChakraLink>
+          <ChakraLink mr="20px" color="text">
+            Kėbulas
+          </ChakraLink>
+          <ChakraLink mr="20px" color="text">
+            Variklis
+          </ChakraLink>
+          <ChakraLink mr="20px" color="text">
+            Modifikavimas
+          </ChakraLink>
+          <ChakraLink mr="20px" color="text">
+            Priežiūra
+          </ChakraLink>
+          <ChakraLink mr="20px" color="text">
+            Ratai
+          </ChakraLink>
+          <ChakraLink color="text">Kita</ChakraLink>
+        </Flex>
+        <Flex alignItems="center">
+          <Menu>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              fontWeight="400"
+              color="text"
+              _focus={{ boxShadow: "none" }}
+            >
+              LT
+            </MenuButton>
+            <MenuList
+              border="none"
+              boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)"
+              width="auto"
+              minWidth="80px"
+            >
+              <MenuOptionGroup defaultValue="LT" title="Kalba" type="radio">
+                <MenuItemOption value="LT">LT</MenuItemOption>
+                <MenuItemOption value="EN">EN</MenuItemOption>
+                <MenuItemOption value="RU">RU</MenuItemOption>
+              </MenuOptionGroup>
+            </MenuList>
+          </Menu>
+          <Link href="/partners/dashboard" passHref>
+            <ChakraLink fontWeight="500" _hover={{ textDecoration: "none" }} color="text" mr="20px">
+              Paslaųgų teikėjams
+            </ChakraLink>
+          </Link>
+          <UserInfo />
+        </Flex>
+      </Flex>
+      <Flex>
+        <Box maxWidth="650px" ml="200px">
+          <Heading size="2xl" fontWeight="500" lineHeight="1.4">
+            Rinkitės praktiškumą, <br />
+            registruokitės su <BrandText>Wheelter</BrandText>.
+          </Heading>
+          <Heading
+            as="h2"
+            fontSize="md"
+            mt="1rem"
+            color="text"
+            mb="50px"
+            fontWeight="400"
+            lineHeight="2"
+          >
+            Registracija autopaslaugoms su <BrandText>Wheelter</BrandText> tapo daug paprastesnė.{" "}
+            <br />
+            Rezervuokite laiką dabar. Atsiskaitykite vietoje.
+          </Heading>
+          <Flex
+            backgroundColor="#ffffff"
+            maxWidth="500px"
+            boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
+            borderRadius="10px"
+            mb="20px"
+          >
+            <Box
+              backgroundColor="brand.500"
+              borderRadius="100%"
+              p="0.7rem"
+              mr="30px"
+              my="20px"
+              ml="20px"
+            >
+              <FastIcon boxSize={8} color="white" />
             </Box>
-          </Box>
-          <Box alignSelf="flex-end" justifySelf="center">
-            <Image
-              src="/illustration-main.svg"
-              width="700px"
-              height="539px"
-              alt="Wheelter illustration"
-            />
-          </Box>
-        </Grid>
-        {/* <Suspense fallback="Kraunama...">
-          <QuickHelp />
-        </Suspense> */}
-      </Box>
-      <Grid
-        templateColumns="1fr 1fr 1fr"
-        gap={10}
-        mx="15vw"
-        width="70vw"
-        mt="3.75rem"
-        minHeight="22rem"
+            <Box>
+              <Heading as="h2" fontSize="18px" mt="15px">
+                Greičiau
+              </Heading>
+              <Text fontSize="14px" color="text" mt="5px">
+                Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų
+                automobiliui.
+              </Text>
+            </Box>
+          </Flex>
+          <Flex
+            backgroundColor="#ffffff"
+            maxWidth="500px"
+            boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
+            borderRadius="10px"
+            mb="20px"
+          >
+            <Box
+              backgroundColor="brand.500"
+              borderRadius="100%"
+              p="0.7rem"
+              mr="30px"
+              my="20px"
+              ml="20px"
+            >
+              <ReliableIcon boxSize={8} color="white" />
+            </Box>
+            <Box>
+              <Heading as="h2" fontSize="18px" mt="15px">
+                Patogiau
+              </Heading>
+              <Text fontSize="14px" color="text" mt="5px">
+                Vieta ir laikas nuo šiol nebe rodikliai.
+              </Text>
+            </Box>
+          </Flex>
+          <Flex
+            backgroundColor="#ffffff"
+            maxWidth="500px"
+            boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
+            borderRadius="10px"
+            mb="20px"
+          >
+            <Box
+              backgroundColor="brand.500"
+              borderRadius="100%"
+              p="0.7rem"
+              mr="30px"
+              my="20px"
+              ml="20px"
+            >
+              <TrustworthyIcon boxSize={8} color="white" />
+            </Box>
+            <Box>
+              <Heading as="h2" fontSize="18px" mt="15px">
+                Patikimiau
+              </Heading>
+              <Text fontSize="14px" color="text" mt="5px">
+                Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją
+                išmaniai.
+              </Text>
+            </Box>
+          </Flex>
+        </Box>
+        <Box justifySelf="flex-end" alignSelf="center">
+          <Image src="/illustration.svg" width="900px" height="532px" alt="Wheelter illustration" />
+        </Box>
+      </Flex>
+      <Flex
+        backgroundColor="#ffffff"
+        boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
+        borderRadius="10px"
+        mx="200px"
+        p="55px"
+        mt="20px"
+        position="relative"
       >
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          alignItems="center"
-          backgroundColor="#fff"
-          borderRadius="10px"
-          p={12}
-          position="relative"
-          boxShadow="0px 0px 40px 0px rgba(0, 0, 0, 0.08);"
-        >
-          <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
-            <FastIcon boxSize={8} color="white" />
-          </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
-            Greičiau
-          </Heading>
-          <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
-            Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų automobiliui.
+        <Box backgroundColor="green.300" borderRadius="full" position="absolute" top="-15px">
+          <Text fontSize="14px" color="white" px="35px" py="5px">
+            Paieška
           </Text>
-          <Link href="/about" passHref>
-            <Text
-              color="brand.500"
-              fontWeight="600"
-              pt="1.5rem"
-              position="absolute"
-              bottom={12}
-              cursor="pointer"
-              _hover={{ color: "brand.400" }}
-            >
-              Sužinokite daugiau →
-            </Text>
-          </Link>
         </Box>
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          alignItems="center"
-          backgroundColor="#fff"
-          borderRadius="10px"
-          p={12}
-          position="relative"
-          boxShadow="0px 0px 40px 0px rgba(0, 0, 0, 0.08);"
-        >
-          <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
-            <ReliableIcon boxSize={8} color="white" />
+        <Flex alignItems="center" width="350px">
+          <LocationIcon boxSize={8} color="brand.500" />
+          <Box ml="20px">
+            <Text fontSize="14px" color="#a0a0a0">
+              Pasirinkite lokaciją
+            </Text>
+            <Text fontSize="14px" color="text" fontWeight="500">
+              Klaipėda
+            </Text>
           </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
-            Patogiau
-          </Heading>
-          <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
-            Vieta ir laikas nuo šiol nebe rodikliai.
-          </Text>
-          <Link href="/about" passHref>
-            <Text
-              color="brand.500"
-              fontWeight="600"
-              pt="1.5rem"
-              position="absolute"
-              bottom={12}
-              cursor="pointer"
-              _hover={{ color: "brand.400" }}
-            >
-              Sužinokite daugiau →
+        </Flex>
+        <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
+        <Flex alignItems="center" width="350px">
+          <CalendarIcon boxSize={8} color="brand.500" />
+          <Box ml="20px">
+            <Text fontSize="14px" color="#a0a0a0">
+              Pasirinkite datą
             </Text>
-          </Link>
-        </Box>
-        <Box
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          alignItems="center"
-          backgroundColor="#fff"
-          borderRadius="10px"
-          p={12}
-          position="relative"
-          boxShadow="0px 0px 40px 0px rgba(0, 0, 0, 0.08);"
-        >
-          <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem">
-            <TrustworthyIcon boxSize={8} color="white" />
+            <Text fontSize="14px" color="text" fontWeight="500">
+              2021.09.16
+            </Text>
           </Box>
-          <Heading fontSize="2xl" as="h5" fontWeight="600" my="1.5rem">
-            Patikimiau
-          </Heading>
-          <Text color="#7e7e7e" fontSize="1rem" textAlign="center">
-            Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją išmaniai.
-          </Text>
-          <Link href="/about" passHref>
-            <Text
-              color="brand.500"
-              fontWeight="600"
-              pt="1.5rem"
-              position="absolute"
-              bottom={12}
-              cursor="pointer"
-              _hover={{ color: "brand.400" }}
-            >
-              Sužinokite daugiau →
+        </Flex>
+        <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
+        <Flex alignItems="center" width="350px">
+          <ServicesIcon boxSize={8} color="brand.500" />
+          <Box ml="20px">
+            <Text fontSize="14px" color="#a0a0a0">
+              Pasirinkite paslaugą
             </Text>
-          </Link>
-        </Box>
-      </Grid>
-      <Box mx="15vw" width="70vw" my={12}>
+            <Text fontSize="14px" color="text" fontWeight="500">
+              Langų tamsinimas
+            </Text>
+          </Box>
+        </Flex>
+        <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
+        <Flex direction="column" width="350px" alignItems="center" justifyContent="center">
+          <Button
+            variant="solid"
+            backgroundColor="brand.500"
+            color="white"
+            width={48}
+            height={14}
+            borderRadius="10px"
+            fontWeight="600"
+            boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
+            _hover={{ backgroundColor: "brand.400" }}
+          >
+            Ieškoti
+          </Button>
+        </Flex>
+      </Flex>
+      <Box mx="200px" my={12}>
         <Heading fontSize="4xl" as="h2" fontWeight="700" my="1.5rem" textAlign="center">
           Daugiau nei{" "}
           <Text fontSize="6xl" fontWeight="700" display="inline" color="brand.500">
@@ -338,10 +375,9 @@ const Main = () => {
       >
         <Grid
           templateColumns="1fr 1fr"
-          mx="15vw"
-          px={20}
-          py={14}
-          width="70vw"
+          mx="200px"
+          px="120px"
+          py={16}
           backgroundColor="white"
           boxShadow="0px 10px 40px 0px rgba(0, 0, 0, 0.08);"
           borderRadius="10px"
@@ -358,21 +394,29 @@ const Main = () => {
             </Text>
           </Box>
           <Box alignSelf="center" justifySelf="flex-end">
-            <Link href="/partners/register" passHref>
-              <Button
-                variant="solid"
-                size="md"
-                backgroundColor="brand.500"
-                color="white"
-                borderRadius="10px"
-                height="60px"
-                width="250px"
-                fontWeight="600"
-                _hover={{ backgroundColor: "brand.400" }}
-                boxShadow="0px 5px 15px 0px rgba(100, 0, 230, 0.3);"
+            <Link href="/partners/dashboard" passHref>
+              <ChakraLink
+                sx={{
+                  ":hover": {
+                    textDecoration: "none",
+                  },
+                }}
               >
-                Tapkite partneriu
-              </Button>
+                <Button
+                  variant="solid"
+                  size="md"
+                  backgroundColor="brand.500"
+                  color="white"
+                  borderRadius="10px"
+                  height="60px"
+                  width="250px"
+                  fontWeight="600"
+                  _hover={{ backgroundColor: "brand.400" }}
+                  boxShadow="0px 5px 15px 0px rgba(100, 0, 230, 0.3);"
+                >
+                  Tapkite partneriu
+                </Button>
+              </ChakraLink>
             </Link>
           </Box>
         </Grid>
@@ -380,40 +424,53 @@ const Main = () => {
       <Box backgroundColor="gray">
         <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" width="70vw" mx="15vw" pt={8} pb={12}>
           <Flex flexDirection="column">
-            <Box height="41px" cursor="pointer">
-              <Link href="/" passHref>
-                <Image src="/logo.svg" height="41px" width="160px" alt="Wheelter logo" />
-              </Link>
-            </Box>
+            <Link href={Routes.Home()} passHref>
+              <ChakraLink
+                sx={{
+                  ":hover": {
+                    textDecoration: "none",
+                  },
+                }}
+              >
+                <Flex alignItems="center" mr="50px" cursor="pointer">
+                  <Image src="/logo.svg" alt="Wheelter logo" width="70px" height="62px" />
+                  <Heading fontSize="2xl">Wheelter</Heading>
+                </Flex>
+              </ChakraLink>
+            </Link>
             <Flex my={6}>
               <Link href="/" passHref>
-                <Box
-                  backgroundColor="white"
-                  borderRadius="100%"
-                  p="0.4rem"
-                  boxShadow="0px 0px 10px 0px rgba(0, 0, 0, 0.12);"
-                  cursor="pointer"
-                  color="brand.500"
-                  _hover={{ backgroundColor: "brand.500", color: "white" }}
-                  mr={4}
-                  transition="all 0.2s"
-                >
-                  <FacebookIcon boxSize={6} />
-                </Box>
+                <ChakraLink>
+                  <Box
+                    backgroundColor="white"
+                    borderRadius="100%"
+                    p="0.4rem"
+                    boxShadow="0px 0px 10px 0px rgba(0, 0, 0, 0.12);"
+                    cursor="pointer"
+                    color="brand.500"
+                    _hover={{ backgroundColor: "brand.500", color: "white" }}
+                    mr={4}
+                    transition="all 0.2s"
+                  >
+                    <FacebookIcon boxSize={6} />
+                  </Box>
+                </ChakraLink>
               </Link>
               <Link href="/" passHref>
-                <Box
-                  backgroundColor="white"
-                  borderRadius="100%"
-                  p="0.4rem"
-                  boxShadow="0px 0px 10px 0px rgba(0, 0, 0, 0.12);"
-                  cursor="pointer"
-                  color="brand.500"
-                  _hover={{ backgroundColor: "brand.500", color: "white" }}
-                  transition="all 0.2s"
-                >
-                  <InstagramIcon boxSize={6} />
-                </Box>
+                <ChakraLink>
+                  <Box
+                    backgroundColor="white"
+                    borderRadius="100%"
+                    p="0.4rem"
+                    boxShadow="0px 0px 10px 0px rgba(0, 0, 0, 0.12);"
+                    cursor="pointer"
+                    color="brand.500"
+                    _hover={{ backgroundColor: "brand.500", color: "white" }}
+                    transition="all 0.2s"
+                  >
+                    <InstagramIcon boxSize={6} />
+                  </Box>
+                </ChakraLink>
               </Link>
             </Flex>
             <Text fontSize="xs" color="text">
@@ -572,4 +629,4 @@ const Main = () => {
   )
 }
 
-export default Main
+export default MainNew
