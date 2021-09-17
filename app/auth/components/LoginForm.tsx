@@ -1,9 +1,8 @@
 import { AuthenticationError, Image, Link, useMutation } from "blitz"
-import { LabeledTextField } from "app/core/components/LabeledTextField"
-import { Form, FORM_ERROR } from "app/core/components/Form"
 import login from "app/auth/mutations/login"
-import { Login } from "app/auth/validations"
 import { Box, Flex, Heading } from "@chakra-ui/react"
+import { useRouter } from "blitz"
+import GoogleButton from "./GoogleButton"
 
 type LoginFormProps = {
   onSuccess?: () => void
@@ -11,6 +10,7 @@ type LoginFormProps = {
 
 export const LoginForm = (props: LoginFormProps) => {
   const [loginMutation] = useMutation(login)
+  const router = useRouter()
 
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center" height="100vh">
@@ -22,7 +22,7 @@ export const LoginForm = (props: LoginFormProps) => {
       <Heading as="h1" mb={1}>
         Prisijunkite prie savo paskyros
       </Heading>
-      <Heading as="h2" size="md" fontWeight="400" mb={12}>
+      <Heading as="h2" size="md" fontWeight="400">
         ir galėsite naudotis visomis puslapio funkcijomis
       </Heading>
       <Box
@@ -30,58 +30,9 @@ export const LoginForm = (props: LoginFormProps) => {
         flexDirection="column"
         alignItems="center"
         backgroundColor="#fff"
-        borderRadius="0.375rem"
         padding="3rem 3rem 1.5rem 3rem"
       >
-        <Form
-          submitText="Prisijungti"
-          schema={Login}
-          initialValues={{ email: "", password: "" }}
-          onSubmit={async (values) => {
-            try {
-              await loginMutation(values)
-              props.onSuccess?.()
-            } catch (error) {
-              if (error instanceof AuthenticationError) {
-                return {
-                  [FORM_ERROR]: "El. paštas arba slaptažodis neteisingas. Bandykite dar kartą.",
-                }
-              } else {
-                return {
-                  [FORM_ERROR]: "Apgailestaujame, kažkas nepavyko. Pamėginkite dar kartą.",
-                }
-              }
-            }
-          }}
-        >
-          <Heading as="h3" size="lg" mb={6}>
-            Prisijungimas
-          </Heading>
-          <LabeledTextField
-            name="email"
-            className="loginFormInput"
-            label="El. paštas"
-            placeholder="Įveskite savo el. paštą"
-            type="email"
-            required
-          />
-          <LabeledTextField
-            name="password"
-            label="Slaptažodis"
-            placeholder="Įveskite savo slaptažodį"
-            type="password"
-            className="loginFormInput"
-            required
-          />
-        </Form>
-        <Flex flexDirection="column" alignItems="center">
-          <Link href="/forgot-password" passHref>
-            <a className="loginLink reset">Pamiršote slaptažodį?</a>
-          </Link>
-          <Link href="/signup" passHref>
-            <a className="loginLink">Neturite paskyros? Prisiregistruokite.</a>
-          </Link>
-        </Flex>
+        <GoogleButton onClick={() => router.push("api/auth/google")} />
       </Box>
       <Link href="/" passHref>
         <a className="loginLink back">Grįžti į pradinį puslapį</a>
