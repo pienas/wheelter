@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Link, useMutation, Image, useQuery, Routes } from "blitz"
 import {
   Container,
@@ -17,6 +17,7 @@ import {
   MenuDivider,
   MenuOptionGroup,
   Grid,
+  Tooltip,
 } from "@chakra-ui/react"
 import { ChevronDownIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
@@ -33,6 +34,7 @@ import BrandText from "./BrandText"
 import ServicesIcon from "./ServicesIcon"
 import LocationIcon from "./LocationIcon"
 import CalendarIcon from "./CalendarIcon"
+import Select from "react-select"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -112,11 +114,58 @@ const UserInfo = () => {
 }
 
 const MainNew = () => {
+  const locations = [
+    { value: "klaipeda", label: "Klaipėda" },
+    { value: "kaunas", label: "Kaunas" },
+    { value: "vilnius", label: "Vilnius" },
+  ]
   const [servicesCount] = useQuery(getServicesCount, {
     where: {
       isReviewed: true,
     },
   })
+  const customStyles = {
+    container: (provided) => ({
+      ...provided,
+      height: "18px",
+    }),
+    control: (provided) => ({
+      ...provided,
+      border: "none",
+      boxShadow: "none",
+      minHeight: "0",
+      height: "18px",
+      cursor: "pointer",
+      ":focus": { border: "none" },
+      ":hover": { border: "none", boxShadow: "none" },
+    }),
+    placeholder: (provided) => ({
+      ...provided,
+      fontSize: "14px",
+      color: "#4f5665",
+      fontWeight: "500",
+      margin: "0",
+      transform: "translateY(0)",
+      top: "0",
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      padding: "0",
+    }),
+    indicatorsContainer: () => ({
+      display: "none",
+    }),
+    input: (provided) => ({
+      ...provided,
+      margin: "0",
+      padding: "0",
+      input: {
+        fontSize: "14px !important",
+        color: "#4f5665 !important",
+        fontWeight: "500 !important",
+      },
+    }),
+  }
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
       <Flex px="200px" pt="30px" pb="50px" overflow="hidden" justifyContent="space-between">
@@ -157,15 +206,17 @@ const MainNew = () => {
         </Flex>
         <Flex alignItems="center">
           <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={<ChevronDownIcon />}
-              fontWeight="400"
-              color="text"
-              _focus={{ boxShadow: "none" }}
-            >
-              LT
-            </MenuButton>
+            <Tooltip label="Kalba" aria-label="Kalba" background="#EFF0F3" color="black">
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                fontWeight="400"
+                color="text"
+                _focus={{ boxShadow: "none" }}
+              >
+                LT
+              </MenuButton>
+            </Tooltip>
             <MenuList
               border="none"
               boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)"
@@ -307,13 +358,11 @@ const MainNew = () => {
         </Box>
         <Flex alignItems="center" width="350px">
           <LocationIcon boxSize={8} color="brand.500" />
-          <Box ml="20px">
+          <Box ml="20px" position="relative">
             <Text fontSize="14px" color="#a0a0a0">
               Pasirinkite lokaciją
             </Text>
-            <Text fontSize="14px" color="text" fontWeight="500">
-              Klaipėda
-            </Text>
+            <Select options={locations} styles={customStyles} placeholder="Pasirinkite" />
           </Box>
         </Flex>
         <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />

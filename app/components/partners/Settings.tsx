@@ -215,13 +215,13 @@ const Map = ({ address, changes, onChanges, onAddressChange, city, street, house
         height="100%"
         mapStyle="mapbox://styles/y3llow/ckodau4t60mk417ol99dbzqmi"
         onViewportChange={setViewport}
-        mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        mapboxApiAccessToken={process.env.BLITZ_PUBLIC_MAPBOX_TOKEN}
         minZoom={6}
         attributionControl={false}
       >
         <Geocoder
           mapRef={mapRef}
-          mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          mapboxApiAccessToken={process.env.BLITZ_PUBLIC_MAPBOX_TOKEN}
           position="top-left"
           marker={false}
           reverseGeocode={true}
@@ -292,19 +292,19 @@ const Settings: FC<Props> = ({
     setUploadState("UPLOADING")
     const files = e[0].file
     const data = new FormData()
-    const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+    const apiSecret = process.env.BLITZ_PUBLIC_CLOUDINARY_API_SECRET
     const timestamp = Math.round(new Date().getTime() / 1000)
-    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET
+    const preset = process.env.BLITZ_PUBLIC_CLOUDINARY_PRESET
     const payloadToSign = `public_id=${activeService}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
     const signature = sha1(payloadToSign)
     data.append("file", files)
-    data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+    data.append("api_key", process.env.BLITZ_PUBLIC_CLOUDINARY_API_KEY!)
     data.append("public_id", activeService.toString())
     data.append("timestamp", timestamp.toString())
     data.append("signature", signature)
     data.append("upload_preset", preset!)
     const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${process.env.BLITZ_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
       {
         method: "POST",
         body: data,
@@ -620,16 +620,16 @@ const Settings: FC<Props> = ({
             serviceActiveImages.forEach(async (element) => {
               if (element.carServiceImageId === i) {
                 const data = new FormData()
-                const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+                const apiSecret = process.env.BLITZ_PUBLIC_CLOUDINARY_API_SECRET
                 const timestamp = Math.round(new Date().getTime() / 1000)
                 const payloadToSign = `public_id=images/carServices/${activeService}_${i}&timestamp=${timestamp}${apiSecret}`
                 const signature = sha1(payloadToSign)
-                data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+                data.append("api_key", process.env.BLITZ_PUBLIC_CLOUDINARY_API_KEY!)
                 data.append("public_id", "images/carServices/" + activeService + "_" + i)
                 data.append("timestamp", timestamp.toString())
                 data.append("signature", signature)
                 const res = await fetch(
-                  `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/destroy`,
+                  `https://api.cloudinary.com/v1_1/${process.env.BLITZ_PUBLIC_CLOUDINARY_CLOUDNAME}/image/destroy`,
                   {
                     method: "POST",
                     body: data,
@@ -647,19 +647,19 @@ const Settings: FC<Props> = ({
             })
           } else {
             const data = new FormData()
-            const apiSecret = process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET
+            const apiSecret = process.env.BLITZ_PUBLIC_CLOUDINARY_API_SECRET
             const timestamp = Math.round(new Date().getTime() / 1000)
-            const preset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_IMAGES
+            const preset = process.env.BLITZ_PUBLIC_CLOUDINARY_PRESET_IMAGES
             const payloadToSign = `public_id=${activeService}_${i}&timestamp=${timestamp}&upload_preset=${preset}${apiSecret}`
             const signature = sha1(payloadToSign)
             data.append("file", files)
-            data.append("api_key", process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!)
+            data.append("api_key", process.env.BLITZ_PUBLIC_CLOUDINARY_API_KEY!)
             data.append("public_id", activeService + "_" + i)
             data.append("timestamp", timestamp.toString())
             data.append("signature", signature)
             data.append("upload_preset", preset!)
             const res = await fetch(
-              `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
+              `https://api.cloudinary.com/v1_1/${process.env.BLITZ_PUBLIC_CLOUDINARY_CLOUDNAME}/image/upload`,
               {
                 method: "POST",
                 body: data,
