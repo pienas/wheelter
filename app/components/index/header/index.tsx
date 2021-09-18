@@ -16,7 +16,7 @@ import {
 import { Image, Link, Routes, useMutation } from "blitz"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
-import DownIcon from "../../partners/ArrowIcon"
+import DownIcon from "../../partners/icons/ArrowIcon"
 import ReactCountryFlag from "react-country-flag"
 
 type ItemProps = {
