@@ -1,7 +1,7 @@
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import ResetPasswordForm from "../components/ResetPasswordForm"
-import SuccessToast from "app/components/index/SuccessToast"
+import SuccessToast from "app/components/index/toast/SuccessToast"
 import { useToast } from "@chakra-ui/toast"
 import { useRef } from "react"
 
