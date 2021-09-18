@@ -1,6 +1,9 @@
 const { sessionMiddleware, simpleRolesIsAuthorized } = require("blitz")
 
 module.exports = {
+  log: {
+    level: "info"
+  },
   middleware: [
     sessionMiddleware({
       isAuthorized: simpleRolesIsAuthorized,
