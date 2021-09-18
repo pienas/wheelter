@@ -1,0 +1,414 @@
+[
+  {
+    "value": "vilnius",
+    "label": "Vilnius"
+  },
+  {
+    "value": "kaunas",
+    "label": "Kaunas"
+  },
+  {
+    "value": "klaipeda",
+    "label": "Klaipėda"
+  },
+  {
+    "value": "siauliai",
+    "label": "Šiauliai"
+  },
+  {
+    "value": "panevezys",
+    "label": "Panevėžys"
+  },
+  {
+    "value": "alytus",
+    "label": "Alytus"
+  },
+  {
+    "value": "marijampole",
+    "label": "Marijampolė"
+  },
+  {
+    "value": "mazeikiai",
+    "label": "Mažeikiai"
+  },
+  {
+    "value": "jonava",
+    "label": "Jonava"
+  },
+  {
+    "value": "utena",
+    "label": "Utena"
+  },
+  {
+    "value": "kedainiai",
+    "label": "Kėdainiai"
+  },
+  {
+    "value": "taurage",
+    "label": "Tauragė"
+  },
+  {
+    "value": "telsiai",
+    "label": "Telšiai"
+  },
+  {
+    "value": "ukmerge",
+    "label": "Ukmergė"
+  },
+  {
+    "value": "visaginas",
+    "label": "Visaginas"
+  },
+  {
+    "value": "plunge",
+    "label": "Plungė"
+  },
+  {
+    "value": "kretinga",
+    "label": "Kretinga"
+  },
+  {
+    "value": "palanga",
+    "label": "Palanga"
+  },
+  {
+    "value": "radviliskis",
+    "label": "Radviliškis"
+  },
+  {
+    "value": "silute",
+    "label": "Šilutė"
+  },
+  {
+    "value": "gargzdai",
+    "label": "Gargždai"
+  },
+  {
+    "value": "druskininkai",
+    "label": "Druskininkai"
+  },
+  {
+    "value": "rokiskis",
+    "label": "Rokiškis"
+  },
+  {
+    "value": "elektrenai",
+    "label": "Elektrėnai"
+  },
+  {
+    "value": "kursenai",
+    "label": "Kuršėnai"
+  },
+  {
+    "value": "grigiskes",
+    "label": "Grigiškės"
+  },
+  {
+    "value": "birzai",
+    "label": "Biržai"
+  },
+  {
+    "value": "lentvaris",
+    "label": "Lentvaris"
+  },
+  {
+    "value": "garliava",
+    "label": "Garliava"
+  },
+  {
+    "value": "jurbarkas",
+    "label": "Jurbarkas"
+  },
+  {
+    "value": "raseiniai",
+    "label": "Raseiniai"
+  },
+  {
+    "value": "vilkaviskis",
+    "label": "Vilkaviškis"
+  },
+  {
+    "value": "anyksciai",
+    "label": "Anykščiai"
+  },
+  {
+    "value": "prienai",
+    "label": "Prienai"
+  },
+  {
+    "value": "joniskis",
+    "label": "Joniškis"
+  },
+  {
+    "value": "varena",
+    "label": "Varėna"
+  },
+  {
+    "value": "kelme",
+    "label": "Kelmė"
+  },
+  {
+    "value": "kaisiadorys",
+    "label": "Kaišiadorys"
+  },
+  {
+    "value": "naujojiAkmene",
+    "label": "Naujoji Akmenė"
+  },
+  {
+    "value": "salcininkai",
+    "label": "Šalčininkai"
+  },
+  {
+    "value": "pasvalys",
+    "label": "Pasvalys"
+  },
+  {
+    "value": "zarasai",
+    "label": "Zarasai"
+  },
+  {
+    "value": "kupiskis",
+    "label": "Kupiškis"
+  },
+  {
+    "value": "kazluRuda",
+    "label": "Kazlų Rūda"
+  },
+  {
+    "value": "sirvintos",
+    "label": "Širvintos"
+  },
+  {
+    "value": "moletai",
+    "label": "Molėtai"
+  },
+  {
+    "value": "pabrade",
+    "label": "Pabradė"
+  },
+  {
+    "value": "skuodas",
+    "label": "Skuodas"
+  },
+  {
+    "value": "sakiai",
+    "label": "Šakiai"
+  },
+  {
+    "value": "ignalina",
+    "label": "Ignalina"
+  },
+  {
+    "value": "svencioneliai",
+    "label": "Švenčionėliai"
+  },
+  {
+    "value": "silale",
+    "label": "Šilalė"
+  },
+  {
+    "value": "nemencine",
+    "label": "Nemenčinė"
+  },
+  {
+    "value": "kybartai",
+    "label": "Kybartai"
+  },
+  {
+    "value": "vievis",
+    "label": "Vievis"
+  },
+  {
+    "value": "pakruojis",
+    "label": "Pakruojis"
+  },
+  {
+    "value": "trakai",
+    "label": "Trakai"
+  },
+  {
+    "value": "svencionys",
+    "label": "Švenčionys"
+  },
+  {
+    "value": "kalvarija",
+    "label": "Kalvarija"
+  },
+  {
+    "value": "lazdijai",
+    "label": "Lazdijai"
+  },
+  {
+    "value": "neringa",
+    "label": "Neringa"
+  },
+  {
+    "value": "ziezmariai",
+    "label": "Žiežmariai"
+  },
+  {
+    "value": "rietavas",
+    "label": "Rietavas"
+  },
+  {
+    "value": "eisiskes",
+    "label": "Eišiškės"
+  },
+  {
+    "value": "birstonas",
+    "label": "Birštonas"
+  },
+  {
+    "value": "ariogala",
+    "label": "Ariogala"
+  },
+  {
+    "value": "seduva",
+    "label": "Šeduva"
+  },
+  {
+    "value": "akmene",
+    "label": "Akmenė"
+  },
+  {
+    "value": "venta",
+    "label": "Venta"
+  },
+  {
+    "value": "vieksniai",
+    "label": "Viekšniai"
+  },
+  {
+    "value": "rudiskes",
+    "label": "Rūdiškės"
+  },
+  {
+    "value": "vilkija",
+    "label": "Vilkija"
+  },
+  {
+    "value": "tytuvenai",
+    "label": "Tytuvėnai"
+  },
+  {
+    "value": "ezerelis",
+    "label": "Ežerėlis"
+  },
+  {
+    "value": "gelgaudiskis",
+    "label": "Gelgaudiškis"
+  },
+  {
+    "value": "pagegiai",
+    "label": "Pagėgiai"
+  },
+  {
+    "value": "kudirkosNaumiestis",
+    "label": "Kudirkos Naumiestis"
+  },
+  {
+    "value": "skaudvile",
+    "label": "Skaudvilė"
+  },
+  {
+    "value": "ramygala",
+    "label": "Ramygala"
+  },
+  {
+    "value": "salantai",
+    "label": "Salantai"
+  },
+  {
+    "value": "zagare",
+    "label": "Žagarė"
+  },
+  {
+    "value": "linkuva",
+    "label": "Linkuva"
+  },
+  {
+    "value": "priekule",
+    "label": "Priekulė"
+  },
+  {
+    "value": "simnas",
+    "label": "Simnas"
+  },
+  {
+    "value": "veisiejai",
+    "label": "Veisiejai"
+  },
+  {
+    "value": "baltojiVoke",
+    "label": "Baltoji Vokė"
+  },
+  {
+    "value": "joniskelis",
+    "label": "Joniškėlis"
+  },
+  {
+    "value": "jieznas",
+    "label": "Jieznas"
+  },
+  {
+    "value": "varniai",
+    "label": "Varniai"
+  },
+  {
+    "value": "daugai",
+    "label": "Daugai"
+  },
+  {
+    "value": "seda",
+    "label": "Seda"
+  },
+  {
+    "value": "virbalis",
+    "label": "Virbalis"
+  },
+  {
+    "value": "subacius",
+    "label": "Subačius"
+  },
+  {
+    "value": "vabalninkas",
+    "label": "Vabalnikas"
+  },
+  {
+    "value": "obeliai",
+    "label": "Obeliai"
+  },
+  {
+    "value": "dukstas",
+    "label": "Dūkštas"
+  },
+  {
+    "value": "pandelys",
+    "label": "Pandėlys"
+  },
+  {
+    "value": "uzventis",
+    "label": "Užventis"
+  },
+  {
+    "value": "dusetos",
+    "label": "Dusetos"
+  },
+  {
+    "value": "kavarskas",
+    "label": "Kavarskas"
+  },
+  {
+    "value": "smalininkai",
+    "label": "Smalininkai"
+  },
+  {
+    "value": "troskunai",
+    "label": "Troškūnai"
+  },
+  {
+    "value": "panemune",
+    "label": "Panemunė"
+  }
+]

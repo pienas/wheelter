@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 import { Link, useMutation, Image, useQuery, Routes } from "blitz"
 import {
   Container,
@@ -16,10 +16,18 @@ import {
   MenuItemOption,
   MenuDivider,
   MenuOptionGroup,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
   Grid,
-  Tooltip,
+  useToast,
+  useDisclosure,
 } from "@chakra-ui/react"
-import { ChevronDownIcon } from "@chakra-ui/icons"
+import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
 import Tabs from "app/components/index/Tabs"
@@ -35,6 +43,14 @@ import ServicesIcon from "./ServicesIcon"
 import LocationIcon from "./LocationIcon"
 import CalendarIcon from "./CalendarIcon"
 import Select from "react-select"
+import ReactCountryFlag from "react-country-flag"
+import locations from "./locations.json"
+import "react-day-picker/lib/style.css"
+import SuccessToast from "./SuccessToast"
+import WarningToast from "./WarningToast"
+import { format } from "date-fns"
+import DaySelector from "./DaySelector"
+import { DaySelectionTypes } from "./DaySelector"
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -62,17 +78,38 @@ const UserInfo = () => {
             <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
           </Flex>
         </MenuButton>
-        <MenuList border="none" boxShadow="20px 20px 30px 0px rgba(0, 0, 0, 0.03)">
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Mano tr. priemonės</MenuItem>
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Mano rezervacijos</MenuItem>
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Pamėgti servisai</MenuItem>
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Paslaugų teikėjai</MenuItem>
+        <MenuList
+          border="none"
+          boxShadow="0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 11px hsl(0deg 0% 0% / 10%)"
+          minWidth="13rem"
+        >
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Mano tr. priemonės
+          </MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Mano rezervacijos
+          </MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Pamėgti servisai
+          </MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Paslaugų teikėjai
+          </MenuItem>
           <MenuDivider color="#d8d8d8" />
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Naudojimosi instrukcija</MenuItem>
-          <MenuItem _hover={{ background: "#F8F8F8" }}>Nustatymai</MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Naujienos
+          </MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Naudojimosi instrukcija
+          </MenuItem>
+          <MenuItem fontSize="14px" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+            Nustatymai
+          </MenuItem>
           <MenuItem
             _hover={{ background: "#F8F8F8" }}
+            fontSize="14px"
+            color="text"
+            py="0.3rem"
             onClick={async () => {
               await logoutMutation()
             }}
@@ -113,11 +150,11 @@ const UserInfo = () => {
   }
 }
 
-const MainNew = () => {
-  const locations = [
-    { value: "klaipeda", label: "Klaipėda" },
-    { value: "kaunas", label: "Kaunas" },
-    { value: "vilnius", label: "Vilnius" },
+const Main = () => {
+  const services = [
+    { value: "langutamsinimas", label: "Langų tamsinimas" },
+    { value: "ratubalansavimas", label: "Ratų balansavimas" },
+    { value: "kebulodazymas", label: "Kėbulo dažymas" },
   ]
   const [servicesCount] = useQuery(getServicesCount, {
     where: {
@@ -127,14 +164,12 @@ const MainNew = () => {
   const customStyles = {
     container: (provided) => ({
       ...provided,
-      height: "18px",
     }),
     control: (provided) => ({
       ...provided,
       border: "none",
       boxShadow: "none",
       minHeight: "0",
-      height: "18px",
       cursor: "pointer",
       ":focus": { border: "none" },
       ":hover": { border: "none", boxShadow: "none" },
@@ -165,6 +200,55 @@ const MainNew = () => {
         fontWeight: "500 !important",
       },
     }),
+    singleValue: (provided) => ({
+      ...provided,
+      margin: "0",
+      fontSize: "14px !important",
+      color: "#4f5665 !important",
+      fontWeight: "500 !important",
+    }),
+    option: (provided) => ({
+      ...provided,
+      padding: "0.3rem 0.8rem",
+      color: "#4f5665",
+      fontSize: "14px",
+    }),
+    menu: (provided) => ({
+      ...provided,
+      display: "block",
+    }),
+    menuList: (provided) => ({
+      ...provided,
+      display: "block",
+    }),
+  }
+  const toast = useToast()
+  const toastIdRef = useRef<any>()
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [selectedDays, setSelectedDays] = useState<Date[]>([new Date()])
+  const [finalDays, setFinalDays] = useState<Date[]>([])
+  const submitRequest = async () => {
+    try {
+      toastIdRef.current = toast({
+        duration: 3000,
+        render: () => (
+          <SuccessToast
+            heading="Pavyko!"
+            text="Data buvo sėkmingai atnaujinta."
+            id={toastIdRef.current}
+          />
+        ),
+      })
+      onClose()
+      setFinalDays(selectedDays)
+    } catch (error) {
+      toastIdRef.current = toast({
+        duration: 3000,
+        render: () => (
+          <WarningToast heading="Kažkas netaip!" text={error.message} id={toastIdRef.current} />
+        ),
+      })
+    }
   }
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
@@ -206,27 +290,46 @@ const MainNew = () => {
         </Flex>
         <Flex alignItems="center">
           <Menu>
-            <Tooltip label="Kalba" aria-label="Kalba" background="#EFF0F3" color="black">
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                fontWeight="400"
-                color="text"
-                _focus={{ boxShadow: "none" }}
-              >
-                LT
-              </MenuButton>
-            </Tooltip>
+            <MenuButton
+              as={Button}
+              rightIcon={<ChevronDownIcon />}
+              fontWeight="400"
+              color="text"
+              _focus={{ boxShadow: "none" }}
+            >
+              LT
+            </MenuButton>
             <MenuList
               border="none"
-              boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)"
+              boxShadow="0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 11px hsl(0deg 0% 0% / 10%)"
               width="auto"
               minWidth="80px"
             >
-              <MenuOptionGroup defaultValue="LT" title="Kalba" type="radio">
-                <MenuItemOption value="LT">LT</MenuItemOption>
-                <MenuItemOption value="EN">EN</MenuItemOption>
-                <MenuItemOption value="RU">RU</MenuItemOption>
+              <MenuOptionGroup defaultValue="LT" type="radio">
+                <MenuItemOption value="LT">
+                  <Flex alignItems="center">
+                    <ReactCountryFlag countryCode="LT" svg />
+                    <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
+                      LT
+                    </Text>
+                  </Flex>
+                </MenuItemOption>
+                <MenuItemOption value="EN">
+                  <Flex alignItems="center">
+                    <ReactCountryFlag countryCode="US" svg />
+                    <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
+                      EN
+                    </Text>
+                  </Flex>
+                </MenuItemOption>
+                <MenuItemOption value="RU">
+                  <Flex alignItems="center">
+                    <ReactCountryFlag countryCode="RU" svg />
+                    <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
+                      RU
+                    </Text>
+                  </Flex>
+                </MenuItemOption>
               </MenuOptionGroup>
             </MenuList>
           </Menu>
@@ -358,35 +461,130 @@ const MainNew = () => {
         </Box>
         <Flex alignItems="center" width="350px">
           <LocationIcon boxSize={8} color="brand.500" />
-          <Box ml="20px" position="relative">
+          <Box ml="20px" position="relative" width="80%">
             <Text fontSize="14px" color="#a0a0a0">
               Pasirinkite lokaciją
             </Text>
-            <Select options={locations} styles={customStyles} placeholder="Pasirinkite" />
+            <Select
+              options={locations}
+              styles={customStyles}
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary: "#E8E8E8",
+                  primary25: "#F8F8F8",
+                  primary50: "#F2F2F2",
+                  primary75: "#F2F2F2",
+                },
+              })}
+              placeholder="Pasirinkite"
+            />
           </Box>
         </Flex>
         <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
         <Flex alignItems="center" width="350px">
           <CalendarIcon boxSize={8} color="brand.500" />
-          <Box ml="20px">
+          <Box ml="20px" width="80%">
             <Text fontSize="14px" color="#a0a0a0">
               Pasirinkite datą
             </Text>
-            <Text fontSize="14px" color="text" fontWeight="500">
-              2021.09.16
-            </Text>
+            <Flex alignItems="center">
+              <Text
+                fontSize="14px"
+                color="text"
+                fontWeight="500"
+                cursor="pointer"
+                onClick={() => {
+                  onOpen()
+                  setSelectedDays(selectedDays)
+                }}
+              >
+                {finalDays.length === undefined && "Pasirinktas intervalas"}
+                {finalDays.length > 1 && "Pasirinktos kelios dienos"}
+                {finalDays.length === 0 && "Pasirinkite"}
+                {finalDays.length === 1 &&
+                  finalDays[0]?.toDateString() &&
+                  format(new Date(Date.parse(finalDays[0].toDateString())), "yyyy-MM-dd")}
+              </Text>
+              {finalDays.length === undefined && (
+                <CloseIcon
+                  boxSize={2}
+                  ml={2}
+                  color="text"
+                  cursor="pointer"
+                  onClick={() => {
+                    setSelectedDays([new Date()])
+                    setFinalDays([])
+                  }}
+                />
+              )}
+              {finalDays.length > 0 && (
+                <CloseIcon
+                  boxSize={2}
+                  ml={2}
+                  color="text"
+                  cursor="pointer"
+                  onClick={() => {
+                    setSelectedDays([new Date()])
+                    setFinalDays([])
+                  }}
+                />
+              )}
+            </Flex>
           </Box>
+          <Modal isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Pasirinkite datą</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <DaySelector
+                  type={DaySelectionTypes.Single}
+                  onSelectedDays={setSelectedDays}
+                  onDaySelectionTypeChanged={() => setSelectedDays([new Date()])}
+                  finalDate={finalDays}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button mr={3} onClick={onClose}>
+                  Atšaukti
+                </Button>
+                <Button
+                  backgroundColor="brand.500"
+                  color="white"
+                  _hover={{ backgroundColor: "brand.400" }}
+                  disabled={selectedDays.length === 0}
+                  onClick={submitRequest}
+                >
+                  Pasirinkti
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Flex>
         <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
         <Flex alignItems="center" width="350px">
           <ServicesIcon boxSize={8} color="brand.500" />
-          <Box ml="20px">
+          <Box ml="20px" width="80%">
             <Text fontSize="14px" color="#a0a0a0">
               Pasirinkite paslaugą
             </Text>
-            <Text fontSize="14px" color="text" fontWeight="500">
-              Langų tamsinimas
-            </Text>
+            <Select
+              options={services}
+              styles={customStyles}
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary: "#E8E8E8",
+                  primary25: "#F8F8F8",
+                  primary50: "#F2F2F2",
+                  primary75: "#F2F2F2",
+                },
+              })}
+              placeholder="Pasirinkite"
+            />
           </Box>
         </Flex>
         <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
@@ -678,4 +876,4 @@ const MainNew = () => {
   )
 }
 
-export default MainNew
+export default Main
