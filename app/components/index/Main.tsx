@@ -30,7 +30,6 @@ import {
 import { ChevronDownIcon, CloseIcon } from "@chakra-ui/icons"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
-import Tabs from "app/components/index/Tabs"
 import TrustworthyIcon from "./TrustworthyIcon"
 import FastIcon from "./FastIcon"
 import ReliableIcon from "./ReliableIcon"
