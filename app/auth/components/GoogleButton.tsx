@@ -7,7 +7,7 @@ type GoogleButtonProps = {
 
 const GoogleButton = ({ onClick }: GoogleButtonProps) => {
     return (
-        <Button onClick={onClick} boxShadow="0px 0px 10px 1px rgba(0, 0, 0, 0.1);">
+        <Button onClick={onClick} boxShadow="0px 0px 10px 1px rgba(0, 0, 0, 0.1);" mb="16px" width="280px">
             <FaGoogle fill="#923ffb" style={{ marginRight: "8px" }} /> Prisijunkite su Google
         </Button>
     )
