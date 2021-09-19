@@ -67,6 +67,7 @@ const MenuOption = ({ value, country }: MenuOptionProps) => {
 const UserInfo = () => {
   const currentUser = useCurrentUser()
   const name = currentUser?.name + " " + currentUser?.surname
+  const pictureUrl = currentUser?.avatarUrl ?? undefined;
   const [logoutMutation] = useMutation(logout)
   if (currentUser) {
     return (
@@ -83,7 +84,7 @@ const UserInfo = () => {
           }}
         >
           <Flex alignItems="center">
-            <Avatar size="sm" name={name} />
+            <Avatar size="sm" name={name} src={pictureUrl} />
             <Text fontWeight="500" mx="10px" transition="all 0.2s">
               {name}
             </Text>

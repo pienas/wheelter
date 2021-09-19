@@ -3,6 +3,7 @@ import login from "app/auth/mutations/login"
 import { Box, Flex, Heading } from "@chakra-ui/react"
 import { useRouter } from "blitz"
 import GoogleButton from "./GoogleButton"
+import FacebookButton from "./FacebookButton"
 
 type LoginFormProps = {
   onSuccess?: () => void
@@ -33,6 +34,7 @@ export const LoginForm = (props: LoginFormProps) => {
         padding="3rem 3rem 1.5rem 3rem"
       >
         <GoogleButton onClick={() => router.push("api/auth/google")} />
+        <FacebookButton onClick={() => router.push("api/auth/facebook")} />
       </Box>
       <Link href="/" passHref>
         <a className="loginLink back">Grįžti į pradinį puslapį</a>
