@@ -1203,7 +1203,7 @@ const Settings: FC<Props> = ({
                                   <ImageIcon boxSize={6} color="#787E97" transition="all 0.2s" />
                                 </Box>
                                 <Text color="#787E97" fontSize="sm" textAlign="center" width="90%">
-                                  Paleiskite tempiamas nuotraukas čia
+                                  Tempkite nuotraukas čia
                                 </Text>
                               </>
                             ) : (
@@ -1252,6 +1252,12 @@ const Settings: FC<Props> = ({
                     </ListItem>
                     <ListItem color="#787E97" fontSize="sm">
                       Maksimalus su jūsų planu galimas įkelti nuotraukų kiekis: {maxImages}
+                      <br />
+                      {maxImages === 3 && (
+                        <Link color="brand.500">
+                          Pakeiskite planą, kad galėtumėte įkelti 6 nuotraukas
+                        </Link>
+                      )}
                     </ListItem>
                   </UnorderedList>
                 </Box>

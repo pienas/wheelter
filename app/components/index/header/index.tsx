@@ -53,7 +53,7 @@ type MenuOptionProps = {
 
 const MenuOption = ({ value, country }: MenuOptionProps) => {
   return (
-    <MenuItemOption value={value}>
+    <MenuItemOption value={value} icon={<></>} iconSpacing={0}>
       <Flex alignItems="center">
         <ReactCountryFlag countryCode={country} svg />
         <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
@@ -185,9 +185,9 @@ const Header = () => {
             border="none"
             boxShadow="0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 11px hsl(0deg 0% 0% / 10%)"
             width="auto"
-            minWidth="80px"
+            minWidth="60px"
           >
-            <MenuOptionGroup defaultValue="LT" type="radio">
+            <MenuOptionGroup defaultValue="LT">
               <MenuOption value="LT" country="LT" />
               <MenuOption value="EN" country="US" />
               <MenuOption value="RU" country="RU" />
