@@ -1,6 +1,6 @@
 import { Strategy as GoogleStrategy } from "passport-google-oauth20"
 import { Strategy as FacebookStrategy } from "passport-facebook"
-import db from "db";
+import db from "db"
 
 export const google = {
   authenticateOptions: { scope: "email profile" },
@@ -8,15 +8,13 @@ export const google = {
     {
       clientID: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL as string
+      callbackURL: process.env.GOOGLE_CALLBACK_URL as string,
     },
     async (_token, _tokenSecret, profile, done) => {
       const email = profile.emails && profile.emails[0]?.value
 
       if (!email) {
-        return done(
-          new Error("Google OAuth 2.0 response doesn't have email."),
-        )
+        return done(new Error("Google OAuth 2.0 response doesn't have email."))
       }
 
       const user = await db.user.upsert({
@@ -26,19 +24,19 @@ export const google = {
           name: profile.name?.givenName ?? "",
           surname: profile.name?.familyName ?? "",
           email: email.toLowerCase(),
-          phone: "",
           role: "USER",
         },
         update: { email },
-      });
+      })
 
       const publicData = {
         userId: user.id,
         roles: [user.role],
         source: "google",
       }
-      done(undefined, { publicData, redirectUrl: '/' })
-    })
+      done(undefined, { publicData, redirectUrl: "/" })
+    }
+  ),
 }
 
 export const facebook = {
@@ -48,15 +46,13 @@ export const facebook = {
       clientID: process.env.FACEBOOK_APP_ID as string,
       clientSecret: process.env.FACEBOOK_APP_SECRET as string,
       callbackURL: process.env.FACEBOOK_CALLBACK_URL as string,
-      profileFields: ['name', 'photos', 'email']
+      profileFields: ["name", "photos", "email"],
     },
     async (_token, _tokenSecret, profile, done) => {
       const email = profile.emails && profile.emails[0]?.value
 
       if (!email) {
-        return done(
-          new Error("Facebook response doesn't have email."),
-        )
+        return done(new Error("Facebook response doesn't have email."))
       }
 
       const user = await db.user.upsert({
@@ -66,17 +62,17 @@ export const facebook = {
           name: profile.name?.givenName ?? "",
           surname: profile.name?.familyName ?? "",
           email: email.toLowerCase(),
-          phone: "",
           role: "USER",
         },
         update: { email },
-      });
+      })
 
       const publicData = {
         userId: user.id,
         roles: [user.role],
         source: "facebook",
       }
-      done(undefined, { publicData, redirectUrl: '/' })
-    })
+      done(undefined, { publicData, redirectUrl: "/" })
+    }
+  ),
 }

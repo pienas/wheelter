@@ -1,16 +1,10 @@
-import { AuthenticationError, Image, Link, useMutation } from "blitz"
-import login from "app/auth/mutations/login"
+import { Image, Link } from "blitz"
 import { Box, Flex, Heading } from "@chakra-ui/react"
 import { useRouter } from "blitz"
 import GoogleButton from "./GoogleButton"
 import FacebookButton from "./FacebookButton"
 
-type LoginFormProps = {
-  onSuccess?: () => void
-}
-
-export const LoginForm = (props: LoginFormProps) => {
-  const [loginMutation] = useMutation(login)
+export const LoginForm = () => {
   const router = useRouter()
 
   return (

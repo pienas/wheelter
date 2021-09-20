@@ -30,7 +30,6 @@ const seed = async () => {
       isReviewed: true,
       avatarUrl:
         "https://res.cloudinary.com/wheelter50e8aa/image/upload/v1631816509/avatars/carServices/1.png",
-      income: 400,
     },
   })
   await db.carServiceUserRelation.create({
@@ -88,13 +87,30 @@ const seed = async () => {
   })
   const today = new Date()
   const tomorrow = new Date(today)
+  const status = ["NEW", "DONE", "CANCELLED"]
   for (let i = 0; i < 10; i++) {
     tomorrow.setHours(tomorrow.getHours() + 1 + i)
+    const review = await db.review.create({
+      data: {
+        rating: Math.floor(Math.random() * (5 - 1 + 1) + 1),
+        isReviewed: true,
+        author: {
+          connect: {
+            id: client.id,
+          },
+        },
+        carService: {
+          connect: {
+            id: carService.id,
+          },
+        },
+      },
+    })
     await db.order.create({
       data: {
         startsAt: tomorrow,
         price: 40,
-        status: "NEW",
+        status: status[Math.floor(Math.random() * status.length)],
         carService: {
           connect: {
             id: carService.id,
@@ -113,6 +129,11 @@ const seed = async () => {
         client: {
           connect: {
             id: client.id,
+          },
+        },
+        review: {
+          connect: {
+            id: review.id,
           },
         },
       },

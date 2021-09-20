@@ -2,7 +2,7 @@ import React, { Suspense } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
-import DashboardMenu from "app/components/partners/DashboardMenu"
+import DashboardMenu from "app/components/partners/dashboardMenu/index"
 
 const PartnersDashboard: BlitzPage = () => {
   return (
@@ -42,7 +42,7 @@ const PartnersDashboard: BlitzPage = () => {
   )
 }
 
-PartnersDashboard.authenticate = { redirectTo: "/login" }
+PartnersDashboard.authenticate = true
 PartnersDashboard.suppressFirstRenderFlicker = true
 PartnersDashboard.getLayout = (page) => <Layout title="Suvestinė ・ Wheelter">{page}</Layout>
 

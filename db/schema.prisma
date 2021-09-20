@@ -16,7 +16,7 @@ model User {
   surname          String
   email            String        @unique
   emailVerifiedAt  DateTime?
-  phone            String        @unique
+  phone            String?       @unique
   hashedPassword   String?
   avatarUrl        String?
   role             String        @default("USER")
