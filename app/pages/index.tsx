@@ -2,7 +2,7 @@ import React, { Suspense } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
-import Main from "app/components/index/Main"
+import Main from "app/core/components/Main"
 
 const Home: BlitzPage = () => {
   return (

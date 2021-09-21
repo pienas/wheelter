@@ -1,8 +1,13 @@
 import React from "react"
 import { Box, Flex, Text, useStyles, useTab } from "@chakra-ui/react"
 
-const CustomTabSettings = React.forwardRef((props: any, ref) => {
-  const tabProps = useTab(props)
+type CustomTabSettingsProps = {
+  children: React.ReactNode
+  icon: React.ReactNode
+}
+
+const CustomTabSettings = React.forwardRef((props: CustomTabSettingsProps) => {
+  const tabProps = useTab({ ...props })
   const isSelected = !!tabProps["aria-selected"]
   const styles = useStyles()
   return (
@@ -27,7 +32,7 @@ const CustomTabSettings = React.forwardRef((props: any, ref) => {
             },
           }}
         >
-          {tabProps.icon}
+          {props.icon}
           <Text fontWeight="500" color="#0B132A" transition="all 0.2s">
             {tabProps.children}
           </Text>
@@ -47,7 +52,7 @@ const CustomTabSettings = React.forwardRef((props: any, ref) => {
             },
           }}
         >
-          {tabProps.icon}
+          {props.icon}
           <Text fontWeight="500" color="#787E97" transition="all 0.2s">
             {tabProps.children}
           </Text>

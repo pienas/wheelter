@@ -2,7 +2,7 @@ import React from "react"
 import { Box, Flex, Text, useStyles, useTab } from "@chakra-ui/react"
 
 const CustomTab = React.forwardRef((props: any, ref) => {
-  const tabProps = useTab(props)
+  const tabProps = useTab({ ...props, ref })
   const isSelected = !!tabProps["aria-selected"]
   const styles = useStyles()
   return (

@@ -3,12 +3,10 @@ import db from "./index"
 const seed = async () => {
   const carServiceUser = await db.carServiceUser.create({
     data: {
-      name: "Karolis",
-      surname: "Urbaitis",
-      email: "urbaitiskarolis1@gmail.com",
-      phone: "37065021903",
-      avatarUrl:
-        "https://lh3.googleusercontent.com/a-/AOh14GgVCrXGUKBRjTmAZdMG5eqYe7l3r8ReuOH49zWhuA=s96-c",
+      name: "Serviso",
+      surname: "Savininkas",
+      email: "savininkas@wheelter.lt",
+      phone: "37065555555",
     },
   })
   const client = await db.user.create({
@@ -16,7 +14,7 @@ const seed = async () => {
       name: "Pirmas",
       surname: "Klientas",
       email: "klientas@wheelter.lt",
-      phone: "865555555",
+      phone: "37065555555",
     },
   })
   const carService = await db.carService.create({
@@ -24,8 +22,8 @@ const seed = async () => {
       plan: "STANDARD",
       url: "wheelter",
       name: "Wheelter",
-      email: "urbaitiskarolis1@gmail.com",
-      phone: "37065021903",
+      email: "wheelter@wheelter.lt",
+      phone: "37065555555",
       isActive: true,
       isReviewed: true,
       avatarUrl:
@@ -64,10 +62,15 @@ const seed = async () => {
   }
   await db.employee.create({
     data: {
-      name: "Karolis",
-      surname: "Urbaitis",
+      name: "Serviso",
+      surname: "Savininkas",
       position: "Savininkas",
       completedOrders: 0,
+      carService: {
+        connect: {
+          id: carService.id,
+        },
+      },
     },
   })
   const employee = await db.employee.create({
@@ -76,6 +79,11 @@ const seed = async () => {
       surname: "Darbuotojas",
       position: "Mechanikas",
       completedOrders: 10,
+      carService: {
+        connect: {
+          id: carService.id,
+        },
+      },
     },
   })
   const service = await db.service.create({

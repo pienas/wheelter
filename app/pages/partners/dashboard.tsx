@@ -2,7 +2,7 @@ import React, { Suspense } from "react"
 import { BlitzPage } from "blitz"
 import Layout from "app/core/layouts/Layout"
 import { Scrollbar } from "react-scrollbars-custom"
-import DashboardMenu from "app/components/partners/dashboardMenu/index"
+import DashboardMenu from "app/partners/components/dashboardMenu"
 
 const PartnersDashboard: BlitzPage = () => {
   return (

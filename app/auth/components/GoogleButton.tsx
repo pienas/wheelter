@@ -1,16 +1,22 @@
 import { Button } from "@chakra-ui/button"
-import { FaGoogle } from 'react-icons/fa'
+import { FaGoogle } from "react-icons/fa"
 
 type GoogleButtonProps = {
-    onClick?: () => void
+  onClick?: () => void
 }
 
 const GoogleButton = ({ onClick }: GoogleButtonProps) => {
-    return (
-        <Button onClick={onClick} boxShadow="0px 0px 10px 1px rgba(0, 0, 0, 0.1);" mb="16px" width="280px">
-            <FaGoogle fill="#923ffb" style={{ marginRight: "8px" }} /> Prisijunkite su Google
-        </Button>
-    )
+  return (
+    <Button
+      onClick={onClick}
+      boxShadow="0px 0px 10px 1px rgba(0, 0, 0, 0.1);"
+      mb="16px"
+      width="280px"
+      leftIcon={<FaGoogle fill="#923ffb" />}
+    >
+      Prisijunkite su Google
+    </Button>
+  )
 }
 
 export default GoogleButton

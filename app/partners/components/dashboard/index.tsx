@@ -472,10 +472,10 @@ const Dashboard: FC<Props> = ({
             <Box width="100px" height="100px" mr="30px">
               <Doughnut
                 data={dataDoughnut}
-                legend={{ display: false }}
                 options={{ tooltips: { enabled: false }, hover: { mode: null } }}
                 width={100}
                 height={100}
+                type="doughnut"
               />
             </Box>
             <Flex width="100%" direction="column" justifyContent="space-between">
@@ -562,8 +562,8 @@ const Dashboard: FC<Props> = ({
           <Box>
             <Line
               data={dataLine}
-              legend={{ display: false }}
               height={85}
+              type="line"
               options={{
                 tooltips: { enabled: false },
                 hover: { mode: null },

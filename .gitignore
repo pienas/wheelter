@@ -17,6 +17,7 @@ blitz-log.log
 
 # misc
 .DS_Store
+.blitz.config.compiled.js
 
 # env files
 .env*
