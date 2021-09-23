@@ -1,17 +1,17 @@
-import { Link as ChakraLink, Button, Heading, Text, Box, Grid } from "@chakra-ui/react"
+import { Link as ChakraLink, Button, Heading, Text, Box, Grid, Flex } from "@chakra-ui/react"
 import { Link } from "blitz"
 
 const Partner = () => {
   return (
-    <Box
-      width="100vw"
+    <Flex
       pb={12}
+      justifyContent="center"
       background="linear-gradient(0deg, rgba(248,248,248,1) 50%, rgba(255,255,255,1) 50%)"
     >
       <Grid
         templateColumns="1fr 1fr"
-        mx="200px"
         px="120px"
+        width="1520px"
         py={16}
         backgroundColor="white"
         boxShadow="0px 10px 40px 0px rgba(0, 0, 0, 0.08);"
@@ -55,7 +55,7 @@ const Partner = () => {
           </Link>
         </Box>
       </Grid>
-    </Box>
+    </Flex>
   )
 }
 

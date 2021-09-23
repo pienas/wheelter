@@ -1,7 +1,7 @@
 import { Flex, Link as ChakraLink, Heading, Text, Box, Grid } from "@chakra-ui/react"
 import { Link, Image, Routes } from "blitz"
-import FacebookIcon from "../icons/FacebookIcon"
-import InstagramIcon from "../icons/InstagramIcon"
+import FacebookIcon from "app/core/components/icons/FacebookIcon"
+import InstagramIcon from "app/core/components/icons/InstagramIcon"
 
 type IconProps = {
   link: string
@@ -48,7 +48,7 @@ const FooterLink = ({ link, children }: FooterLinkProps) => {
 const Footer = () => {
   return (
     <Flex backgroundColor="gray" justifyContent="center">
-      <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" pt={8} pb={12} width="1520px">
+      <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" width="1520px" py={12}>
         <Flex flexDirection="column">
           <Link href={Routes.Home()} passHref>
             <ChakraLink

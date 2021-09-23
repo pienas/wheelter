@@ -15,13 +15,13 @@ const BrandText = ({ children }) => {
 const Hero = () => {
   return (
     <Flex>
-      <Box maxWidth="650px" ml="200px">
+      <Box maxWidth="650px">
         <Heading size="2xl" fontWeight="500" lineHeight="1.4">
           Rinkitės praktiškumą, <br />
           registruokitės su <BrandText>Wheelter</BrandText>.
         </Heading>
         <Heading
-          as="h2"
+          as="h3"
           fontSize="md"
           mt="1rem"
           color="text"

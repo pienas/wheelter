@@ -127,7 +127,6 @@ const Search = () => {
       backgroundColor="#ffffff"
       boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
       borderRadius="10px"
-      mx="200px"
       p="55px"
       mt="20px"
       position="relative"

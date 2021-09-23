@@ -9,7 +9,7 @@ const Services = () => {
     },
   })
   return (
-    <Box mx="200px" my={12}>
+    <Box my={12}>
       <Heading fontSize="4xl" as="h2" fontWeight="700" my="1.5rem" textAlign="center">
         Daugiau nei{" "}
         <Text fontSize="6xl" fontWeight="700" display="inline" color="brand.500">

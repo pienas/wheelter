@@ -64,87 +64,6 @@ const MenuOption = ({ value, country }: MenuOptionProps) => {
   )
 }
 
-const UserInfo = () => {
-  const currentUser = useCurrentUser()
-  const name = currentUser?.name + " " + currentUser?.surname
-  const pictureUrl = currentUser?.avatarUrl ?? undefined
-  const [logoutMutation] = useMutation(logout)
-  if (currentUser) {
-    return (
-      <Menu>
-        <MenuButton
-          cursor="pointer"
-          sx={{
-            ":hover > span div p": {
-              color: "#6500E6",
-            },
-            ":hover > span div svg": {
-              color: "#6500E6",
-            },
-          }}
-        >
-          <Flex alignItems="center">
-            <Avatar size="sm" name={name} src={pictureUrl} />
-            <Text fontWeight="500" mx="10px" transition="all 0.2s">
-              {name}
-            </Text>
-            <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
-          </Flex>
-        </MenuButton>
-        <MenuList
-          border="none"
-          boxShadow="0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 11px hsl(0deg 0% 0% / 10%)"
-          minWidth="13rem"
-        >
-          <Item>Mano tr. priemonės</Item>
-          <Item>Mano rezervacijos</Item>
-          <Item>Pamėgti servisai</Item>
-          <Item>Paslaugų teikėjai</Item>
-          <MenuDivider color="#d8d8d8" />
-          <Item>Naujienos</Item>
-          <Item>Naudojimosi instrukcija</Item>
-          <Item>Nustatymai</Item>
-          <Item
-            onClick={async () => {
-              await logoutMutation()
-            }}
-          >
-            Atsijungti
-          </Item>
-        </MenuList>
-      </Menu>
-    )
-  } else {
-    return (
-      <>
-        <Link href="/login" passHref>
-          <ChakraLink
-            sx={{
-              ":hover": {
-                textDecoration: "none",
-              },
-            }}
-          >
-            <Button
-              variant="solid"
-              backgroundColor="brand.500"
-              color="white"
-              width={48}
-              height={14}
-              borderRadius="10px"
-              fontWeight="600"
-              boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
-              _hover={{ backgroundColor: "brand.400" }}
-            >
-              Prisijungti
-            </Button>
-          </ChakraLink>
-        </Link>
-      </>
-    )
-  }
-}
-
 const Header = () => {
   return (
     <Flex pt="30px" pb="50px" overflow="hidden" justifyContent="space-between">
@@ -163,13 +82,9 @@ const Header = () => {
             </Flex>
           </ChakraLink>
         </Link>
-        <MenuLink>Važiuoklė</MenuLink>
-        <MenuLink>Kėbulas</MenuLink>
-        <MenuLink>Variklis</MenuLink>
-        <MenuLink>Modifikavimas</MenuLink>
-        <MenuLink>Priežiūra</MenuLink>
-        <MenuLink>Ratai</MenuLink>
-        <MenuLink>Kita</MenuLink>
+        <MenuLink>Privalumai</MenuLink>
+        <MenuLink>Informacija</MenuLink>
+        <MenuLink>Kainodara</MenuLink>
       </Flex>
       <Flex alignItems="center">
         <Menu>
@@ -195,12 +110,39 @@ const Header = () => {
             </MenuOptionGroup>
           </MenuList>
         </Menu>
-        <Link href="/partners" passHref>
+        <Link href="/" passHref>
           <ChakraLink fontWeight="500" _hover={{ textDecoration: "none" }} color="text" mr="20px">
-            Paslaųgų teikėjams
+            Klientams
           </ChakraLink>
         </Link>
-        <UserInfo />
+        <Link href="/partners/dashboard" passHref>
+          <ChakraLink fontWeight="500" _hover={{ textDecoration: "none" }} color="text" mr="20px">
+            Valdymo panelė
+          </ChakraLink>
+        </Link>
+        <Link href="/" passHref>
+          <ChakraLink
+            sx={{
+              ":hover": {
+                textDecoration: "none",
+              },
+            }}
+          >
+            <Button
+              variant="solid"
+              backgroundColor="brand.500"
+              color="white"
+              width={56}
+              height={14}
+              borderRadius="10px"
+              fontWeight="600"
+              boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
+              _hover={{ backgroundColor: "brand.400" }}
+            >
+              Tapkite partneriu
+            </Button>
+          </ChakraLink>
+        </Link>
       </Flex>
     </Flex>
   )

@@ -2,10 +2,9 @@ import React from "react"
 import { Container } from "@chakra-ui/react"
 import Header from "./header"
 import Hero from "./hero"
-import Search from "./search"
-import Services from "./services"
-import Partner from "./partner"
 import Footer from "./footer"
+import Benefits from "./benefits"
+import SelectPlan from "./selectPlan"
 
 const Main = () => {
   return (
@@ -13,10 +12,9 @@ const Main = () => {
       <Container width="1520px" maxWidth="1520px">
         <Header />
         <Hero />
-        <Search />
-        <Services />
+        <Benefits />
+        <SelectPlan />
       </Container>
-      <Partner />
       <Footer />
     </Container>
   )
