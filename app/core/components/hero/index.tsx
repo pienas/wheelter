@@ -4,6 +4,12 @@ import FastIcon from "../icons/FastIcon"
 import ReliableIcon from "../icons/ReliableIcon"
 import { Image } from "blitz"
 
+type BenefitProps = {
+  heading: string
+  text: string
+  icon: React.ReactNode
+}
+
 const BrandText = ({ children }) => {
   return (
     <Text fontWeight="700" color="brand.500" display="inline">
@@ -12,10 +18,35 @@ const BrandText = ({ children }) => {
   )
 }
 
+const Benefit = ({ heading, text, icon }: BenefitProps) => {
+  return (
+    <Flex
+      backgroundColor="#ffffff"
+      maxWidth="md"
+      boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
+      borderRadius="10px"
+      mb="20px"
+      px="20px"
+    >
+      <Box backgroundColor="brand.500" borderRadius="100%" p="0.7rem" mr="20px" my="20px">
+        {icon}
+      </Box>
+      <Box>
+        <Heading as="h2" fontSize="lg" mt="15px">
+          {heading}
+        </Heading>
+        <Text fontSize="sm" color="text" mt="5px">
+          {text}
+        </Text>
+      </Box>
+    </Flex>
+  )
+}
+
 const Hero = () => {
   return (
     <Flex>
-      <Box maxWidth="650px">
+      <Box maxWidth="2xl">
         <Heading size="2xl" fontWeight="500" lineHeight="1.4">
           Rinkitės praktiškumą, <br />
           registruokitės su <BrandText>Wheelter</BrandText>.
@@ -33,86 +64,21 @@ const Hero = () => {
           <br />
           Rezervuokite laiką dabar. Atsiskaitykite vietoje.
         </Heading>
-        <Flex
-          backgroundColor="#ffffff"
-          maxWidth="500px"
-          boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
-          borderRadius="10px"
-          mb="20px"
-        >
-          <Box
-            backgroundColor="brand.500"
-            borderRadius="100%"
-            p="0.7rem"
-            mr="30px"
-            my="20px"
-            ml="20px"
-          >
-            <FastIcon boxSize={8} color="white" />
-          </Box>
-          <Box>
-            <Heading as="h2" fontSize="18px" mt="15px">
-              Greičiau
-            </Heading>
-            <Text fontSize="14px" color="text" mt="5px">
-              Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų
-              automobiliui.
-            </Text>
-          </Box>
-        </Flex>
-        <Flex
-          backgroundColor="#ffffff"
-          maxWidth="500px"
-          boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
-          borderRadius="10px"
-          mb="20px"
-        >
-          <Box
-            backgroundColor="brand.500"
-            borderRadius="100%"
-            p="0.7rem"
-            mr="30px"
-            my="20px"
-            ml="20px"
-          >
-            <ReliableIcon boxSize={8} color="white" />
-          </Box>
-          <Box>
-            <Heading as="h2" fontSize="18px" mt="15px">
-              Patogiau
-            </Heading>
-            <Text fontSize="14px" color="text" mt="5px">
-              Vieta ir laikas nuo šiol nebe rodikliai.
-            </Text>
-          </Box>
-        </Flex>
-        <Flex
-          backgroundColor="#ffffff"
-          maxWidth="500px"
-          boxShadow="0 0 30px 0 rgba(0, 0, 0, 10%)"
-          borderRadius="10px"
-          mb="20px"
-        >
-          <Box
-            backgroundColor="brand.500"
-            borderRadius="100%"
-            p="0.7rem"
-            mr="30px"
-            my="20px"
-            ml="20px"
-          >
-            <TrustworthyIcon boxSize={8} color="white" />
-          </Box>
-          <Box>
-            <Heading as="h2" fontSize="18px" mt="15px">
-              Patikimiau
-            </Heading>
-            <Text fontSize="14px" color="text" mt="5px">
-              Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją
-              išmaniai.
-            </Text>
-          </Box>
-        </Flex>
+        <Benefit
+          heading="Greičiau"
+          text="Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų automobiliui."
+          icon={<FastIcon boxSize={8} color="white" />}
+        />
+        <Benefit
+          heading="Patogiau"
+          text="Vieta ir laikas nuo šiol nebe rodikliai."
+          icon={<ReliableIcon boxSize={8} color="white" />}
+        />
+        <Benefit
+          heading="Patikimiau"
+          text="Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją išmaniai."
+          icon={<TrustworthyIcon boxSize={8} color="white" />}
+        />
       </Box>
       <Box justifySelf="flex-end" alignSelf="center">
         <Image src="/illustration.svg" width="900px" height="532px" alt="Wheelter illustration" />
