@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Order" ALTER COLUMN "endsAt" DROP DEFAULT;

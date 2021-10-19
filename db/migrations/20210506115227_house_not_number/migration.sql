@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Address" ALTER COLUMN "house" SET DATA TYPE TEXT;
