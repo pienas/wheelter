@@ -1,5 +1,17 @@
-import { Box, Flex, Heading, Text } from "@chakra-ui/react"
-import { TabList, Tabs } from "@chakra-ui/tabs"
+import {
+  Box,
+  Flex,
+  Heading,
+  Text,
+  TabList,
+  Tabs,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react"
 import { useQuery } from "blitz"
 import React, { FC } from "react"
 import CustomTab from "./../customTab/CustomTab"
@@ -10,7 +22,6 @@ import OrdersIcon from "./../icons/OrdersIcon"
 import RatingIcon from "./../icons/RatingIcon"
 import ReviewsIcon from "./../icons/ReviewsIcon"
 import { Doughnut, Line } from "react-chartjs-2"
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getServiceReviewsCount from "app/partners/queries/getServiceReviewsCount"
 import getServiceRating from "app/partners/queries/getServiceRating"
@@ -138,7 +149,7 @@ const Dashboard: FC<Props> = ({
       status: true,
       employee: { select: { name: true, surname: true } },
       client: { select: { name: true, surname: true } },
-      service: { select: { name: true, price: true, duration: true } },
+      service: { select: { name: true, price: true, durationTo: true, durationFrom: true } },
     },
     orderBy: {
       startsAt: "asc",

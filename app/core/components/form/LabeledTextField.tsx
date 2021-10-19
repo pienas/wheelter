@@ -1,7 +1,7 @@
 import { forwardRef, PropsWithoutRef } from "react"
 import { Field, useField } from "react-final-form"
 import "react-phone-input-2/lib/style.css"
-import { Text } from "@chakra-ui/react"
+import { Text, Box, Input } from "@chakra-ui/react"
 import PhoneInput from "react-phone-input-2"
 import lt from "app/core/components/phoneLang.json"
 
@@ -76,11 +76,11 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
     // const normalizedError = Array.isArray(error) ? error.join(", ") : error || submitError
 
     return (
-      <div {...outerProps} className="fullW">
+      <Box {...outerProps}>
         <Text mb={1}>{label}</Text>
-        {!isPhone && <input {...input} disabled={submitting} {...props} ref={ref} />}
+        {!isPhone && <Input {...input} disabled={submitting} ref={ref} />}
         {isPhone && (
-          <div className="inputGroup">
+          <Box>
             <Field
               name="phone"
               type="tel"
@@ -90,17 +90,14 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
               {...props}
               ref={ref}
             />
-          </div>
+          </Box>
         )}
         {/* {touched && normalizedError && (
           <div role="alert" style={{ color: "red" }}>
             {normalizedError}
           </div>
         )} */}
-        <style jsx>{`
-          .fullW {
-            width: 100%;
-          }
+        {/* <style jsx>{`
           input {
             background-color: #eff0f7;
             border-radius: 0.6rem;
@@ -114,8 +111,8 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
             border: 1px solid #7000ff;
             outline: none;
           }
-        `}</style>
-      </div>
+        `}</style> */}
+      </Box>
     )
   }
 )

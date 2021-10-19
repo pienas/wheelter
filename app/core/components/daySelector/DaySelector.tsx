@@ -102,7 +102,7 @@ const DaySelector: FC<Props> = ({
           )
         )}
       </HStack>
-      <Text fontSize="14px" textAlign="center" fontWeight="600">
+      <Text fontSize="sm" textAlign="center" fontWeight="600">
         {daySelectionType === DaySelectionTypes.Range
           ? "Kalendoriuje pasirinkite Jums tinkamų dienų intervalą:"
           : daySelectionType === DaySelectionTypes.Multi
@@ -152,63 +152,63 @@ const DaySelector: FC<Props> = ({
       </Flex>
       {daySelectionType === DaySelectionTypes.Range && !selectedRange.from && !selectedRange.to && (
         <>
-          <Text fontSize="14px" textAlign="center" fontWeight="600">
+          <Text fontSize="sm" textAlign="center" fontWeight="600">
             Jūsų pasirinktas intervalas:
           </Text>
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             Pasirinkite pirmąją dieną
           </Text>
         </>
       )}
       {daySelectionType === DaySelectionTypes.Range && selectedRange.from && !selectedRange.to && (
         <>
-          <Text fontSize="14px" textAlign="center" fontWeight="600">
+          <Text fontSize="sm" textAlign="center" fontWeight="600">
             Jūsų pasirinktas intervalas:
           </Text>
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             Pasirinkite paskutinę dieną
           </Text>
         </>
       )}
       {daySelectionType === DaySelectionTypes.Range && selectedRange.from && selectedRange.to && (
         <>
-          <Text fontSize="14px" textAlign="center" fontWeight="600">
+          <Text fontSize="sm" textAlign="center" fontWeight="600">
             Jūsų pasirinktas intervalas:
           </Text>
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             {format(selectedRange.from, "yyyy-MM-dd")} - {format(selectedRange.to, "yyyy-MM-dd")}
           </Text>
         </>
       )}
       {daySelectionType === DaySelectionTypes.Multi && selectedDays.length > 0 && (
-        <Text fontSize="14px" textAlign="center" fontWeight="600">
+        <Text fontSize="sm" textAlign="center" fontWeight="600">
           Jūsų pasirinktos dienos:
         </Text>
       )}
       {daySelectionType === DaySelectionTypes.Multi &&
         selectedDays.length > 0 &&
         selectedDays.map((day) => (
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             {format(day, "yyyy-MM-dd")}
             <br />
           </Text>
         ))}
       {daySelectionType === DaySelectionTypes.Multi && selectedDays.length === 0 && (
         <>
-          <Text fontSize="14px" textAlign="center" fontWeight="600">
+          <Text fontSize="sm" textAlign="center" fontWeight="600">
             Jūsų pasirinktos dienos:
           </Text>
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             Pasirinkite dienas
           </Text>
         </>
       )}
       {daySelectionType === DaySelectionTypes.Single && (
         <>
-          <Text fontSize="14px" textAlign="center" fontWeight="600">
+          <Text fontSize="sm" textAlign="center" fontWeight="600">
             Jūsų pasirinkta diena:
           </Text>
-          <Text fontSize="14px" textAlign="center">
+          <Text fontSize="sm" textAlign="center">
             {selectedDays[0]?.toDateString() &&
               format(new Date(Date.parse(selectedDays[0].toDateString())), "yyyy-MM-dd")}
           </Text>

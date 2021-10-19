@@ -15,7 +15,7 @@ type BenefitProps = {
 
 const Benefit = ({ icon, heading1, heading2, text }: BenefitProps) => {
   return (
-    <Box width="430px">
+    <Box>
       {icon}
       <Heading fontSize="3xl" color="black" fontWeight="500" mt="10px">
         {heading1}

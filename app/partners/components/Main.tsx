@@ -9,8 +9,8 @@ import SelectPlan from "./selectPlan"
 const Main = () => {
   return (
     <Container bg="white" width="100vw" maxWidth="100vw" overflow="hidden" p={0}>
-      <Container width="1520px" maxWidth="1520px">
-        <Header />
+      <Header />
+      <Container width="7xl" maxWidth="7xl">
         <Hero />
         <Benefits />
         <SelectPlan />

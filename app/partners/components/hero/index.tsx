@@ -1,7 +1,5 @@
 import { Flex, Heading, Text, Button, Link as ChakraLink, Box } from "@chakra-ui/react"
 import { Image, Link } from "blitz"
-import Benefits from "../benefits"
-import SelectPlan from "../selectPlan"
 
 const BrandText = ({ children }) => {
   return (
@@ -14,8 +12,8 @@ const BrandText = ({ children }) => {
 const Hero = () => {
   return (
     <Flex direction="column">
-      <Flex alignItems="center" justifyContent="space-between" height="750px">
-        <Box maxWidth="650px">
+      <Flex alignItems="center" justifyContent="space-between" height="3xl">
+        <Box maxWidth="2xl">
           <Heading
             size="xs"
             color="#8C929F"
@@ -94,8 +92,8 @@ const Hero = () => {
         <Box justifySelf="flex-end" alignSelf="center">
           <Image
             src="/illustration-partners.svg"
-            width="900px"
-            height="550px"
+            width="700px"
+            height="430px"
             alt="Wheelter illustration"
           />
         </Box>

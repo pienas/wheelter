@@ -4,39 +4,15 @@ import {
   Heading,
   MenuButton,
   MenuList,
-  MenuItem,
-  MenuDivider,
   Menu,
   MenuOptionGroup,
   MenuItemOption,
-  Avatar,
   Text,
   Button,
 } from "@chakra-ui/react"
-import { Image, Link, Routes, useMutation } from "blitz"
-import { useCurrentUser } from "app/core/hooks/useCurrentUser"
-import logout from "app/auth/mutations/logout"
+import { Image, Link, Routes } from "blitz"
 import DownIcon from "app/partners/components/icons/ArrowIcon"
 import ReactCountryFlag from "react-country-flag"
-
-type ItemProps = {
-  children: React.ReactNode
-  onClick?: () => void
-}
-
-const Item = ({ children, onClick }: ItemProps) => {
-  return (
-    <MenuItem
-      fontSize="14px"
-      color="text"
-      py="0.3rem"
-      _hover={{ background: "#F8F8F8" }}
-      onClick={onClick}
-    >
-      {children}
-    </MenuItem>
-  )
-}
 
 const MenuLink = ({ children }) => {
   return (
@@ -56,7 +32,7 @@ const MenuOption = ({ value, country }: MenuOptionProps) => {
     <MenuItemOption value={value} icon={<></>} iconSpacing={0}>
       <Flex alignItems="center">
         <ReactCountryFlag countryCode={country} svg />
-        <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
+        <Text fontSize="sm" color="text" ml="5px" lineHeight="0.8">
           {value}
         </Text>
       </Flex>
@@ -66,7 +42,13 @@ const MenuOption = ({ value, country }: MenuOptionProps) => {
 
 const Header = () => {
   return (
-    <Flex pt="30px" pb="50px" overflow="hidden" justifyContent="space-between">
+    <Flex
+      pt="30px"
+      pb="50px"
+      overflow="hidden"
+      justifyContent="space-between"
+      px="calc((100vw - 1280px) / 2)"
+    >
       <Flex alignItems="center">
         <Link href={Routes.Home()} passHref>
           <ChakraLink

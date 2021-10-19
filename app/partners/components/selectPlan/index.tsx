@@ -88,7 +88,7 @@ const Row = ({ benefit, basic, smart, individual, isLastRow }: RowProps) => {
   return (
     <Grid
       templateColumns="repeat(4, 1fr)"
-      width="1520px"
+      width="7xl"
       height="50px"
       borderBottom={isLastRow ? "none" : "1px solid #E7E7E7"}
       mb={isLastRow ? "50px" : "0"}
@@ -245,7 +245,7 @@ const SelectPlan = () => {
           </TabList>
         </Tabs>
       </Flex>
-      <Grid templateColumns="repeat(4, 1fr)" width="1520px" justifyItems="center" mb="30px">
+      <Grid templateColumns="repeat(4, 1fr)" width="7xl" justifyItems="center" mb="30px">
         <Box></Box>
         <Plan
           yearlySelected={isYearlySelected}

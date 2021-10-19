@@ -1,8 +1,34 @@
 import { Head, Router, useMutation, useQuery } from "blitz"
-import { Avatar } from "@chakra-ui/avatar"
-import { useDisclosure } from "@chakra-ui/hooks"
-import { Box, Divider, Flex, Heading, Link, Text } from "@chakra-ui/react"
-import { Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/menu"
+import {
+  Avatar,
+  Box,
+  Divider,
+  Flex,
+  Heading,
+  Link,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  ModalCloseButton,
+  Tooltip,
+  Button,
+  Tabs,
+  TabList,
+  TabPanels,
+  TabPanel,
+  useDisclosure,
+  useToast,
+  useOutsideClick,
+} from "@chakra-ui/react"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getUsersActiveService from "app/partners/queries/getUsersActiveService"
 import getUsersServices from "app/partners/queries/getUsersServices"
@@ -31,15 +57,30 @@ import Services from "./../services"
 import Settings from "./../settings"
 import NotesIcon from "./../icons/NotesIcon"
 import Notes from "./../notes"
-import { Tooltip } from "@chakra-ui/tooltip"
-import { Button } from "@chakra-ui/button"
-import { useToast } from "@chakra-ui/toast"
 import SuccessToast from "app/core/components/toast/SuccessToast"
 import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
-import getUserNotificationsCount from "app/partners/queries/getUserNotificationsCount"
 import getServiceAddress from "app/partners/queries/getServiceAddress"
 import DiscountsIcon from "./../icons/DiscountsIcon"
 import Discounts from "./../discounts"
+import LockIcon from "../icons/LockIcon"
+import CopyIcon from "../icons/CopyIcon"
+import getUserNotifications from "app/partners/queries/getUserNotifications"
+import CustomTabNotifications from "../customTab/CustomTabNotifications"
+import moment from "moment"
+import "moment/locale/lt"
+import updateUserNotification from "app/partners/mutations/updateUserNotification"
+import { Scrollbars } from "react-custom-scrollbars"
+import { Notification } from "db"
+
+type MenuLinkProps = {
+  isOpen: boolean
+  url: string
+  label: string
+  icon: React.ReactNode
+  isOrders: boolean
+  newOrders?: number
+  lateOrdersCount?: number
+}
 
 const UserInfo = () => {
   const currentUser = useCurrentUser()
@@ -86,7 +127,88 @@ const UserInfo = () => {
   )
 }
 
+const MenuLink = ({
+  isOpen,
+  url,
+  label,
+  icon,
+  isOrders,
+  newOrders,
+  lateOrdersCount,
+}: MenuLinkProps) => {
+  return (
+    <Link href={`/partners/${url}`} textDecoration="none !important">
+      <Tooltip
+        label={label}
+        placement="right"
+        background="#EFF0F3"
+        color="black"
+        isDisabled={isOpen}
+      >
+        <Flex
+          justifyContent="flex-start"
+          alignItems="center"
+          height="50px"
+          cursor="pointer"
+          transition="all 0.2s"
+          background={Router.route === `/partners/${url}` ? "#FDF9FF" : "transparent"}
+          _hover={{ background: "#FDF9FF" }}
+          sx={{
+            ":hover > svg": {
+              color: "#6500E6",
+            },
+            ":hover > p": {
+              color: "#0B132A",
+            },
+          }}
+          position="relative"
+          _before={{
+            content: '""',
+            borderRadius: "0 50px 50px 0",
+            width: "6px",
+            height: "100%",
+            background: Router.route === `/partners/${url}` ? "#6500E6" : "transparent",
+            position: "absolute",
+            left: "0",
+          }}
+        >
+          {icon}
+          {isOpen && (
+            <Text
+              fontWeight="600"
+              fontSize="sm"
+              color={Router.route === `/partners/${url}` ? "#0B132A" : "#A8A8A8"}
+              transition="all 0.2s"
+            >
+              {label}
+            </Text>
+          )}
+          {isOrders && (newOrders! > 0 || lateOrdersCount! > 0) && (
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              background="#FF5454"
+              width="18px"
+              height="18px"
+              borderRadius="100%"
+              ml={isOpen ? "10px" : "-15px"}
+              mt={isOpen ? "0" : "-15px"}
+              transition="all 0.2s"
+            >
+              <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
+                {newOrders! + lateOrdersCount! > 9 ? "9+" : newOrders! + lateOrdersCount!}
+              </Text>
+            </Flex>
+          )}
+        </Flex>
+      </Tooltip>
+    </Link>
+  )
+}
+
 const DashboardMenu = () => {
+  moment.locale("lt")
+  const { isOpen: isModalOpen, onOpen: onModalOpen, onClose: onModalClose } = useDisclosure()
   const currentUser = useCurrentUser()
   const [carServices] = useQuery(getUsersServices, null)
   const services = carServices!
@@ -131,36 +253,103 @@ const DashboardMenu = () => {
       refetchInterval: 60000,
     }
   )
-  // const [quickHelpOrders] = useQuery(
-  //   getServiceOrdersCount,
-  //   {
-  //     where: { carServiceId: activeService, status: "QUICK" },
-  //   },
-  //   {
-  //     refetchInterval: 60000,
-  //   }
-  // )
   const [lastNotificationsCount, setLastNofiticationCount] = useState<any>()
   const [notificationSound] = useSound("/notification.mp3")
-  const [notificationsCount] = useQuery(
-    getUserNotificationsCount,
+  const [notifications, { refetch: refecthNotifications }] = useQuery(
+    getUserNotifications,
     {
-      where: { carServiceUserId: currentUser?.id, seen: false },
+      where: { carServiceUserId: currentUser?.id },
+      select: {
+        id: true,
+        createdAt: true,
+        type: true,
+        read: true,
+        seen: true,
+        order: {
+          select: {
+            id: true,
+            service: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            client: {
+              select: {
+                id: true,
+                name: true,
+                surname: true,
+                avatarUrl: true,
+              },
+            },
+            carService: {
+              select: {
+                id: true,
+                name: true,
+                url: true,
+              },
+            },
+          },
+        },
+      },
     },
     {
       refetchInterval: 60000,
       refetchIntervalInBackground: true,
-      onSuccess: (count) => {
-        if (count > lastNotificationsCount) {
-          notificationSound()
-        }
-        setLastNofiticationCount(count)
-      },
     }
   )
+  const notificationsCount = notifications.filter((n) => n.seen === false).length
   const toast = useToast()
   const toastIdRef = useRef<any>()
   const [buttonLoading, setButtonLoading] = useState(false)
+
+  const updateNotification = async (id: number, state: boolean) => {
+    await updateUserNotification({
+      where: {
+        id: id,
+        carServiceUserId: currentUser?.id,
+      },
+      data: {
+        read: state,
+      },
+    }).then(() => {
+      refecthNotifications()
+    })
+  }
+
+  const updateAllNotifications = async () => {
+    await updateUserNotification({
+      where: {
+        carServiceUserId: currentUser?.id,
+      },
+      data: {
+        read: true,
+      },
+    }).then(() => {
+      refecthNotifications()
+    })
+  }
+
+  const markAllNotificationsSeen = async () => {
+    await updateUserNotification({
+      where: {
+        carServiceUserId: currentUser?.id,
+      },
+      data: {
+        seen: true,
+      },
+    }).then(() => {
+      refecthNotifications()
+    })
+  }
+
+  const [notificationsVisible, setNotificationsVisible] = useState(false)
+  const notificationsRef = useRef<HTMLDivElement>(null)
+  useOutsideClick({
+    ref: notificationsRef,
+    handler: () => setNotificationsVisible(false),
+  })
+
   return (
     <>
       {Router.route === "/partners/dashboard" && (
@@ -295,6 +484,7 @@ const DashboardMenu = () => {
                 setButtonLoading(false)
                 refetch()
                 toastIdRef.current = toast({
+                  position: "bottom-left",
                   duration: 5000,
                   render: () => (
                     <SuccessToast
@@ -352,6 +542,7 @@ const DashboardMenu = () => {
                   setButtonLoading(false)
                   refetch()
                   toastIdRef.current = toast({
+                    position: "bottom-left",
                     duration: 5000,
                     render: () => (
                       <SuccessToast
@@ -407,537 +598,143 @@ const DashboardMenu = () => {
               </Flex>
             </Link>
           </Box>
-          <Link href="/partners/dashboard" textDecoration="none !important">
-            <Tooltip
-              label="Suvestinė"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+          <MenuLink
+            isOpen={isOpen}
+            url="dashboard"
+            label="Suvestinė"
+            icon={
+              <DashboardIcon
+                boxSize={7}
+                color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/dashboard" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/dashboard" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <DashboardIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/dashboard" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Suvestinė
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/stats" textDecoration="none !important">
-            <Tooltip
-              label="Statistika"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="stats"
+            label="Statistika"
+            icon={
+              <StatsIcon
+                boxSize={7}
+                color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/stats" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/stats" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <StatsIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/stats" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Statistika
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/calendar" textDecoration="none !important">
-            <Tooltip
-              label="Kalendorius"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="calendar"
+            label="Kalendorius"
+            icon={
+              <CalendarIcon
+                boxSize={7}
+                color={Router.route === "/partners/calendar" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/calendar" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/calendar" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <CalendarIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/calendar" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/calendar" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Kalendorius
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/orders" textDecoration="none !important">
-            <Tooltip
-              label="Užsakymai"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="orders"
+            label="Užsakymai"
+            icon={
+              <OrdersIcon
+                boxSize={7}
+                color={Router.route === "/partners/orders" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/orders" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/orders" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <OrdersIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/orders" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/orders" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Užsakymai
-                  </Text>
-                )}
-                {(newOrders > 0 || lateOrdersCount > 0) && (
-                  <Flex
-                    justifyContent="center"
-                    alignItems="center"
-                    background="#FF5454"
-                    width="18px"
-                    height="18px"
-                    borderRadius="100%"
-                    ml={isOpen ? "10px" : "-15px"}
-                    mt={isOpen ? "0" : "-15px"}
-                    transition="all 0.2s"
-                  >
-                    <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                      {newOrders + lateOrdersCount > 9 ? "9+" : newOrders + lateOrdersCount}
-                    </Text>
-                  </Flex>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/services" textDecoration="none !important">
-            <Tooltip
-              label="Paslaugos"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={true}
+            newOrders={newOrders}
+            lateOrdersCount={lateOrdersCount}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="services"
+            label="Paslaugos"
+            icon={
+              <ServicesIcon
+                boxSize={7}
+                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/services" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/services" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <ServicesIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/services" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Paslaugos
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          {/* <Link href="/partners/quickhelp" textDecoration="none !important">
-            <Tooltip
-              label="Greita pagalba"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="services"
+            label="Paslaugos"
+            icon={
+              <ServicesIcon
+                boxSize={7}
+                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/quickhelp" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/quickhelp" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <QuickhelpIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/quickhelp" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/quickhelp" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                    whiteSpace="nowrap"
-                  >
-                    Greita pagalba
-                  </Text>
-                )}
-                {quickHelpOrders > 0 && (
-                  <Flex
-                    justifyContent="center"
-                    alignItems="center"
-                    background="#FF5454"
-                    width="18px"
-                    height="18px"
-                    borderRadius="100%"
-                    ml={isOpen ? "10px" : "-15px"}
-                    mt={isOpen ? "0" : "-15px"}
-                    transition="all 0.2s"
-                  >
-                    <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                      {quickHelpOrders > 9 ? "9+" : quickHelpOrders}
-                    </Text>
-                  </Flex>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link> */}
-          <Link href="/partners/notes" textDecoration="none !important">
-            <Tooltip
-              label="Užrašinė"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="notes"
+            label="Užrašinė"
+            icon={
+              <NotesIcon
+                boxSize={7}
+                color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/notes" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/notes" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <NotesIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/notes" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                    whiteSpace="nowrap"
-                  >
-                    Užrašinė
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/discounts" textDecoration="none !important">
-            <Tooltip
-              label="Akcijos"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="settings"
+            label="Nustatymai"
+            icon={
+              <SettingsIcon
+                boxSize={7}
+                color={Router.route === "/partners/settings" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/discounts" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/discounts" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <DiscountsIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/discounts" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/discounts" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Akcijos
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
-          <Link href="/partners/settings" textDecoration="none !important">
-            <Tooltip
-              label="Nustatymai"
-              placement="right"
-              background="#EFF0F3"
-              color="black"
-              isDisabled={isOpen}
-            >
-              <Flex
-                justifyContent="flex-start"
-                alignItems="center"
-                height="50px"
-                cursor="pointer"
+              />
+            }
+            isOrders={false}
+          />
+          <MenuLink
+            isOpen={isOpen}
+            url="services"
+            label="Paslaugos"
+            icon={
+              <ServicesIcon
+                boxSize={7}
+                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
+                mr={isOpen ? "20px" : "0"}
+                ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
-                background={Router.route === "/partners/settings" ? "#FDF9FF" : "transparent"}
-                _hover={{ background: "#FDF9FF" }}
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                  ":hover > p": {
-                    color: "#0B132A",
-                  },
-                }}
-                position="relative"
-                _before={{
-                  content: '""',
-                  borderRadius: "0 50px 50px 0",
-                  width: "6px",
-                  height: "100%",
-                  background: Router.route === "/partners/settings" ? "#6500E6" : "transparent",
-                  position: "absolute",
-                  left: "0",
-                }}
-              >
-                <SettingsIcon
-                  boxSize={7}
-                  color={Router.route === "/partners/settings" ? "#6500E6" : "#A8A8A8"}
-                  mr={isOpen ? "20px" : "0"}
-                  ml={isOpen ? "70px" : "34px"}
-                  transition="all 0.2s"
-                />
-                {isOpen && (
-                  <Text
-                    fontWeight="600"
-                    fontSize="sm"
-                    color={Router.route === "/partners/settings" ? "#0B132A" : "#A8A8A8"}
-                    transition="all 0.2s"
-                  >
-                    Nustatymai
-                  </Text>
-                )}
-              </Flex>
-            </Tooltip>
-          </Link>
+              />
+            }
+            isOrders={false}
+          />
           <Tooltip
             label="Dalintis"
             placement="right"
@@ -952,6 +749,7 @@ const DashboardMenu = () => {
               cursor="pointer"
               transition="all 0.2s"
               _hover={{ background: "#FDF9FF" }}
+              onClick={onModalOpen}
               sx={{
                 ":hover > svg": {
                   color: "#6500E6",
@@ -1110,7 +908,7 @@ const DashboardMenu = () => {
                         whiteSpace="nowrap"
                         transition="all 0.2s"
                       >
-                        {`${activeCarService?.carService.address[0].street}, ${activeCarService?.carService.address[0].city}`}
+                        {`${activeCarService?.carService.address?.street}, ${activeCarService?.carService.address?.city}`}
                       </Text>
                     </Flex>
                   )}
@@ -1181,7 +979,7 @@ const DashboardMenu = () => {
                                 whiteSpace="nowrap"
                                 transition="all 0.2s"
                               >
-                                {`${service?.carService.address[0].street}, ${service?.carService.address[0].city}`}
+                                {`${service?.carService.address?.street}, ${service?.carService.address?.city}`}
                               </Text>
                             </Flex>
                           )}
@@ -1252,6 +1050,85 @@ const DashboardMenu = () => {
               : 0
           }
         >
+          <Modal isOpen={isModalOpen} onClose={onModalClose} size="xl">
+            <ModalOverlay />
+            <ModalContent>
+              <Flex justifyContent="center" mt="20px">
+                <ShareIcon boxSize={10} color="brand.500" />
+              </Flex>
+              <ModalHeader textAlign="center" fontWeight="500" fontSize="2xl">
+                Pasidalinkite savo servisu
+                <Text color="text" fontWeight="400" fontSize="md" mt="10px">
+                  Pasidalinkite savo servisu
+                </Text>
+              </ModalHeader>
+              <ModalCloseButton />
+              <Divider color="#d8d8d8" />
+              <ModalBody mb="30px">
+                <Text color="text" fontWeight="400" fontSize="md">
+                  Nuoroda pasidalinimui:
+                </Text>
+                <Flex
+                  backgroundColor="#EFF0F3"
+                  px="20px"
+                  py="12px"
+                  borderRadius="10px"
+                  mt="10px"
+                  position="relative"
+                >
+                  <LockIcon boxSize={6} color="brand.500" />
+                  <Text color="#787E97" ml="10px">
+                    {window.location.hostname + "/partners/" + activeCarService?.carService.url}
+                  </Text>
+                  <CopyIcon
+                    boxSize={6}
+                    color="#787E97"
+                    position="absolute"
+                    right="20px"
+                    _hover={{ color: "brand.500" }}
+                    transition="all 0.2s"
+                    cursor="pointer"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        window.location.hostname + "/partners/" + activeCarService?.carService.url
+                      )
+                      toastIdRef.current = toast({
+                        position: "bottom-left",
+                        duration: 5000,
+                        render: () => (
+                          <SuccessToast
+                            heading="Pavyko!"
+                            text={`Nuoroda buvo sėkmingai nukopijuota.`}
+                            id={toastIdRef.current}
+                          />
+                        ),
+                      })
+                    }}
+                  />
+                </Flex>
+                <Text color="text" fontWeight="400" fontSize="md" mt="20px">
+                  Dalinkitės per:
+                </Text>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="outline"
+                  color="text"
+                  width={24}
+                  height={10}
+                  fontSize="sm"
+                  borderRadius="10px"
+                  fontWeight="400"
+                  borderColor="#d8d8d8"
+                  // boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
+                  // _hover={{ backgroundColor: "brand.400" }}
+                  onClick={onModalClose}
+                >
+                  Atšaukti
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
           <Flex
             mt="50px"
             mb="30px"
@@ -1285,32 +1162,473 @@ const DashboardMenu = () => {
               />
             </Box>
             <Flex alignItems="center">
-              <Flex
-                cursor="pointer"
-                sx={{
-                  ":hover > svg": {
-                    color: "#6500E6",
-                  },
-                }}
-              >
-                <NotificationsIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
-                {notificationsCount > 0 && (
-                  <Flex
-                    justifyContent="center"
-                    alignItems="center"
-                    background="#FF5454"
-                    width="18px"
-                    height="18px"
-                    borderRadius="100%"
-                    ml="-15px"
-                    transition="all 0.2s"
-                  >
-                    <Text color="#ffffff" fontWeight="500" fontSize="0.6rem" transition="all 0.2s">
-                      {notificationsCount > 9 ? "9+" : notificationsCount}
-                    </Text>
+              <Box position="relative">
+                <Button
+                  _focus={{ boxShadow: "none" }}
+                  sx={{
+                    ":hover > span > div > svg": {
+                      color: "#6500E6",
+                    },
+                  }}
+                  p="0"
+                  onClick={() => {
+                    markAllNotificationsSeen()
+                    setNotificationsVisible(notificationsVisible ? false : true)
+                  }}
+                >
+                  <Flex>
+                    <NotificationsIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
+                    {notificationsCount > 0 && (
+                      <Flex
+                        justifyContent="center"
+                        alignItems="center"
+                        background="#FF5454"
+                        width="18px"
+                        height="18px"
+                        borderRadius="100%"
+                        transition="all 0.2s"
+                        ml="-15px"
+                      >
+                        <Text
+                          color="#ffffff"
+                          fontWeight="500"
+                          fontSize="0.6rem"
+                          transition="all 0.2s"
+                        >
+                          {notificationsCount > 9 ? "9+" : notificationsCount}
+                        </Text>
+                      </Flex>
+                    )}
                   </Flex>
-                )}
-              </Flex>
+                </Button>
+                <Box
+                  border="none"
+                  backgroundColor="white"
+                  borderRadius="10px"
+                  boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)"
+                  position="absolute"
+                  top="48px"
+                  left="50%"
+                  transform={
+                    notificationsVisible
+                      ? "translateX(-50%)"
+                      : "translateZ(0px) translateY(100px) translateX(-50%)"
+                  }
+                  zIndex="15"
+                  width="xl"
+                  visibility={notificationsVisible ? "visible" : "hidden"}
+                  ref={notificationsRef}
+                  opacity={notificationsVisible ? 1 : 0}
+                  transition="all 0.2s"
+                >
+                  <Tabs variant="unstyled">
+                    <Flex p={6} alignItems="center" justifyContent="space-between">
+                      <Heading fontWeight="500" color="black" fontSize="2xl">
+                        Pranešimai
+                      </Heading>
+                      <Text
+                        color="brand.500"
+                        fontSize="xs"
+                        _hover={{ opacity: 0.8 }}
+                        cursor="pointer"
+                        onClick={() => updateAllNotifications()}
+                      >
+                        Pažymėti visus kaip perskaitytus
+                      </Text>
+                    </Flex>
+                    <TabList px={6} borderBottom="1px solid" borderColor="#efefef">
+                      <CustomTabNotifications>
+                        <Flex alignItems="center">
+                          Užsakymai{" "}
+                          <Flex
+                            justifyContent="center"
+                            alignItems="center"
+                            background="#FF5454"
+                            width="24px"
+                            height="16px"
+                            borderRadius="10px"
+                            ml="10px"
+                          >
+                            <Text color="#ffffff" fontWeight="400" fontSize="0.6rem">
+                              {
+                                notifications
+                                  .filter((n) => n.type === "ORDER")
+                                  .filter((n) => n.read === false).length
+                              }
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </CustomTabNotifications>
+                      <CustomTabNotifications>
+                        <Flex alignItems="center">
+                          Atnaujinimai
+                          <Flex
+                            justifyContent="center"
+                            alignItems="center"
+                            background="#FF5454"
+                            width="24px"
+                            height="16px"
+                            borderRadius="10px"
+                            ml="10px"
+                          >
+                            <Text color="#ffffff" fontWeight="400" fontSize="0.6rem">
+                              {
+                                notifications
+                                  .filter((n) => n.type === "UPDATE")
+                                  .filter((n) => n.read === false).length
+                              }
+                            </Text>
+                          </Flex>
+                        </Flex>
+                      </CustomTabNotifications>
+                    </TabList>
+                    <Scrollbars autoHeight autoHeightMax={700} noScrollX>
+                      <TabPanels>
+                        <TabPanel p="0">
+                          {notifications.filter((n) => n.type === "ORDER").length === 0 && (
+                            <Text textAlign="center" py="20px" fontSize="xl">
+                              Pranešimų nėra.
+                            </Text>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "ORDER")
+                            .filter((n) => n.read === false).length !== 0 && (
+                            <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
+                              Neperskaityti
+                            </Heading>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "ORDER")
+                            .filter((n) => n.read === false)
+                            .sort(
+                              (a: Notification, b: Notification) =>
+                                b.createdAt.getTime() - a.createdAt.getTime()
+                            )
+                            .map((notification: any, i, { length }) => {
+                              return (
+                                <Flex
+                                  justifyContent="space-between"
+                                  px={6}
+                                  py={4}
+                                  borderBottom={i !== length - 1 ? "1px solid #efefef" : "none"}
+                                  cursor="pointer"
+                                  // as="a"
+                                  // href={`/partners/orders/${notification.order.id}`}
+                                  _hover={{ backgroundColor: "#F5F6FD" }}
+                                  borderBottomRightRadius={
+                                    notifications
+                                      .filter((n) => n.type === "ORDER")
+                                      .filter((n) => n.read === true).length
+                                      ? "0"
+                                      : i !== length - 1
+                                      ? "0"
+                                      : "10px"
+                                  }
+                                  borderBottomLeftRadius={
+                                    notifications
+                                      .filter((n) => n.type === "ORDER")
+                                      .filter((n) => n.read === true).length
+                                      ? "0"
+                                      : i !== length - 1
+                                      ? "0"
+                                      : "10px"
+                                  }
+                                >
+                                  <Flex mr="10px">
+                                    <Avatar
+                                      size="md"
+                                      name={notification.order.client.name}
+                                      src={notification.order.client.avatarUrl}
+                                    />
+                                    <Box ml="10px">
+                                      <Heading fontSize="md" fontWeight="600" mb="5px">
+                                        Naujas užsakymas
+                                      </Heading>
+                                      <Text color="#525456" fontSize="sm">
+                                        <Text display="inline" color="brand.500" fontWeight="400">
+                                          {notification.order.client.name}{" "}
+                                          {notification.order.client.surname[0]}.
+                                        </Text>{" "}
+                                        užsakė{" "}
+                                        <Text display="inline" color="brand.500" fontWeight="500">
+                                          {notification.order.service.name}
+                                        </Text>{" "}
+                                        servise{" "}
+                                        <Text display="inline" color="brand.500" fontWeight="400">
+                                          {notification.order.carService.name}
+                                        </Text>
+                                      </Text>
+                                    </Box>
+                                  </Flex>
+                                  <Flex
+                                    textAlign="end"
+                                    minW="160px"
+                                    direction="column"
+                                    justifyContent="space-between"
+                                  >
+                                    <Text
+                                      color="brand.500"
+                                      fontSize="xs"
+                                      _hover={{ opacity: 0.8 }}
+                                      onClick={() => updateNotification(notification.id, true)}
+                                    >
+                                      Pažymėti kaip perskaitytą
+                                    </Text>
+                                    <Text color="#B7BBC0" fontSize="xs">
+                                      {moment(notification.createdAt).fromNow()}
+                                    </Text>
+                                  </Flex>
+                                </Flex>
+                              )
+                            })}
+                          {notifications
+                            .filter((n) => n.type === "ORDER")
+                            .filter((n) => n.read === true).length !== 0 && (
+                            <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
+                              Perskaityti
+                            </Heading>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "ORDER")
+                            .filter((n) => n.read === true)
+                            .sort(
+                              (a: Notification, b: Notification) =>
+                                b.createdAt.getTime() - a.createdAt.getTime()
+                            )
+                            .map((notification: any, i, { length }) => (
+                              <Flex
+                                justifyContent="space-between"
+                                px={6}
+                                py={4}
+                                borderBottom={i !== length - 1 ? "1px solid #efefef" : "none"}
+                                cursor="pointer"
+                                _hover={{ backgroundColor: "#F5F6FD" }}
+                                borderBottomRightRadius={i !== length - 1 ? "0" : "10px"}
+                                borderBottomLeftRadius={i !== length - 1 ? "0" : "10px"}
+                                color="text"
+                              >
+                                <Flex mr="10px">
+                                  <Avatar
+                                    size="md"
+                                    name={notification.order.client.name}
+                                    src={notification.order.client.avatarUrl}
+                                  />
+                                  <Box ml="10px">
+                                    <Heading fontSize="md" fontWeight="600" mb="5px">
+                                      Naujas užsakymas
+                                    </Heading>
+                                    <Text color="#525456" fontSize="sm">
+                                      <Text display="inline" fontWeight="400">
+                                        {notification.order.client.name}{" "}
+                                        {notification.order.client.surname[0]}.
+                                      </Text>{" "}
+                                      užsakė{" "}
+                                      <Text display="inline" fontWeight="500">
+                                        {notification.order.service.name}
+                                      </Text>{" "}
+                                      servise{" "}
+                                      <Text display="inline" fontWeight="400">
+                                        {notification.order.carService.name}
+                                      </Text>
+                                    </Text>
+                                  </Box>
+                                </Flex>
+                                <Flex
+                                  textAlign="end"
+                                  minW="160px"
+                                  direction="column"
+                                  justifyContent="space-between"
+                                >
+                                  <Text
+                                    color="brand.500"
+                                    fontSize="xs"
+                                    _hover={{ opacity: 0.8 }}
+                                    onClick={() => updateNotification(notification.id, false)}
+                                  >
+                                    Pažymėti kaip neperskaitytą
+                                  </Text>
+                                  <Text color="#B7BBC0" fontSize="xs">
+                                    {moment(notification.createdAt).fromNow()}
+                                  </Text>
+                                </Flex>
+                              </Flex>
+                            ))}
+                        </TabPanel>
+                        <TabPanel p="0">
+                          {notifications.filter((n) => n.type === "UPDATE").length === 0 && (
+                            <Text textAlign="center" py="20px" fontSize="xl">
+                              Pranešimų nėra.
+                            </Text>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "UPDATE")
+                            .filter((n) => n.read === false).length !== 0 && (
+                            <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
+                              Neperskaityti
+                            </Heading>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "UPDATE")
+                            .filter((n) => n.read === false)
+                            .sort(
+                              (a: Notification, b: Notification) =>
+                                b.createdAt.getTime() - a.createdAt.getTime()
+                            )
+                            .map((notification: any, i, { length }) => (
+                              <Flex
+                                justifyContent="space-between"
+                                px={6}
+                                py={4}
+                                borderBottom={i !== length - 1 ? "1px solid #efefef" : "none"}
+                                cursor="pointer"
+                                // as="a"
+                                // href={`/partners/orders/${notification.order.id}`}
+                                _hover={{ backgroundColor: "#F5F6FD" }}
+                                borderBottomRightRadius={
+                                  notifications
+                                    .filter((n) => n.type === "UPDATE")
+                                    .filter((n) => n.read === true).length
+                                    ? "0"
+                                    : i !== length - 1
+                                    ? "0"
+                                    : "10px"
+                                }
+                                borderBottomLeftRadius={
+                                  notifications
+                                    .filter((n) => n.type === "UPDATE")
+                                    .filter((n) => n.read === true).length
+                                    ? "0"
+                                    : i !== length - 1
+                                    ? "0"
+                                    : "10px"
+                                }
+                              >
+                                <Flex mr="10px">
+                                  <Avatar
+                                    size="md"
+                                    name={notification.order.client.name}
+                                    src={notification.order.client.avatarUrl}
+                                  />
+                                  <Box ml="10px">
+                                    <Heading fontSize="md" fontWeight="600" mb="5px">
+                                      Naujas užsakymas
+                                    </Heading>
+                                    <Text color="#525456" fontSize="sm">
+                                      Klientas{" "}
+                                      <Text display="inline" color="brand.500" fontWeight="400">
+                                        {notification.order.client.name}{" "}
+                                        {notification.order.client.surname[0]}.
+                                      </Text>{" "}
+                                      užsakė{" "}
+                                      <Text display="inline" color="brand.500" fontWeight="500">
+                                        {notification.order.service.name}
+                                      </Text>{" "}
+                                      servise{" "}
+                                      <Text display="inline" color="brand.500" fontWeight="400">
+                                        {notification.order.carService.name}
+                                      </Text>
+                                    </Text>
+                                  </Box>
+                                </Flex>
+                                <Flex
+                                  textAlign="end"
+                                  minW="160px"
+                                  direction="column"
+                                  justifyContent="space-between"
+                                >
+                                  <Text
+                                    color="brand.500"
+                                    fontSize="xs"
+                                    _hover={{ opacity: 0.8 }}
+                                    onClick={() => updateNotification(notification.id, true)}
+                                  >
+                                    Pažymėti kaip perskaitytą
+                                  </Text>
+                                  <Text color="#B7BBC0" fontSize="xs">
+                                    {moment(notification.createdAt).fromNow()}
+                                  </Text>
+                                </Flex>
+                              </Flex>
+                            ))}
+                          {notifications
+                            .filter((n) => n.type === "UPDATE")
+                            .filter((n) => n.read === true).length !== 0 && (
+                            <Heading fontSize="lg" mx={6} py={2} fontWeight="600">
+                              Perskaityti
+                            </Heading>
+                          )}
+                          {notifications
+                            .filter((n) => n.type === "UPDATE")
+                            .filter((n) => n.read === true)
+                            .sort(
+                              (a: Notification, b: Notification) =>
+                                b.createdAt.getTime() - a.createdAt.getTime()
+                            )
+                            .map((notification: any, i, { length }) => (
+                              <Flex
+                                justifyContent="space-between"
+                                px={6}
+                                py={4}
+                                borderBottom={i !== length - 1 ? "1px solid #efefef" : "none"}
+                                cursor="pointer"
+                                _hover={{ backgroundColor: "#F5F6FD" }}
+                                borderBottomRightRadius={i !== length - 1 ? "0" : "10px"}
+                                borderBottomLeftRadius={i !== length - 1 ? "0" : "10px"}
+                                color="text"
+                              >
+                                <Flex mr="10px">
+                                  <Avatar
+                                    size="md"
+                                    name={notification.order.client.name}
+                                    src={notification.order.client.avatarUrl}
+                                  />
+                                  <Box ml="10px">
+                                    <Heading fontSize="md" fontWeight="600" mb="5px">
+                                      Naujas užsakymas
+                                    </Heading>
+                                    <Text color="#525456" fontSize="sm">
+                                      Klientas{" "}
+                                      <Text display="inline" fontWeight="400">
+                                        {notification.order.client.name}{" "}
+                                        {notification.order.client.surname[0]}.
+                                      </Text>{" "}
+                                      užsakė{" "}
+                                      <Text display="inline" fontWeight="500">
+                                        {notification.order.service.name}
+                                      </Text>{" "}
+                                      servise{" "}
+                                      <Text display="inline" fontWeight="400">
+                                        {notification.order.carService.name}
+                                      </Text>
+                                    </Text>
+                                  </Box>
+                                </Flex>
+                                <Flex
+                                  textAlign="end"
+                                  minW="160px"
+                                  direction="column"
+                                  justifyContent="space-between"
+                                >
+                                  <Text
+                                    color="brand.500"
+                                    fontSize="xs"
+                                    _hover={{ opacity: 0.8 }}
+                                    onClick={() => updateNotification(notification.id, false)}
+                                  >
+                                    Pažymėti kaip neperskaitytą
+                                  </Text>
+                                  <Text color="#B7BBC0" fontSize="xs">
+                                    {moment(notification.createdAt).fromNow()}
+                                  </Text>
+                                </Flex>
+                              </Flex>
+                            ))}
+                        </TabPanel>
+                      </TabPanels>
+                    </Scrollbars>
+                  </Tabs>
+                </Box>
+              </Box>
               <UserInfo />
             </Flex>
           </Flex>

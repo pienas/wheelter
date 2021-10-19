@@ -27,7 +27,7 @@ type ItemProps = {
 const Item = ({ children, onClick }: ItemProps) => {
   return (
     <MenuItem
-      fontSize="14px"
+      fontSize="sm"
       color="text"
       py="0.3rem"
       _hover={{ background: "#F8F8F8" }}
@@ -56,7 +56,7 @@ const MenuOption = ({ value, country }: MenuOptionProps) => {
     <MenuItemOption value={value} icon={<></>} iconSpacing={0}>
       <Flex alignItems="center">
         <ReactCountryFlag countryCode={country} svg />
-        <Text fontSize="14px" color="text" ml="5px" lineHeight="0.8">
+        <Text fontSize="sm" color="text" ml="5px" lineHeight="0.8">
           {value}
         </Text>
       </Flex>
@@ -147,7 +147,13 @@ const UserInfo = () => {
 
 const Header = () => {
   return (
-    <Flex pt="30px" pb="50px" overflow="hidden" justifyContent="space-between">
+    <Flex
+      pt="30px"
+      pb="50px"
+      overflow="hidden"
+      justifyContent="space-between"
+      px="calc((100vw - 1280px) / 2)"
+    >
       <Flex alignItems="center">
         <Link href={Routes.Home()} passHref>
           <ChakraLink

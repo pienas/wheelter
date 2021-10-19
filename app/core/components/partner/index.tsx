@@ -11,7 +11,7 @@ const Partner = () => {
       <Grid
         templateColumns="1fr 1fr"
         px="120px"
-        width="1520px"
+        width="7xl"
         py={16}
         backgroundColor="white"
         boxShadow="0px 10px 40px 0px rgba(0, 0, 0, 0.08);"
@@ -43,8 +43,8 @@ const Partner = () => {
                 backgroundColor="brand.500"
                 color="white"
                 borderRadius="10px"
-                height="60px"
-                width="250px"
+                height={16}
+                width={64}
                 fontWeight="600"
                 _hover={{ backgroundColor: "brand.400" }}
                 boxShadow="0px 5px 15px 0px rgba(100, 0, 230, 0.3);"

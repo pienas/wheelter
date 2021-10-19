@@ -2,7 +2,7 @@ import { Input, InputGroup, InputLeftAddon } from "@chakra-ui/input"
 import { Box, Divider, Flex, Heading, Link, ListItem, Text, UnorderedList } from "@chakra-ui/react"
 import { TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/tabs"
 import { Textarea } from "@chakra-ui/textarea"
-import React, { FC, useCallback, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import CustomTabSettings from "./../customTab/CustomTabSettings"
 import ImageUploading from "react-images-uploading"
 import ImageIcon from "./../icons/ImageIcon"
@@ -29,31 +29,15 @@ import updateServiceImages from "app/partners/mutations/updateServiceImages"
 import getServiceImages from "app/partners/queries/getServiceImages"
 import deleteServiceImages from "app/partners/mutations/deleteServiceImages"
 import OtherIcon from "./../icons/OtherIcon"
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/table"
-import EditIcon from "./../icons/EditIcon"
-import DeleteIcon from "./../icons/DeleteIcon"
-import AddIcon from "./../icons/AddIcon"
-import getEmployees from "app/partners/queries/getEmployees"
-import { useDisclosure } from "@chakra-ui/hooks"
-import {
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from "@chakra-ui/modal"
-import createEmployee from "app/partners/mutations/createEmployee"
-import deleteEmployee from "app/partners/mutations/deleteEmployee"
-import updateEmployee from "app/partners/mutations/updateEmployee"
 import { CircularProgress } from "@chakra-ui/progress"
 import updateServiceAddress from "app/partners/mutations/updateServiceAddress"
-import MapGL, { FlyToInterpolator, Marker } from "react-map-gl"
-import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css"
-import Geocoder from "react-map-gl-geocoder"
+import Employees from "./Employees"
+import Other from "./Other"
+import Subscription from "./Subscription"
+import Notifications from "./Notifications"
+import Contacts from "./Contacts"
 
-type Props = {
+type SettingsProps = {
   isMenuOpen: boolean
   activeService: number
   avatarUrl: string
@@ -71,187 +55,7 @@ type Props = {
   longitude: number
 }
 
-const Pin = (props) => {
-  const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
-  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
-  C20.1,15.8,20.2,15.8,20.2,15.7z`
-  const pinStyle = {
-    fill: "#6500e6",
-    stroke: "none",
-  }
-  const { size = 20 } = props
-  return (
-    <svg height={size} viewBox="0 0 24 24" style={pinStyle}>
-      <path d={ICON} />
-    </svg>
-  )
-}
-const Map = ({ address, changes, onChanges, onAddressChange, city, street, house }) => {
-  const handleChanges = useCallback(() => {
-    changes.splice(6, 1, true)
-    onChanges(changes)
-  }, [onChanges])
-  const handleAddressChange = useCallback(
-    (newAddress) => {
-      onAddressChange(newAddress)
-    },
-    [onAddressChange]
-  )
-  const [viewport, setViewport] = useState({
-    latitude: address.latitude,
-    longitude: address.longitude,
-    zoom:
-      address.latitude == 55.32953572348781 && address.longitude == 23.905501899207678 ? 6.5 : 18,
-    bearing: 0,
-    pitch: 0,
-  })
-  const [marker, setMarker] = useState({
-    latitude: address.latitude,
-    longitude: address.longitude,
-  })
-  const [addressTemp, setAddressTemp] = useState({
-    city: "",
-    street: "",
-    house: "",
-    latitude: marker.latitude,
-    longitude: marker.longitude,
-  })
-  const onMarkerDragEnd = useCallback(
-    (event) => {
-      setMarker({
-        longitude: event.lngLat[0],
-        latitude: event.lngLat[1],
-      })
-      handleChanges()
-      if (addressTemp.city.length) {
-        handleAddressChange({
-          ...addressTemp,
-          latitude: event.lngLat[1],
-          longitude: event.lngLat[0],
-        })
-      } else {
-        handleAddressChange({
-          ...address,
-          latitude: event.lngLat[1],
-          longitude: event.lngLat[0],
-        })
-      }
-    },
-    [addressTemp]
-  )
-  const mapRef = useRef(null)
-  const handleViewportChange = useCallback((newViewport) => {
-    setViewport(newViewport)
-    handleChanges()
-  }, [])
-  useEffect(() => {
-    handleViewportChange({
-      latitude: addressTemp.latitude,
-      longitude: addressTemp.longitude,
-      transitionDuration: 1000,
-      transitionInterpolator: new FlyToInterpolator(),
-      zoom: 18,
-    })
-    setMarker({
-      latitude: addressTemp.latitude,
-      longitude: addressTemp.longitude,
-    })
-  }, [addressTemp])
-  const handleQuery = useCallback((result) => {
-    handleChanges()
-    const tempAddress = result.result.place_name.split(/[\s, ]+/)
-    handleAddressChange({
-      city:
-        tempAddress[
-          tempAddress.findIndex(
-            (string) => parseInt(string) >= 10000 && parseInt(string) <= 99999
-          ) - 1
-        ],
-      street:
-        tempAddress[tempAddress.findIndex((string) => string === "g." || string === "G.") - 1] +
-        " g.",
-      house: tempAddress[2].match(/^\d/) ? tempAddress[2] : "",
-      latitude: result.result.center[1],
-      longitude: result.result.center[0],
-    })
-    setAddressTemp({
-      city:
-        tempAddress[
-          tempAddress.findIndex(
-            (string) => parseInt(string) >= 10000 && parseInt(string) <= 99999
-          ) - 1
-        ],
-      street:
-        tempAddress[tempAddress.findIndex((string) => string === "g." || string === "G.") - 1] +
-        " g.",
-      house: tempAddress[2].match(/^\d/) ? tempAddress[2] : "",
-      latitude: result.result.center[1],
-      longitude: result.result.center[0],
-    })
-  }, [])
-  const handleResult = useCallback(
-    (result) => {
-      return handleQuery(result)
-    },
-    [handleQuery]
-  )
-  const handleInitilisation = useCallback((event) => {
-    setTimeout(() => {
-      event._inputEl.parentElement.children[2].children[0].style.display = "none"
-    }, 500)
-  }, [])
-  const handleInit = useCallback(
-    (event) => {
-      return handleInitilisation(event)
-    },
-    [handleInitilisation]
-  )
-  return (
-    <Box height="300px">
-      <MapGL
-        {...viewport}
-        ref={mapRef}
-        width="100%"
-        height="100%"
-        mapStyle="mapbox://styles/y3llow/ckodau4t60mk417ol99dbzqmi"
-        onViewportChange={setViewport}
-        mapboxApiAccessToken={process.env.BLITZ_PUBLIC_MAPBOX_TOKEN}
-        minZoom={6}
-        attributionControl={false}
-      >
-        <Geocoder
-          mapRef={mapRef}
-          mapboxApiAccessToken={process.env.BLITZ_PUBLIC_MAPBOX_TOKEN}
-          position="top-left"
-          marker={false}
-          reverseGeocode={true}
-          onResult={handleResult}
-          onInit={handleInit}
-          limit={3}
-          language="lt"
-          countries="lt"
-          zoom={18}
-          placeholder="Įveskite adresą"
-          minLength={4}
-          inputValue={
-            street.length && city.length ? `${street} ${house}, ${city}` : city.length ? city : ""
-          }
-        />
-        <Marker
-          longitude={marker.longitude}
-          latitude={marker.latitude}
-          offsetTop={-20}
-          offsetLeft={-10}
-          draggable
-          onDragEnd={onMarkerDragEnd}
-        >
-          <Pin size={20} />
-        </Marker>
-      </MapGL>
-    </Box>
-  )
-}
-const Settings: FC<Props> = ({
+const Settings = ({
   isMenuOpen,
   activeService,
   avatarUrl,
@@ -267,20 +71,7 @@ const Settings: FC<Props> = ({
   house,
   latitude,
   longitude,
-}: Props) => {
-  const [isMapLoading, setIsMapLoading] = useState(true)
-  useEffect(() => {
-    setTimeout(() => {
-      setIsMapLoading(false)
-    }, 7000)
-  }, [])
-  const [address, setAddress] = useState({
-    city: city,
-    street: street,
-    house: house,
-    latitude: latitude != null ? latitude : 55.32953572348781,
-    longitude: longitude != null ? longitude : 23.905501899207678,
-  })
+}: SettingsProps) => {
   const [image, setImage] = useState([])
   const onChange = (imageList) => {
     setImage(imageList)
@@ -556,60 +347,14 @@ const Settings: FC<Props> = ({
     setServiceDescription(value)
   }
   const [serviceEmail, setServiceEmail] = useState(email)
-  const onServiceEmailChange = (value) => {
-    changesArray.splice(4, 1, true)
-    setChanges(changesArray)
-    setServiceEmail(value)
-  }
   const [servicePhone, setServicePhone] = useState(phone)
-  const onServicePhoneChange = (value) => {
-    changesArray.splice(5, 1, true)
-    setChanges(changesArray)
-    setServicePhone(value)
-  }
-  const [employeeName, setEmployeeName] = useState("")
-  const onEmployeeNameChange = (value) => {
-    setEmployeeName(value)
-  }
-  const [employeeSurname, setEmployeeSurname] = useState("")
-  const onEmployeeSurnameChange = (value) => {
-    setEmployeeSurname(value)
-  }
-  const [employeePosition, setEmployeePosition] = useState("")
-  const onEmployeePositionChange = (value) => {
-    if (value.length) {
-      var firstLetter = value[0]
-      if (isNaN(firstLetter)) {
-        if (firstLetter.toUpperCase() + value.substring(1) !== "Savininkas") {
-          setEmployeePosition(value)
-        } else {
-          toastIdRef.current = toast({
-            duration: 5000,
-            render: () => (
-              <WarningToast
-                heading="Kažkas netaip!"
-                text={`Pridėti papildomą savininką draudžiama. Jei norite pakeisti savininką, susisiekite su mumis per pagalbos centrą arba pagalba@wheelter.lt`}
-                id={toastIdRef.current}
-              />
-            ),
-          })
-        }
-      } else {
-        toastIdRef.current = toast({
-          duration: 5000,
-          render: () => (
-            <WarningToast
-              heading="Kažkas netaip!"
-              text={`Pareigos negali prasidėti skaitmeniu.`}
-              id={toastIdRef.current}
-            />
-          ),
-        })
-      }
-    } else {
-      setEmployeePosition(value)
-    }
-  }
+  const [address, setAddress] = useState({
+    city: city,
+    street: street,
+    house: house,
+    latitude: latitude != null ? latitude : 55.32953572348781,
+    longitude: longitude != null ? longitude : 23.905501899207678,
+  })
   const uploadImages = (e) => {
     return new Promise(async (resolve) => {
       const oldImages = Array.from(serviceActiveImages, (v) => v).map((v) => v.carServiceImageId)
@@ -766,6 +511,7 @@ const Settings: FC<Props> = ({
             })
             refetchOther()
             toastIdRef.current = toast({
+              position: "bottom-left",
               duration: 5000,
               render: () => (
                 <SuccessToast
@@ -804,6 +550,7 @@ const Settings: FC<Props> = ({
           })
           refetchOther()
           toastIdRef.current = toast({
+            position: "bottom-left",
             duration: 5000,
             render: () => (
               <SuccessToast
@@ -820,6 +567,7 @@ const Settings: FC<Props> = ({
       setChanging(true)
       refetchOther()
       toastIdRef.current = toast({
+        position: "bottom-left",
         duration: 5000,
         render: () => (
           <SuccessToast
@@ -833,90 +581,6 @@ const Settings: FC<Props> = ({
     }
     changesArray.splice(0, 7, false, false, false, false, false, false, false)
     setChanges(changesArray)
-  }
-  const [employees, { refetch }] = useQuery(getEmployees, activeService)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [isCreatingNewEmployee, setIsCreatingNewEmployee] = useState(false)
-  const [updatingEmployeeId, setUpdatingEmployeeId] = useState(-1)
-  const onCreateEmployee = async () => {
-    if (!employeeName.length || !employeePosition.length) {
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <WarningToast
-            heading="Kažkas netaip!"
-            text={`Norėdami pridėti naują darbuotoją, užpildykite visus privalomus laukus.`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-    } else {
-      await createEmployee({
-        data: {
-          carServiceId: activeService,
-          name: employeeName,
-          surname: employeeSurname,
-          position: employeePosition,
-        },
-      })
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <SuccessToast
-            heading="Pavyko!"
-            text={`Darbuotojas sėkmingai pridėtas.`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-      refetch()
-      onClose()
-      setEmployeeName("")
-      setEmployeeSurname("")
-      setEmployeePosition("")
-      setIsCreatingNewEmployee(false)
-    }
-  }
-  const onUpdateEmployee = async (employeeId) => {
-    if (!employeeName.length || !employeePosition.length) {
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <WarningToast
-            heading="Kažkas netaip!"
-            text={`Norėdami pakeisti darbuotojo informaciją, užpildykite visus privalomus laukus.`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-    } else {
-      await updateEmployee({
-        where: {
-          id: employeeId,
-        },
-        data: {
-          name: employeeName,
-          surname: employeeSurname,
-          position: employeePosition,
-        },
-      })
-      toastIdRef.current = toast({
-        duration: 5000,
-        render: () => (
-          <SuccessToast
-            heading="Pavyko!"
-            text={`Darbuotojo informacija sėkmingai atnaujinta.`}
-            id={toastIdRef.current}
-          />
-        ),
-      })
-      refetch()
-      onClose()
-      setEmployeeName("")
-      setEmployeeSurname("")
-      setEmployeePosition("")
-      setIsCreatingNewEmployee(false)
-    }
   }
   return (
     <Box mr="70px" ml={isMenuOpen ? "370px" : "170px"} transition="all 0.2s">
@@ -1413,486 +1077,37 @@ const Settings: FC<Props> = ({
               </Flex>
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" mt="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              <Table variant="unstyled" width="100%" maxWidth="1920px" minWidth="1350px">
-                <Thead>
-                  <Tr borderBottom="1px solid #E0E3EF">
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Darbuotojas
-                    </Th>
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Pareigos
-                    </Th>
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Atlikti darbai
-                    </Th>
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Uždirbta suma
-                    </Th>
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Įvertinimas
-                    </Th>
-                    <Th
-                      textTransform="none"
-                      fontWeight="500"
-                      fontSize="md"
-                      letterSpacing="0"
-                      height="100px"
-                    >
-                      Priskirti darbai
-                    </Th>
-                    <Th display="flex" justifyContent="flex-end" alignItems="center" height="100px">
-                      <Flex
-                        justifyContent="center"
-                        alignItems="center"
-                        background="#EFF0F3"
-                        borderRadius="5px"
-                        height="40px"
-                        px="15px"
-                        cursor="pointer"
-                        maxWidth="200px"
-                        sx={{
-                          ":hover > svg": {
-                            color: "brand.500",
-                          },
-                          ":hover > p": {
-                            color: "brand.500",
-                          },
-                        }}
-                        onClick={() => {
-                          setIsCreatingNewEmployee(true)
-                          onOpen()
-                        }}
-                      >
-                        <AddIcon boxSize={5} transition="all 0.2s" mr="10px" />
-                        <Text
-                          fontWeight="500"
-                          transition="all 0.2s"
-                          textTransform="none"
-                          fontSize="sm"
-                          letterSpacing="0"
-                        >
-                          Pridėti darbuotoją
-                        </Text>
-                      </Flex>
-                    </Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {employees.map((employee) => {
-                    var employeeProfit = 0
-                    var employeeRating = 0
-                    var employeeOrdersCount = 0
-                    employee.orders.forEach((order) => {
-                      employeeProfit += order.price
-                      if (order.review?.isReviewed) {
-                        employeeRating += order.review?.rating
-                        employeeOrdersCount++
-                      }
-                    })
-                    employeeRating /= employeeOrdersCount
-                    return (
-                      <Tr
-                        transition="all 0.2s"
-                        cursor="pointer"
-                        _hover={{
-                          background: "white",
-                          boxShadow: "0px 5px 20px 0px rgba(0, 0, 0, 0.03)",
-                        }}
-                        _notLast={{ borderBottom: "1px solid #E0E3EF" }}
-                        key={employee.id}
-                      >
-                        <Td height="100px">
-                          <Text>
-                            {employee.name} {employee.surname}
-                          </Text>
-                        </Td>
-                        <Td height="100px">
-                          <Text>{employee.position}</Text>
-                        </Td>
-                        <Td height="100px">
-                          <Text>{employee.completedOrders}</Text>
-                        </Td>
-                        <Td height="100px">
-                          <Text>{employeeProfit} €</Text>
-                        </Td>
-                        <Td height="100px">
-                          <Text>{employeeRating > 0 ? employeeRating.toFixed(2) : "0.00"}</Text>
-                        </Td>
-                        <Td height="100px">
-                          <Link
-                            color="brand.500"
-                            textDecoration="none !important"
-                            _hover={{ color: "brand.200" }}
-                            transition="all 0.2s"
-                          >
-                            Peržiūrėti darbus
-                          </Link>
-                        </Td>
-                        <Td height="100px" textAlign="end">
-                          <EditIcon
-                            boxSize={6}
-                            transition="all 0.2s"
-                            cursor="pointer"
-                            _hover={{ color: "brand.500" }}
-                            onClick={() => {
-                              setEmployeeName(employee.name)
-                              setEmployeeSurname(employee.surname ? employee.surname : "")
-                              setEmployeePosition(employee.position)
-                              setIsCreatingNewEmployee(false)
-                              setUpdatingEmployeeId(employee.id)
-                              onOpen()
-                            }}
-                          />
-                          {employee.position !== "Savininkas" && (
-                            <DeleteIcon
-                              boxSize={6}
-                              transition="all 0.2s"
-                              ml="15px"
-                              cursor="pointer"
-                              _hover={{ color: "brand.500" }}
-                              onClick={async () => {
-                                await deleteEmployee({
-                                  where: {
-                                    id: employee.id,
-                                  },
-                                })
-                                toastIdRef.current = toast({
-                                  duration: 5000,
-                                  render: () => (
-                                    <SuccessToast
-                                      heading="Pavyko!"
-                                      text={`Darbuotojas sėkmingai pašalintas.`}
-                                      id={toastIdRef.current}
-                                    />
-                                  ),
-                                })
-                                refetch()
-                              }}
-                            />
-                          )}
-                        </Td>
-                      </Tr>
-                    )
-                  })}
-                </Tbody>
-              </Table>
-              <Modal
-                isOpen={isOpen}
-                isCentered
-                onClose={onClose}
-                size="lg"
-                onEsc={() => {
-                  setEmployeeName("")
-                  setEmployeeSurname("")
-                  setEmployeePosition("")
-                  setIsCreatingNewEmployee(false)
-                  setUpdatingEmployeeId(-1)
-                }}
-                onOverlayClick={() => {
-                  setEmployeeName("")
-                  setEmployeeSurname("")
-                  setEmployeePosition("")
-                  setIsCreatingNewEmployee(false)
-                  setUpdatingEmployeeId(-1)
-                }}
-              >
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>Pridėti darbuotoją</ModalHeader>
-                  <ModalCloseButton
-                    onClick={() => {
-                      setEmployeeName("")
-                      setEmployeeSurname("")
-                      setEmployeePosition("")
-                      setIsCreatingNewEmployee(false)
-                      setUpdatingEmployeeId(-1)
-                    }}
-                  />
-                  <ModalBody>
-                    <Input
-                      placeholder="Vardas *"
-                      borderRadius="5px"
-                      borderWidth="1px"
-                      borderStyle="solid"
-                      borderColor="#E0E3EF"
-                      mb="20px"
-                      value={employeeName}
-                      onChange={(e) => onEmployeeNameChange(e.target.value)}
-                      required
-                    />
-                    <Input
-                      placeholder="Pavardė"
-                      borderRadius="5px"
-                      borderWidth="1px"
-                      borderStyle="solid"
-                      borderColor="#E0E3EF"
-                      mb="20px"
-                      value={employeeSurname}
-                      onChange={(e) => onEmployeeSurnameChange(e.target.value)}
-                    />
-                    <Input
-                      placeholder="Pareigos *"
-                      borderRadius="5px"
-                      borderWidth="1px"
-                      borderStyle="solid"
-                      borderColor="#E0E3EF"
-                      mb="20px"
-                      value={employeePosition}
-                      onChange={(e) => onEmployeePositionChange(e.target.value)}
-                      required
-                      disabled={employeePosition === "Savininkas"}
-                    />
-                  </ModalBody>
-                  <ModalFooter>
-                    {isCreatingNewEmployee ? (
-                      <Button
-                        background="#EFF0F3"
-                        _hover={{ background: "#E0E3EF" }}
-                        mr={3}
-                        onClick={onCreateEmployee}
-                      >
-                        Pridėti
-                      </Button>
-                    ) : (
-                      <Button
-                        background="#EFF0F3"
-                        _hover={{ background: "#E0E3EF" }}
-                        mr={3}
-                        onClick={() => {
-                          onUpdateEmployee(updatingEmployeeId)
-                        }}
-                      >
-                        Atnaujinti
-                      </Button>
-                    )}
-                    <Button
-                      onClick={() => {
-                        onClose()
-                        setEmployeeName("")
-                        setEmployeeSurname("")
-                        setEmployeePosition("")
-                        setIsCreatingNewEmployee(false)
-                        setUpdatingEmployeeId(-1)
-                      }}
-                    >
-                      Atšaukti
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-              <Divider color="#E0E3EF" mb="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              <Flex
-                justifyContent="center"
-                width="100%"
-                maxWidth="1920px"
-                minWidth="1400px"
-                mb="70px"
-                mt="30px"
-              >
-                <Button
-                  background="#EFF0F3"
-                  _hover={{ background: "#E0E3EF" }}
-                  isLoading={changing}
-                  width="200px"
-                  onClick={onChanging}
-                >
-                  Tvirtinti pakeitimus
-                </Button>
-              </Flex>
+              <Employees
+                activeService={activeService}
+                changing={changing}
+                onChanging={() => onChanging()}
+              />
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              Pranešimų nustatymai
-              <Flex
-                justifyContent="center"
-                width="100%"
-                maxWidth="1920px"
-                minWidth="1400px"
-                mb="70px"
-              >
-                <Button
-                  background="#EFF0F3"
-                  _hover={{ background: "#E0E3EF" }}
-                  isLoading={changing}
-                  width="200px"
-                  onClick={onChanging}
-                >
-                  Tvirtinti pakeitimus
-                </Button>
-              </Flex>
+              <Notifications changing={changing} onChanging={onChanging} />
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              Prenumerata
-              <Flex
-                justifyContent="center"
-                width="100%"
-                maxWidth="1920px"
-                minWidth="1400px"
-                mb="70px"
-              >
-                <Button
-                  background="#EFF0F3"
-                  _hover={{ background: "#E0E3EF" }}
-                  isLoading={changing}
-                  width="200px"
-                  onClick={onChanging}
-                >
-                  Tvirtinti pakeitimus
-                </Button>
-              </Flex>
+              <Subscription changing={changing} onChanging={onChanging} />
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
-                <Box width="450px">
-                  <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
-                    Kontaktai
-                  </Heading>
-                  <Text color="#787E97">
-                    Pakeiskite savo el. paštą ir telefono numerį, kad jūsų klientai visada galėtų su
-                    jumis susisiekti
-                  </Text>
-                </Box>
-                <Box width="700px">
-                  <Input
-                    placeholder="El. paštas"
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    mb="20px"
-                    value={serviceEmail}
-                    onChange={(e) => onServiceEmailChange(e.target.value)}
-                    focusBorderColor="brand.500"
-                  />
-                  <Input
-                    placeholder="Tel. nr."
-                    borderRadius="5px"
-                    borderWidth="1px"
-                    borderStyle="solid"
-                    borderColor="#E0E3EF"
-                    value={servicePhone}
-                    onChange={(e) => onServicePhoneChange(e.target.value)}
-                    focusBorderColor="brand.500"
-                  />
-                </Box>
-              </Flex>
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              <Flex justifyContent="space-between" width="100%" maxWidth="1920px" minWidth="1350px">
-                <Box width="450px">
-                  <Heading as="h5" fontSize="2xl" mb="15px" fontWeight="500">
-                    Adresas
-                  </Heading>
-                  <Text color="#787E97" mb="20px">
-                    Pakeiskite savo adresą ir patikslinkite vietą žemėlapyje, kad klientams nekiltų
-                    problemų jus randant
-                  </Text>
-                  <Text color="#787E97" display="inline">
-                    Nerandate savo adreso?
-                  </Text>
-                  <Link
-                    href="/partners/support"
-                    textDecoration="none !important"
-                    color="#6500e6"
-                    display="inline"
-                    ml="5px"
-                    _hover={{ opacity: 0.8 }}
-                  >
-                    Susisiekite su mumis
-                  </Link>
-                </Box>
-                <Box width="700px" display={isMapLoading ? "none" : "block"}>
-                  <Map
-                    address={address}
-                    changes={changesArray}
-                    onChanges={setChanges}
-                    onAddressChange={setAddress}
-                    city={city}
-                    street={street}
-                    house={house}
-                  />
-                </Box>
-                <Flex
-                  width="700px"
-                  height="300px"
-                  justifyContent="center"
-                  alignItems="center"
-                  display={isMapLoading ? "flex" : "none"}
-                >
-                  <CircularProgress isIndeterminate color="#6500E6" />
-                </Flex>
-              </Flex>
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              <Flex
-                justifyContent="center"
-                width="100%"
-                maxWidth="1920px"
-                minWidth="1400px"
-                mb="70px"
-              >
-                <Button
-                  background="#EFF0F3"
-                  _hover={{ background: "#E0E3EF" }}
-                  isLoading={changing}
-                  width="200px"
-                  onClick={onChanging}
-                >
-                  Tvirtinti pakeitimus
-                </Button>
-              </Flex>
+              <Contacts
+                changing={changing}
+                onChanging={onChanging}
+                city={city}
+                street={street}
+                house={house}
+                setChanges={setChanges}
+                changesArray={changesArray}
+                serviceEmail={serviceEmail}
+                setServiceEmail={setServiceEmail}
+                servicePhone={servicePhone}
+                setServicePhone={setServicePhone}
+                address={address}
+                setAddress={setAddress}
+              />
             </TabPanel>
             <TabPanel padding="0">
-              <Divider color="#E0E3EF" my="30px" width="100%" maxWidth="1920px" minWidth="1350px" />
-              Kiti nustatymai
-              <Flex
-                justifyContent="center"
-                width="100%"
-                maxWidth="1920px"
-                minWidth="1400px"
-                mb="70px"
-              >
-                <Button
-                  background="#EFF0F3"
-                  _hover={{ background: "#E0E3EF" }}
-                  isLoading={changing}
-                  width="200px"
-                  onClick={onChanging}
-                >
-                  Tvirtinti pakeitimus
-                </Button>
-              </Flex>
+              <Other changing={changing} onChanging={onChanging} />
             </TabPanel>
           </TabPanels>
         </Tabs>

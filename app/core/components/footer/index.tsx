@@ -48,7 +48,7 @@ const FooterLink = ({ link, children }: FooterLinkProps) => {
 const Footer = () => {
   return (
     <Flex backgroundColor="gray" justifyContent="center">
-      <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" pt={8} pb={12} width="1520px">
+      <Grid templateColumns="1fr 1fr 1fr 1fr 1fr" pt={8} pb={12} width="7xl">
         <Flex flexDirection="column">
           <Link href={Routes.Home()} passHref>
             <ChakraLink
