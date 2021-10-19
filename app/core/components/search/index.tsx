@@ -102,6 +102,7 @@ const Search = () => {
   const submitRequest = async () => {
     try {
       toastIdRef.current = toast({
+        position: "bottom-left",
         duration: 3000,
         render: () => (
           <SuccessToast
@@ -131,15 +132,15 @@ const Search = () => {
       mt="20px"
       position="relative"
     >
-      <Box backgroundColor="green.300" borderRadius="full" position="absolute" top="-15px">
-        <Text fontSize="14px" color="white" px="35px" py="5px">
+      <Box backgroundColor="green.400" borderRadius="full" position="absolute" top="-15px">
+        <Text fontSize="sm" color="white" px="35px" py="5px">
           Paieška
         </Text>
       </Box>
-      <Flex alignItems="center" width="350px">
+      <Flex alignItems="center" width="sm">
         <LocationIcon boxSize={8} color="brand.500" />
         <Box ml="20px" position="relative" width="80%">
-          <Text fontSize="14px" color="#a0a0a0">
+          <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite lokaciją
           </Text>
           <Select
@@ -160,15 +161,15 @@ const Search = () => {
         </Box>
       </Flex>
       <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
-      <Flex alignItems="center" width="350px">
+      <Flex alignItems="center" width="sm">
         <CalendarIcon boxSize={8} color="brand.500" />
         <Box ml="20px" width="80%">
-          <Text fontSize="14px" color="#a0a0a0">
+          <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite datą
           </Text>
           <Flex alignItems="center">
             <Text
-              fontSize="14px"
+              fontSize="sm"
               color="text"
               fontWeight="500"
               cursor="pointer"
@@ -241,10 +242,10 @@ const Search = () => {
         </Modal>
       </Flex>
       <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
-      <Flex alignItems="center" width="350px">
+      <Flex alignItems="center" width="sm">
         <ServicesIcon boxSize={8} color="brand.500" />
         <Box ml="20px" width="80%">
-          <Text fontSize="14px" color="#a0a0a0">
+          <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite paslaugą
           </Text>
           <Select
@@ -265,7 +266,7 @@ const Search = () => {
         </Box>
       </Flex>
       <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
-      <Flex direction="column" width="350px" alignItems="center" justifyContent="center">
+      <Flex direction="column" width="sm" alignItems="center" justifyContent="center">
         <Button
           variant="solid"
           backgroundColor="brand.500"

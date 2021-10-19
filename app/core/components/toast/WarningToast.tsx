@@ -1,11 +1,13 @@
 import React from "react"
-import { Box, Flex, Heading, Text, useToast } from "@chakra-ui/react"
-import { WarningIcon, CloseIcon } from "@chakra-ui/icons"
+import { Box, Circle, Center, Flex, Heading, Text, useToast } from "@chakra-ui/react"
+import { CloseIcon } from "@chakra-ui/icons"
+import moment from "moment"
+import WarningIcon from "../icons/WarningIcon"
 
 type Props = {
   heading: string
   text: string
-  id: any
+  id: number
 }
 
 const WarningToast = ({ heading, text, id }: Props) => {
@@ -18,34 +20,37 @@ const WarningToast = ({ heading, text, id }: Props) => {
   return (
     <Flex
       color="black"
-      p={5}
-      bg="white"
+      p={6}
+      bg="rgba(255, 255, 255, 0.5)"
       position="relative"
       borderRadius="5px"
       alignItems="center"
       boxShadow="1px 7px 14px -5px rgba(0, 0, 0, 0.2)"
-      _before={{
-        content: '""',
-        position: "absolute",
-        top: "0",
-        left: "0",
-        width: "5px",
-        height: "100%",
-        borderTopLeftRadius: "5px",
-        borderBottomLeftRadius: "5px",
-        backgroundColor: "#ffc007",
-      }}
     >
-      <WarningIcon boxSize={8} color="#ffc007" />
-      <Box px={8}>
-        <Heading as="h4" size="md">
+      <Circle backgroundColor="orange.100" size="24px">
+        <Center>
+          <WarningIcon boxSize={3} color="orange.400" />
+        </Center>
+      </Circle>
+      <Box px={6}>
+        <Heading as="h4" size="sm" color="orange.400">
           {heading}
         </Heading>
         <Text fontSize="sm" color="text">
           {text}
         </Text>
+        <Text fontSize="xs" color="#a0a0a0">
+          {moment().format("HH:mm")}
+        </Text>
       </Box>
-      <CloseIcon boxSize={4} color="text" onClick={close} cursor="pointer" />
+      <CloseIcon
+        boxSize={3}
+        color="#a0a0a0"
+        onClick={close}
+        cursor="pointer"
+        transition="all 0.2s"
+        _hover={{ color: "brand.500" }}
+      />
     </Flex>
   )
 }

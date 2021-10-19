@@ -1,8 +1,8 @@
 import React from "react"
 import { Box, Circle, Center, Flex, Heading, Text, useToast } from "@chakra-ui/react"
-import CheckIcon from "../icons/CheckIcon"
 import { CloseIcon } from "@chakra-ui/icons"
 import moment from "moment"
+import InfoIcon from "../icons/InfoIcon"
 
 type Props = {
   heading: string
@@ -10,7 +10,7 @@ type Props = {
   id: number
 }
 
-const SuccessToast = ({ heading, text, id }: Props) => {
+const InfoToast = ({ heading, text, id }: Props) => {
   const toast = useToast()
   const close = () => {
     if (id) {
@@ -27,13 +27,13 @@ const SuccessToast = ({ heading, text, id }: Props) => {
       alignItems="center"
       boxShadow="1px 7px 14px -5px rgba(0, 0, 0, 0.2)"
     >
-      <Circle backgroundColor="green.100" size="24px">
+      <Circle backgroundColor="blue.100" size="24px">
         <Center>
-          <CheckIcon boxSize={3} color="green.400" />
+          <InfoIcon boxSize={3} color="blue.400" />
         </Center>
       </Circle>
       <Box px={6}>
-        <Heading as="h4" size="sm" color="green.400">
+        <Heading as="h4" size="sm" color="blue.400">
           {heading}
         </Heading>
         <Text fontSize="sm" color="text">
@@ -55,4 +55,4 @@ const SuccessToast = ({ heading, text, id }: Props) => {
   )
 }
 
-export default SuccessToast
+export default InfoToast
