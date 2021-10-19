@@ -19,7 +19,7 @@ model User {
   phone            String?       @unique
   hashedPassword   String?
   avatarUrl        String?
-  role             String        @default("USER")
+  role             UserRole      @default(USER)
   tokens           Token[]
   sessions         Session[]
   orders           Order[]
@@ -30,23 +30,23 @@ model User {
 }
 
 model Vehicle {
-  id            Int      @id @default(autoincrement())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  type          String
+  id            Int                @id @default(autoincrement())
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  type          VehicleType        @default(CAR)
   make          String
   model         String
   year          Int
-  fuelType      String
-  bodyType      String
-  gearbox       String
+  fuelType      FuelType           @default(PETROL)
+  bodyType      BodyType           @default(SEDAN)
+  gearbox       GearboxType        @default(MANUAL)
   displacement  Float
   kw            Int
-  drivingWheels String?
+  drivingWheels DrivingWheelsType?
   engineCode    String?
   colorCode     String?
   vinCode       String?
-  user          User?    @relation(fields: [userId], references: [id])
+  user          User?              @relation(fields: [userId], references: [id])
   userId        Int?
 }
 
@@ -100,6 +100,7 @@ model CarServiceUser {
   phone                  String                   @unique
   hashedPassword         String?
   avatarUrl              String?
+  role                   CarServiceUserRole       @default(EMPLOYEE)
   tokens                 CarServiceUserToken[]
   sessions               CarServiceUserSession[]
   changes                Change[]
@@ -107,6 +108,7 @@ model CarServiceUser {
   goals                  Goal[]
   notifications          Notification[]
   settings               CarServiceUserSetting[]
+  invoices               Invoice[]
   carServiceUserRelation CarServiceUserRelation[]
 }
 
@@ -152,7 +154,7 @@ model CarService {
   id                     Int                      @id @default(autoincrement())
   createdAt              DateTime                 @default(now())
   updatedAt              DateTime                 @updatedAt
-  plan                   String                   @default("STANDARD")
+  plan                   PlanType                 @default(STANDARD)
   paymentExpiresAt       DateTime?
   paymentMethod          String?
   paymentUrl             String?
@@ -178,22 +180,22 @@ model CarService {
   settings               Setting[]
   promos                 Promo[]
   notes                  Note[]
-  address                Address[]
+  address                Address?
   goals                  Goal[]
   images                 Image[]
   usersWhoLike           User[]
-  carServiceUserRelation CarServiceUserRelation[]
   reviews                Review[]
+  carServiceUserRelation CarServiceUserRelation[]
 }
 
 model CarServiceUserRelation {
-  id              Int            @id @default(autoincrement())
-  carService      CarService     @relation(fields: [carServiceId], references: [id])
+  id              Int                @id @default(autoincrement())
+  completedOrders Int                @default(0)
+  userRole        CarServiceUserRole @default(EMPLOYEE)
+  carService      CarService         @relation(fields: [carServiceId], references: [id])
   carServiceId    Int
-  user            CarServiceUser @relation(fields: [userId], references: [id])
+  user            CarServiceUser     @relation(fields: [userId], references: [id])
   userId          Int
-  userRole        String         @default("Darbuotojas")
-  completedOrders Int            @default(0)
 }
 
 model Change {
@@ -208,20 +210,21 @@ model Change {
 }
 
 model Order {
-  id           Int         @id @default(autoincrement())
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id           Int           @id @default(autoincrement())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   startsAt     DateTime
-  price        Float       @default(0.0)
-  status       String      @default("NEW")
+  price        Float         @default(0.0)
+  status       OrderStatus   @default(NEW)
   review       Review?
-  service      Service?    @relation(fields: [serviceId], references: [id])
+  notification Notification?
+  service      Service?      @relation(fields: [serviceId], references: [id])
   serviceId    Int?
-  employee     Employee?   @relation(fields: [employeeId], references: [id])
+  employee     Employee?     @relation(fields: [employeeId], references: [id])
   employeeId   Int?
-  client       User?       @relation(fields: [clientId], references: [id])
+  client       User?         @relation(fields: [clientId], references: [id])
   clientId     Int?
-  carService   CarService? @relation(fields: [carServiceId], references: [id])
+  carService   CarService?   @relation(fields: [carServiceId], references: [id])
   carServiceId Int?
 }
 
@@ -257,20 +260,21 @@ model Category {
 }
 
 model Service {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  imageUrl    String?
-  name        String
-  description String?
-  price       Float
-  duration    Int
-  viewCount   Int       @default(0)
-  orders      Order[]
-  category    Category? @relation(fields: [categoryId], references: [id])
-  categoryId  Int?
-  promo       Promo?    @relation(fields: [promoId], references: [id])
-  promoId     Int?
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  imageUrl     String?
+  name         String
+  description  String?
+  price        Float
+  durationFrom Int
+  durationTo   Int
+  viewCount    Int       @default(0)
+  orders       Order[]
+  category     Category? @relation(fields: [categoryId], references: [id])
+  categoryId   Int?
+  promo        Promo?    @relation(fields: [promoId], references: [id])
+  promoId      Int?
 }
 
 model Employee {
@@ -350,13 +354,14 @@ model Goal {
 }
 
 model Notification {
-  id               Int             @id @default(autoincrement())
-  createdAt        DateTime        @default(now())
-  type             String
-  title            String
-  content          String
-  seen             Boolean         @default(false)
-  carServiceUser   CarServiceUser? @relation(fields: [carServiceUserId], references: [id])
+  id               Int              @id @default(autoincrement())
+  createdAt        DateTime         @default(now())
+  type             NotificationType @default(ORDER)
+  read             Boolean          @default(false)
+  seen             Boolean          @default(false)
+  order            Order?           @relation(fields: [orderId], references: [id])
+  orderId          Int?
+  carServiceUser   CarServiceUser?  @relation(fields: [carServiceUserId], references: [id])
   carServiceUserId Int?
 }
 
@@ -366,4 +371,104 @@ model Image {
   carServiceImageId Int?
   carService        CarService? @relation(fields: [carServiceId], references: [id])
   carServiceId      Int?
+}
+
+model Invoice {
+  id               Int             @id @default(autoincrement())
+  createdAt        DateTime        @default(now())
+  plan             PlanType        @default(STANDARD)
+  total            Float           @default(19.99)
+  status           InvoiceStatus   @default(PENDING)
+  carServiceUser   CarServiceUser? @relation(fields: [carServiceUserId], references: [id])
+  carServiceUserId Int?
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum CarServiceUserRole {
+  EMPLOYEE
+  OWNER
+  ADMIN
+}
+
+enum OrderStatus {
+  NEW
+  ACTIVE
+  DONE
+  CANCELLED
+}
+
+enum NotificationType {
+  ORDER
+  UPDATE
+}
+
+enum VehicleType {
+  CAR
+  MOTORCYCLE
+  HEAVYTRANSPORT
+}
+
+enum FuelType {
+  PETROL
+  DIESEL
+  PETROLGAS
+  PETROLELECTRICITY
+  ELECTRICITY
+  DIESELELECTRICITY
+  BIOETANOL
+  OTHER
+}
+
+enum BodyType {
+  SEDAN
+  HATCHBACK
+  UNIVERSAL
+  MONOTONOUS
+  SUV
+  COUPE
+  COMMERCIAL
+  CABRIOLET
+  LIMOUSINE
+  PICKUP
+  MINIBUS
+  CHOPPER
+  KARTING
+  QUAD
+  SNOWMOBILE
+  TRICYCLE
+  SUPERBIKE
+  CROSS
+  STREETBIKE
+  TOURING
+  TRUCK
+  VAN
+  TRAWL
+  OTHER
+}
+
+enum DrivingWheelsType {
+  FWD
+  RWD
+  AWD
+}
+
+enum GearboxType {
+  MANUAL
+  AUTOMATIC
+}
+
+enum PlanType {
+  STANDARD
+  PREMIUM
+  CUSTOM
+}
+
+enum InvoiceStatus {
+  PENDING
+  SUCCESS
+  CANCELLED
 }

@@ -11,6 +11,7 @@ const seed = async () => {
   })
   const client = await db.user.create({
     data: {
+      id: 2,
       name: "Pirmas",
       surname: "Klientas",
       email: "klientas@wheelter.lt",
@@ -32,7 +33,7 @@ const seed = async () => {
   })
   await db.carServiceUserRelation.create({
     data: {
-      userRole: "Savininkas",
+      userRole: "OWNER",
       completedOrders: 0,
       user: {
         connect: {
@@ -46,20 +47,6 @@ const seed = async () => {
       },
     },
   })
-  for (let i = 0; i < 10; i++) {
-    await db.notification.create({
-      data: {
-        type: "NEW",
-        title: `Notification ${i + 1}`,
-        content: `${i + 1}`,
-        carServiceUser: {
-          connect: {
-            id: carServiceUser.id,
-          },
-        },
-      },
-    })
-  }
   await db.employee.create({
     data: {
       name: "Serviso",
@@ -90,12 +77,12 @@ const seed = async () => {
     data: {
       name: "Ratų balansavimas",
       price: 40,
-      duration: 40,
+      durationFrom: 40,
+      durationTo: 60,
     },
   })
   const today = new Date()
   const tomorrow = new Date(today)
-  const status = ["NEW", "DONE", "CANCELLED"]
   for (let i = 0; i < 10; i++) {
     tomorrow.setHours(tomorrow.getHours() + 1 + i)
     const review = await db.review.create({
@@ -114,11 +101,21 @@ const seed = async () => {
         },
       },
     })
+    const notification = await db.notification.create({
+      data: {
+        type: "ORDER",
+        carServiceUser: {
+          connect: {
+            id: carServiceUser.id,
+          },
+        },
+      },
+    })
     await db.order.create({
       data: {
         startsAt: tomorrow,
         price: 40,
-        status: status[Math.floor(Math.random() * status.length)],
+        status: "NEW",
         carService: {
           connect: {
             id: carService.id,
@@ -142,6 +139,11 @@ const seed = async () => {
         review: {
           connect: {
             id: review.id,
+          },
+        },
+        notification: {
+          connect: {
+            id: notification.id,
           },
         },
       },
