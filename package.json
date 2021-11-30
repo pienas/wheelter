@@ -32,6 +32,8 @@
     "blitz": "0.41.1",
     "chart.js": "3.5.1",
     "date-fns": "2.17.0",
+    "dayjs": "1.10.7",
+    "file-saver": "2.0.5",
     "final-form": "4.20.4",
     "framer-motion": "4.1.17",
     "moment": "2.29.1",
@@ -40,6 +42,7 @@
     "react-chartjs-2": "3.0.3",
     "react-country-flag": "2.3.1",
     "react-custom-scrollbars": "4.2.1",
+    "react-data-export": "0.6.0",
     "react-day-picker": "7.4.8",
     "react-dom": "0.0.0-experimental-6a589ad71",
     "react-final-form": "6.5.2",
@@ -50,10 +53,13 @@
     "react-phone-input-2": "2.13.9",
     "react-scrollbars-custom": "4.0.25",
     "react-select": "4.3.1",
+    "react-table": "7.7.0",
+    "react-to-print": "2.14.1",
     "sha1": "1.1.1",
     "use-sound": "2.0.1",
+    "xlsx": "0.17.4",
     "yarn": "1.22.10",
-    "zod": "1.11.11"
+    "zod": "3.10.3"
   },
   "devDependencies": {
     "@types/node": "15.0.2",

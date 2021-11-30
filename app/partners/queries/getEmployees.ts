@@ -13,6 +13,7 @@ export default async function getEmployees(input: number, ctx: Ctx) {
       completedOrders: true,
       orders: {
         select: {
+          id: true,
           price: true,
           status: true,
           review: {
@@ -21,6 +22,14 @@ export default async function getEmployees(input: number, ctx: Ctx) {
               isReviewed: true,
             },
           },
+        },
+      },
+      carServiceUser: {
+        select: {
+          id: true,
+          name: true,
+          surname: true,
+          avatarUrl: true,
         },
       },
     },

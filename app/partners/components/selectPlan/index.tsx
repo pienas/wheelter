@@ -1,9 +1,11 @@
-import { Flex, Heading, Text, Link as ChakraLink, Button, Grid, Box, Icon } from "@chakra-ui/react"
+import { Flex, Heading, Text, Link as ChakraLink, Button, Grid, Box } from "@chakra-ui/react"
 import { TabList, Tabs } from "@chakra-ui/tabs"
 import CustomTabIndex from "../customTab/CustomTabIndex"
 import { useState } from "react"
 import { Link } from "blitz"
-import { HiCheck, HiX } from "react-icons/hi"
+import CheckIcon from "app/core/components/icons/CheckIcon"
+import CrossIcon from "app/core/components/icons/CrossIcon"
+import InfinityIcon from "app/core/components/icons/InfinityIcon"
 
 type PlanProps = {
   yearlySelected: boolean
@@ -24,8 +26,8 @@ type ButtonProps = {
 type RowProps = {
   benefit: string
   basic: boolean | string
-  smart: boolean | string
-  individual: boolean | string
+  smart: boolean | string | number
+  individual: boolean | string | number
   isLastRow: boolean
 }
 
@@ -92,6 +94,8 @@ const Row = ({ benefit, basic, smart, individual, isLastRow }: RowProps) => {
       height="50px"
       borderBottom={isLastRow ? "none" : "1px solid #E7E7E7"}
       mb={isLastRow ? "50px" : "0"}
+      cursor="pointer"
+      _hover={{ backgroundColor: "#f8f8f8" }}
     >
       <Flex alignItems="center" justifyContent="flex-start" borderRight="1px solid #E7E7E7">
         <Text color="text" fontSize="lg">
@@ -105,12 +109,12 @@ const Row = ({ benefit, basic, smart, individual, isLastRow }: RowProps) => {
           </Flex>
         ) : (
           <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
-            <Icon as={HiCheck} w={6} h={6} color="green.300" />
+            <CheckIcon boxSize={6} color="green.300" />
           </Flex>
         )
       ) : (
         <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
-          <Icon as={HiX} w={6} h={6} color="red.500" />
+          <CrossIcon boxSize={6} color="red.500" />
         </Flex>
       )}
       {smart ? (
@@ -118,14 +122,18 @@ const Row = ({ benefit, basic, smart, individual, isLastRow }: RowProps) => {
           <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
             <Text color="text">{smart}</Text>
           </Flex>
+        ) : typeof smart === "boolean" ? (
+          <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
+            <CheckIcon boxSize={6} color="green.300" />
+          </Flex>
         ) : (
           <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
-            <Icon as={HiCheck} w={6} h={6} color="green.300" />
+            <InfinityIcon boxSize={5} color="text" />
           </Flex>
         )
       ) : (
         <Flex alignItems="center" justifyContent="center" borderRight="1px solid #E7E7E7">
-          <Icon as={HiX} w={6} h={6} color="red.500" />
+          <CrossIcon boxSize={6} color="red.500" />
         </Flex>
       )}
       {individual ? (
@@ -133,14 +141,18 @@ const Row = ({ benefit, basic, smart, individual, isLastRow }: RowProps) => {
           <Flex alignItems="center" justifyContent="center">
             <Text color="text">{individual}</Text>
           </Flex>
+        ) : typeof individual === "boolean" ? (
+          <Flex alignItems="center" justifyContent="center">
+            <CheckIcon boxSize={6} color="green.300" />
+          </Flex>
         ) : (
           <Flex alignItems="center" justifyContent="center">
-            <Icon as={HiCheck} w={6} h={6} color="green.300" />
+            <InfinityIcon boxSize={5} color="text" />
           </Flex>
         )
       ) : (
         <Flex alignItems="center" justifyContent="center">
-          <Icon as={HiX} w={6} h={6} color="red.500" />
+          <CrossIcon boxSize={6} color="red.500" />
         </Flex>
       )}
     </Grid>
@@ -184,15 +196,15 @@ const Plan = ({
         )}
       </Flex>
       <Flex alignItems="flex-end" alignSelf="flex-start">
-        <Heading as="h3" fontSize="6xl" color="black" fontWeight="500">
+        <Heading as="h3" fontSize="5xl" color="black" fontWeight="500">
           {yearlySelected ? priceYearly : priceMonthly} €
         </Heading>
-        <Text color="#8C96AB" fontWeight="500" fontSize="2xl" ml="5px">
+        <Text color="#8C96AB" fontWeight="500" fontSize="xl" ml="5px">
           {yearlySelected ? " metams" : "/ mėn"}
         </Text>
       </Flex>
       <Text color="black" fontSize="lg" mb="20px" alignSelf="flex-start">
-        {objectsText}
+        {objectsText.endsWith("objektų") && <InfinityIcon boxSize={5} />} {objectsText}
       </Text>
       {isPrimary ? (
         <PrimaryButton text={hasFreeVersion ? "Išbandykite nemokamai" : "Susisiekite*"} link="/" />
@@ -273,7 +285,7 @@ const SelectPlan = () => {
           hasTag={false}
           priceMonthly="*"
           priceYearly="*"
-          objectsText="∞ aptarnaujančių objektų"
+          objectsText="aptarnaujančių objektų"
           isPrimary={false}
           hasFreeVersion={false}
         />
@@ -341,8 +353,8 @@ const SelectPlan = () => {
         individual={true}
         isLastRow={false}
       />
-      <Row benefit="Darbuotojų skaičius" basic="1" smart="∞" individual="∞" isLastRow={false} />
-      <Row benefit="Nuotraukų skaičius" basic="3" smart="6" individual="∞" isLastRow={true} />
+      <Row benefit="Darbuotojų skaičius" basic="1" smart={99} individual={99} isLastRow={false} />
+      <Row benefit="Nuotraukų skaičius" basic="3" smart="6" individual={99} isLastRow={true} />
     </Flex>
   )
 }

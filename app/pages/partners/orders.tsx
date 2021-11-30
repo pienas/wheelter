@@ -19,9 +19,6 @@ const PartnersOrders: BlitzPage = () => {
           #wizard:focus {
             box-shadow: none;
           }
-          #wizard:not([aria-selected="true"]):hover p {
-            color: #0b132a;
-          }
           a:hover {
             text-decoration: none !important;
           }

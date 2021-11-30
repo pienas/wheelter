@@ -16,8 +16,16 @@ import {
 import { Image, Link, Routes, useMutation } from "blitz"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
-import DownIcon from "app/partners/components/icons/ArrowIcon"
 import ReactCountryFlag from "react-country-flag"
+import TruckIcon from "../icons/TruckIcon"
+import WatchIcon from "../icons/WatchIcon"
+import BookmarksIcon from "../icons/BookmarksIcon"
+import NoteTextIcon from "../icons/NoteTextIcon"
+import MegaphoneIcon from "../icons/MegaphoneIcon"
+import BookOpenIcon from "../icons/BookOpenIcon"
+import GearIcon from "../icons/GearIcon"
+import LogOutIcon from "../icons/LogOutIcon"
+import ChevronDownIcon from "../icons/ChevronDownIcon"
 
 type ItemProps = {
   children: React.ReactNode
@@ -88,7 +96,7 @@ const UserInfo = () => {
             <Text fontWeight="500" mx="10px" transition="all 0.2s">
               {name}
             </Text>
-            <DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
+            <ChevronDownIcon boxSize={4} color="#4F5665" transition="all 0.2s" />
           </Flex>
         </MenuButton>
         <MenuList
@@ -96,19 +104,40 @@ const UserInfo = () => {
           boxShadow="0 0 0 1px hsl(0deg 0% 0% / 10%), 0 4px 11px hsl(0deg 0% 0% / 10%)"
           minWidth="13rem"
         >
-          <Item>Mano tr. priemonės</Item>
-          <Item>Mano rezervacijos</Item>
-          <Item>Pamėgti servisai</Item>
-          <Item>Paslaugų teikėjai</Item>
+          <Item>
+            <TruckIcon boxSize={3} color="text" mr={2} /> Mano tr. priemonės
+          </Item>
+          <Item>
+            <WatchIcon boxSize={3} color="text" mr={2} />
+            Mano rezervacijos
+          </Item>
+          <Item>
+            <BookmarksIcon boxSize={3} color="text" mr={2} />
+            Pamėgti servisai
+          </Item>
+          <Item>
+            <NoteTextIcon boxSize={3} color="text" mr={2} />
+            Paslaugų teikėjai
+          </Item>
           <MenuDivider color="#d8d8d8" />
-          <Item>Naujienos</Item>
-          <Item>Naudojimosi instrukcija</Item>
-          <Item>Nustatymai</Item>
+          <Item>
+            <MegaphoneIcon boxSize={3} color="text" mr={2} />
+            Naujienos
+          </Item>
+          <Item>
+            <BookOpenIcon boxSize={3} color="text" mr={2} />
+            Naudojimosi instrukcija
+          </Item>
+          <Item>
+            <GearIcon boxSize={3} color="text" mr={2} />
+            Nustatymai
+          </Item>
           <Item
             onClick={async () => {
               await logoutMutation()
             }}
           >
+            <LogOutIcon boxSize={3} color="text" mr={2} />
             Atsijungti
           </Item>
         </MenuList>
@@ -181,7 +210,7 @@ const Header = () => {
         <Menu>
           <MenuButton
             as={Button}
-            rightIcon={<DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />}
+            rightIcon={<ChevronDownIcon boxSize={4} color="#4F5665" transition="all 0.2s" />}
             fontWeight="400"
             color="text"
             _focus={{ boxShadow: "none" }}

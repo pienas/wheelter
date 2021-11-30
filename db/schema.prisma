@@ -27,6 +27,9 @@ model User {
   favoriteServices CarService[]
   vehicles         Vehicle[]
   settings         UserSetting[]
+  logs             Log[]
+  inviteToken      InviteToken?  @relation(fields: [inviteTokenId], references: [id])
+  inviteTokenId    Int?
 }
 
 model Vehicle {
@@ -34,6 +37,7 @@ model Vehicle {
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
   type          VehicleType        @default(CAR)
+  shortMake     String
   make          String
   model         String
   year          Int
@@ -46,6 +50,7 @@ model Vehicle {
   engineCode    String?
   colorCode     String?
   vinCode       String?
+  orders        Order[]
   user          User?              @relation(fields: [userId], references: [id])
   userId        Int?
 }
@@ -88,6 +93,20 @@ model Token {
   @@unique([hashedToken, type])
 }
 
+model InviteToken {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  hashedToken  String
+  type         String
+  expiresAt    DateTime
+  createdBy    User[]
+  carService   CarService @relation(fields: [carServiceId], references: [id])
+  carServiceId Int
+
+  @@unique([hashedToken, type])
+}
+
 model CarServiceUser {
   id                     Int                      @id @default(autoincrement())
   createdAt              DateTime                 @default(now())
@@ -106,9 +125,11 @@ model CarServiceUser {
   changes                Change[]
   notes                  Note[]
   goals                  Goal[]
-  notifications          Notification[]
+  notificationsOrder     NotificationOrder[]
+  notificationsUpdate    NotificationUpdate[]
   settings               CarServiceUserSetting[]
   invoices               Invoice[]
+  employee               Employee[]
   carServiceUserRelation CarServiceUserRelation[]
 }
 
@@ -185,6 +206,8 @@ model CarService {
   images                 Image[]
   usersWhoLike           User[]
   reviews                Review[]
+  tokens                 InviteToken[]
+  logs                   Log[]
   carServiceUserRelation CarServiceUserRelation[]
 }
 
@@ -210,22 +233,27 @@ model Change {
 }
 
 model Order {
-  id           Int           @id @default(autoincrement())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  startsAt     DateTime
-  price        Float         @default(0.0)
-  status       OrderStatus   @default(NEW)
-  review       Review?
-  notification Notification?
-  service      Service?      @relation(fields: [serviceId], references: [id])
-  serviceId    Int?
-  employee     Employee?     @relation(fields: [employeeId], references: [id])
-  employeeId   Int?
-  client       User?         @relation(fields: [clientId], references: [id])
-  clientId     Int?
-  carService   CarService?   @relation(fields: [carServiceId], references: [id])
-  carServiceId Int?
+  id                String             @id
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  startsAt          DateTime
+  price             Float              @default(0.0)
+  status            OrderStatus        @default(NEW)
+  paymentMethod     PaymentMethodType  @default(CASH)
+  vehicle           Vehicle            @relation(fields: [vehicleId], references: [id])
+  vehicleId         Int
+  review            Review?
+  notificationOrder NotificationOrder?
+  promo             Promo?             @relation(fields: [promoId], references: [id])
+  promoId           Int?
+  service           Service            @relation(fields: [serviceId], references: [id])
+  serviceId         Int
+  employee          Employee?          @relation(fields: [employeeId], references: [id])
+  employeeId        Int?
+  client            User               @relation(fields: [clientId], references: [id])
+  clientId          Int
+  carService        CarService         @relation(fields: [carServiceId], references: [id])
+  carServiceId      Int
 }
 
 model Review {
@@ -234,7 +262,7 @@ model Review {
   content      String?
   isReviewed   Boolean     @default(false)
   order        Order?      @relation(fields: [orderId], references: [id])
-  orderId      Int?
+  orderId      String?
   author       User?       @relation(fields: [authorId], references: [id])
   authorId     Int?
   carService   CarService? @relation(fields: [carServiceId], references: [id])
@@ -278,16 +306,19 @@ model Service {
 }
 
 model Employee {
-  id              Int         @id @default(autoincrement())
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  name            String
-  surname         String?
-  position        String
-  completedOrders Int         @default(0)
-  orders          Order[]
-  carService      CarService? @relation(fields: [carServiceId], references: [id])
-  carServiceId    Int?
+  id                 Int                  @id @default(autoincrement())
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  name               String
+  surname            String?
+  position           String
+  completedOrders    Int                  @default(0)
+  orders             Order[]
+  notificationUpdate NotificationUpdate[]
+  carService         CarService?          @relation(fields: [carServiceId], references: [id])
+  carServiceId       Int?
+  carServiceUser     CarServiceUser?      @relation(fields: [carServiceUserId], references: [id])
+  carServiceUserId   Int?
 }
 
 model Setting {
@@ -311,7 +342,9 @@ model Promo {
   isRedeemed   Boolean     @default(false)
   title        String
   description  String
+  discount     Int
   services     Service[]
+  orders       Order[]
   carService   CarService? @relation(fields: [carServiceId], references: [id])
   carServiceId Int?
 }
@@ -353,15 +386,30 @@ model Goal {
   carServiceId Int?
 }
 
-model Notification {
-  id               Int              @id @default(autoincrement())
-  createdAt        DateTime         @default(now())
-  type             NotificationType @default(ORDER)
-  read             Boolean          @default(false)
-  seen             Boolean          @default(false)
-  order            Order?           @relation(fields: [orderId], references: [id])
-  orderId          Int?
-  carServiceUser   CarServiceUser?  @relation(fields: [carServiceUserId], references: [id])
+model NotificationOrder {
+  id               Int                          @id @default(autoincrement())
+  createdAt        DateTime                     @default(now())
+  read             Boolean                      @default(false)
+  seen             Boolean                      @default(false)
+  type             NotificationOrderType
+  updateType       NotificationOrderUpdateType?
+  order            Order?                       @relation(fields: [orderId], references: [id])
+  orderId          String?
+  carServiceUser   CarServiceUser?              @relation(fields: [carServiceUserId], references: [id])
+  carServiceUserId Int?
+}
+
+model NotificationUpdate {
+  id               Int                    @id @default(autoincrement())
+  createdAt        DateTime               @default(now())
+  read             Boolean                @default(false)
+  seen             Boolean                @default(false)
+  type             NotificationUpdateType
+  title            String?
+  message          String?
+  employee         Employee?              @relation(fields: [employeeId], references: [id])
+  employeeId       Int?
+  carServiceUser   CarServiceUser?        @relation(fields: [carServiceUserId], references: [id])
   carServiceUserId Int?
 }
 
@@ -376,11 +424,22 @@ model Image {
 model Invoice {
   id               Int             @id @default(autoincrement())
   createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
   plan             PlanType        @default(STANDARD)
   total            Float           @default(19.99)
   status           InvoiceStatus   @default(PENDING)
   carServiceUser   CarServiceUser? @relation(fields: [carServiceUserId], references: [id])
   carServiceUserId Int?
+}
+
+model Log {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedWhat  String
+  updatedBy    User?       @relation(fields: [updatedById], references: [id])
+  updatedById  Int?
+  carService   CarService? @relation(fields: [carServiceId], references: [id])
+  carServiceId Int?
 }
 
 enum UserRole {
@@ -394,16 +453,26 @@ enum CarServiceUserRole {
   ADMIN
 }
 
+enum NotificationOrderType {
+  NEW
+  UPDATED
+  CANCELLED
+}
+
+enum NotificationOrderUpdateType {
+  TIME
+}
+
+enum NotificationUpdateType {
+  UPDATE
+  EMPLOYEE
+}
+
 enum OrderStatus {
   NEW
   ACTIVE
   DONE
   CANCELLED
-}
-
-enum NotificationType {
-  ORDER
-  UPDATE
 }
 
 enum VehicleType {
@@ -471,4 +540,9 @@ enum InvoiceStatus {
   PENDING
   SUCCESS
   CANCELLED
+}
+
+enum PaymentMethodType {
+  CASH
+  CARD
 }

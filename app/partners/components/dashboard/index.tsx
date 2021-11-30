@@ -15,12 +15,6 @@ import {
 import { useQuery } from "blitz"
 import React, { FC } from "react"
 import CustomTab from "./../customTab/CustomTab"
-import DotsIcon from "./../icons/DotsIcon"
-import ArrowIcon from "./../icons/ArrowIcon"
-import MoneyIcon from "./../icons/MoneyIcon"
-import OrdersIcon from "./../icons/OrdersIcon"
-import RatingIcon from "./../icons/RatingIcon"
-import ReviewsIcon from "./../icons/ReviewsIcon"
 import { Doughnut, Line } from "react-chartjs-2"
 import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getServiceReviewsCount from "app/partners/queries/getServiceReviewsCount"
@@ -28,6 +22,13 @@ import getServiceRating from "app/partners/queries/getServiceRating"
 import getServiceOrders from "app/partners/queries/getServiceOrders"
 import getServiceIncome from "app/partners/queries/getServiceIncome"
 import { format } from "date-fns"
+import CashIcon from "app/core/components/icons/CashIcon"
+import CalendarNoteIcon from "app/core/components/icons/CalendarNoteIcon"
+import ThumbsUpIcon from "app/core/components/icons/ThumbsUpIcon"
+import StarIcon from "app/core/components/icons/StarIcon"
+import ChevronDownIcon from "app/core/components/icons/ChevronDownIcon"
+import ChevronRightIcon from "app/core/components/icons/ChevronRightIcon"
+import DotsIcon from "app/core/components/icons/DotsIcon"
 
 const OrderTableRow = (props) => {
   const { order } = props
@@ -268,7 +269,7 @@ const Dashboard: FC<Props> = ({
               justifyContent="center"
               mb="15px"
             >
-              <MoneyIcon boxSize={7} color="#ffffff" />
+              <CashIcon boxSize={7} color="#ffffff" />
             </Flex>
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
@@ -297,7 +298,7 @@ const Dashboard: FC<Props> = ({
               justifyContent="center"
               mb="15px"
             >
-              <OrdersIcon boxSize={7} color="#ffffff" />
+              <CalendarNoteIcon boxSize={7} color="#ffffff" />
             </Flex>
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
@@ -326,7 +327,7 @@ const Dashboard: FC<Props> = ({
               justifyContent="center"
               mb="15px"
             >
-              <ReviewsIcon boxSize={7} color="#ffffff" />
+              <ThumbsUpIcon boxSize={7} color="#ffffff" />
             </Flex>
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
@@ -355,7 +356,7 @@ const Dashboard: FC<Props> = ({
               justifyContent="center"
               mb="15px"
             >
-              <RatingIcon boxSize={7} color="#ffffff" />
+              <StarIcon boxSize={7} color="#ffffff" />
             </Flex>
             <DotsIcon boxSize={4} color="#0B132A" cursor="pointer" _hover={{ color: "#6500E6" }} />
           </Flex>
@@ -391,7 +392,7 @@ const Dashboard: FC<Props> = ({
               <Text fontSize="3xl" fontWeight="500" transition="all 0.2s">
                 Užsakymai
               </Text>
-              <ArrowIcon boxSize={4} transition="all 0.2s" ml="10px" />
+              <ChevronDownIcon boxSize={6} transition="all 0.2s" ml="10px" />
             </Flex>
             <Tabs variant="unstyled" isFitted background="#F1F1F1" p="3px" borderRadius="10px">
               <TabList>
@@ -444,13 +445,7 @@ const Dashboard: FC<Props> = ({
               }}
             >
               <Text color="#6500E6">Peržiūrėti užsakymus</Text>
-              <ArrowIcon
-                boxSize={3}
-                transition="all 0.2s"
-                mx="10px"
-                color="#6500E6"
-                transform="rotate(270deg)"
-              />
+              <ChevronRightIcon boxSize={5} transition="all 0.2s" mx="5px" color="#6500E6" />
             </Flex>
           </Flex>
           <Flex justifyContent="space-between" mt="20px">
@@ -559,7 +554,7 @@ const Dashboard: FC<Props> = ({
               <Text fontSize="3xl" fontWeight="500" transition="all 0.2s">
                 Įvertinimas
               </Text>
-              <ArrowIcon boxSize={4} transition="all 0.2s" ml="10px" />
+              <ChevronDownIcon boxSize={6} transition="all 0.2s" ml="10px" />
             </Flex>
             <Tabs variant="unstyled" isFitted background="#F1F1F1" p="3px" borderRadius="10px">
               <TabList>

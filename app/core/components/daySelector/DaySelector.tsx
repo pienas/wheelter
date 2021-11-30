@@ -1,9 +1,10 @@
 import React, { FC, useEffect, useState } from "react"
-import { Text, Flex, HStack } from "@chakra-ui/react"
+import { Text, Flex, HStack, Box, Button } from "@chakra-ui/react"
 import DayPicker, { DateUtils, DayModifiers, RangeModifier } from "react-day-picker"
 import RadioPill from "./RadioPill"
 import DaySelectorStyles from "./DaySelectorStyles"
 import { format } from "date-fns"
+import ChevronRightIcon from "../icons/ChevronRightIcon"
 
 export enum DaySelectionTypes {
   Single = "Viena diena",
@@ -12,9 +13,9 @@ export enum DaySelectionTypes {
 }
 
 type Props = {
-  onSelectedDays: (days) => void
+  onSelectedDays: (days: any) => void
   type: DaySelectionTypes
-  onDaySelectionTypeChanged: (selectionType) => void
+  onDaySelectionTypeChanged: (selectionType: DaySelectionTypes) => void
   finalDate: any
 }
 
@@ -30,7 +31,10 @@ const DaySelector: FC<Props> = ({
     to: new Date(),
   })
   const [daySelectionType, setDaySelectionType] = useState(type)
-  const modifiers = { start: selectedRange.from, end: selectedRange.to }
+  const modifiers = {
+    start: selectedRange.from,
+    end: selectedRange.to,
+  }
 
   if (finalDate.length === 0) {
     useEffect(() => {
@@ -81,27 +85,29 @@ const DaySelector: FC<Props> = ({
   }
   return (
     <>
-      <HStack mb={4} justifyContent="space-between">
-        {[DaySelectionTypes.Single, DaySelectionTypes.Multi, DaySelectionTypes.Range].map(
-          (dst, index) => (
-            <RadioPill
-              key={dst}
-              isSelected={daySelectionType === dst}
-              value={index}
-              onChange={() => {
-                setDaySelectionType(dst)
-                setSelectedDays([new Date()])
-                setSelectedRange({ from: new Date(), to: new Date() })
-                if (onDaySelectionTypeChanged) {
-                  onDaySelectionTypeChanged(dst)
-                }
-              }}
-            >
-              {dst}
-            </RadioPill>
-          )
-        )}
-      </HStack>
+      <Flex justifyContent="center">
+        <HStack mb={4} justifyContent="space-between" maxW="400px">
+          {[DaySelectionTypes.Single, DaySelectionTypes.Multi, DaySelectionTypes.Range].map(
+            (dst, index) => (
+              <RadioPill
+                key={dst}
+                isSelected={daySelectionType === dst}
+                value={index}
+                onChange={() => {
+                  setDaySelectionType(dst)
+                  setSelectedDays([new Date()])
+                  setSelectedRange({ from: new Date(), to: new Date() })
+                  if (onDaySelectionTypeChanged) {
+                    onDaySelectionTypeChanged(dst)
+                  }
+                }}
+              >
+                {dst}
+              </RadioPill>
+            )
+          )}
+        </HStack>
+      </Flex>
       <Text fontSize="sm" textAlign="center" fontWeight="600">
         {daySelectionType === DaySelectionTypes.Range
           ? "Kalendoriuje pasirinkite Jums tinkamų dienų intervalą:"
@@ -147,6 +153,8 @@ const DaySelector: FC<Props> = ({
               : selectedDays
           }
           modifiers={daySelectionType === DaySelectionTypes.Range ? modifiers : undefined}
+          numberOfMonths={daySelectionType === DaySelectionTypes.Range ? 2 : 1}
+          fixedWeeks
         />
         <DaySelectorStyles type={daySelectionType ?? "Single"} />
       </Flex>

@@ -101,9 +101,9 @@ const seed = async () => {
         },
       },
     })
-    const notification = await db.notification.create({
+    const notificationOrder = await db.notificationOrder.create({
       data: {
-        type: "ORDER",
+        type: "NEW",
         carServiceUser: {
           connect: {
             id: carServiceUser.id,
@@ -141,9 +141,9 @@ const seed = async () => {
             id: review.id,
           },
         },
-        notification: {
+        notificationOrder: {
           connect: {
-            id: notification.id,
+            id: notificationOrder.id,
           },
         },
       },

@@ -1,7 +1,7 @@
 import { Flex, Heading, Text, Box } from "@chakra-ui/react"
-import TrustworthyIcon from "../icons/TrustworthyIcon"
-import FastIcon from "../icons/FastIcon"
-import ReliableIcon from "../icons/ReliableIcon"
+import ShieldCheckIcon from "../icons/ShieldCheckIcon"
+import RocketIcon from "../icons/RocketIcon"
+import CheckCircleIcon from "../icons/CheckCircleIcon"
 import { Image } from "blitz"
 
 type BenefitProps = {
@@ -67,17 +67,17 @@ const Hero = () => {
         <Benefit
           heading="Greičiau"
           text="Vos kelių mygtukų paspaudimu išsirinkite geriausią paslaugos teikėją jūsų automobiliui."
-          icon={<FastIcon boxSize={8} color="white" />}
+          icon={<RocketIcon boxSize={8} color="white" />}
         />
         <Benefit
           heading="Patogiau"
           text="Vieta ir laikas nuo šiol nebe rodikliai."
-          icon={<ReliableIcon boxSize={8} color="white" />}
+          icon={<CheckCircleIcon boxSize={8} color="white" />}
         />
         <Benefit
           heading="Patikimiau"
           text="Matykite paslaugos teikėjo informaciją bei kaupkite savo automobilio istoriją išmaniai."
-          icon={<TrustworthyIcon boxSize={8} color="white" />}
+          icon={<ShieldCheckIcon boxSize={8} color="white" />}
         />
       </Box>
       <Box justifySelf="flex-end" alignSelf="center">

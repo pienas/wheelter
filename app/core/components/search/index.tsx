@@ -14,18 +14,19 @@ import {
   useToast,
   useDisclosure,
 } from "@chakra-ui/react"
-import ServicesIcon from "../icons/ServicesIcon"
-import LocationIcon from "../icons/LocationIcon"
-import CalendarIcon from "../icons/CalendarIcon"
+import PinIcon from "../icons/PinIcon"
+import CalendarDatesIcon from "../icons/CalendarDatesIcon"
 import Select from "react-select"
 import locations from "./../locations.json"
-import { CloseIcon } from "@chakra-ui/icons"
 import { format } from "date-fns"
 import DaySelector from "../daySelector/DaySelector"
 import { DaySelectionTypes } from "../daySelector/DaySelector"
 import "react-day-picker/lib/style.css"
 import SuccessToast from "../toast/SuccessToast"
 import WarningToast from "../toast/WarningToast"
+import CrossIcon from "../icons/CrossIcon"
+import SearchIcon from "../icons/SearchIcon"
+import WrenchIcon from "../icons/WrenchIcon"
 
 const Search = () => {
   const services = [
@@ -98,6 +99,7 @@ const Search = () => {
   const toastIdRef = useRef<any>()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [selectedDays, setSelectedDays] = useState<Date[]>([new Date()])
+  const [daySelectionType, setDaySelectionType] = useState(DaySelectionTypes.Single)
   const [finalDays, setFinalDays] = useState<Date[]>([])
   const submitRequest = async () => {
     try {
@@ -117,6 +119,7 @@ const Search = () => {
     } catch (error) {
       toastIdRef.current = toast({
         duration: 3000,
+        position: "bottom-left",
         render: () => (
           <WarningToast heading="Kažkas netaip!" text={error.message} id={toastIdRef.current} />
         ),
@@ -133,12 +136,12 @@ const Search = () => {
       position="relative"
     >
       <Box backgroundColor="green.400" borderRadius="full" position="absolute" top="-15px">
-        <Text fontSize="sm" color="white" px="35px" py="5px">
-          Paieška
-        </Text>
+        <Flex alignItems="center" fontSize="sm" color="white" px="35px" py="5px">
+          <SearchIcon boxSize={4} mr={2} color="white" /> Paieška
+        </Flex>
       </Box>
       <Flex alignItems="center" width="sm">
-        <LocationIcon boxSize={8} color="brand.500" />
+        <PinIcon boxSize={8} color="brand.500" />
         <Box ml="20px" position="relative" width="80%">
           <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite lokaciją
@@ -162,7 +165,7 @@ const Search = () => {
       </Flex>
       <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
       <Flex alignItems="center" width="sm">
-        <CalendarIcon boxSize={8} color="brand.500" />
+        <CalendarDatesIcon boxSize={8} color="brand.500" />
         <Box ml="20px" width="80%">
           <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite datą
@@ -186,8 +189,8 @@ const Search = () => {
                 format(new Date(Date.parse(finalDays[0].toDateString())), "yyyy-MM-dd")}
             </Text>
             {finalDays.length === undefined && (
-              <CloseIcon
-                boxSize={2}
+              <CrossIcon
+                boxSize={4}
                 ml={2}
                 color="text"
                 cursor="pointer"
@@ -198,8 +201,8 @@ const Search = () => {
               />
             )}
             {finalDays.length > 0 && (
-              <CloseIcon
-                boxSize={2}
+              <CrossIcon
+                boxSize={4}
                 ml={2}
                 color="text"
                 cursor="pointer"
@@ -211,7 +214,11 @@ const Search = () => {
             )}
           </Flex>
         </Box>
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal
+          isOpen={isOpen}
+          onClose={onClose}
+          size={daySelectionType === DaySelectionTypes.Range ? "2xl" : "md"}
+        >
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Pasirinkite datą</ModalHeader>
@@ -220,18 +227,41 @@ const Search = () => {
               <DaySelector
                 type={DaySelectionTypes.Single}
                 onSelectedDays={setSelectedDays}
-                onDaySelectionTypeChanged={() => setSelectedDays([new Date()])}
+                onDaySelectionTypeChanged={(type) => {
+                  setSelectedDays([new Date()])
+                  setDaySelectionType(type)
+                }}
                 finalDate={finalDays}
               />
             </ModalBody>
             <ModalFooter>
-              <Button mr={3} onClick={onClose}>
+              <Button
+                variant="outline"
+                color="text"
+                width={24}
+                height={10}
+                fontSize="sm"
+                borderRadius="10px"
+                fontWeight="400"
+                borderColor="#d8d8d8"
+                mr={3}
+                _hover={{ backgroundColor: "#f8f8f8" }}
+                _focus={{ boxShadow: "none" }}
+                onClick={onClose}
+              >
                 Atšaukti
               </Button>
               <Button
-                backgroundColor="brand.500"
+                variant="solid"
                 color="white"
+                width={24}
+                height={10}
+                fontSize="sm"
+                borderRadius="10px"
+                fontWeight="400"
+                backgroundColor="brand.500"
                 _hover={{ backgroundColor: "brand.400" }}
+                _focus={{ boxShadow: "none" }}
                 disabled={selectedDays.length === 0}
                 onClick={submitRequest}
               >
@@ -243,7 +273,7 @@ const Search = () => {
       </Flex>
       <Box backgroundColor="brand.500" width="5px" borderRadius="full" opacity="0.5" mr="30px" />
       <Flex alignItems="center" width="sm">
-        <ServicesIcon boxSize={8} color="brand.500" />
+        <WrenchIcon boxSize={8} color="brand.500" />
         <Box ml="20px" width="80%">
           <Text fontSize="sm" color="#a0a0a0">
             Pasirinkite paslaugą

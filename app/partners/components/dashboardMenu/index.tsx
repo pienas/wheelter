@@ -4,6 +4,8 @@ import {
   Box,
   Divider,
   Flex,
+  Circle,
+  Center,
   Heading,
   Link,
   Text,
@@ -33,20 +35,8 @@ import getServiceOrdersCount from "app/partners/queries/getServiceOrdersCount"
 import getUsersActiveService from "app/partners/queries/getUsersActiveService"
 import getUsersServices from "app/partners/queries/getUsersServices"
 import { useEffect, useRef, useState } from "react"
-import CalendarIcon from "./../icons/CalendarIcon"
-import StatsIcon from "./../icons/StatsIcon"
-import ArrowIcon from "./../icons/ArrowIcon"
-import SupportIcon from "./../icons/SupportIcon"
-import DashboardIcon from "./../icons/DashboardIcon"
 import Logo from "./../Logo"
-import OrdersIcon from "./../icons/OrdersIcon"
-import ServicesIcon from "./../icons/ServicesIcon"
-import SettingsIcon from "./../icons/SettingsIcon"
-import ShareIcon from "./../icons/ShareIcon"
-import InstructionsIcon from "./../icons/InstructionsIcon"
 import useSound from "use-sound"
-import MenuIcon from "./../icons/MenuIcon"
-import NotificationsIcon from "./../icons/NotificationsIcon"
 import { useCurrentUser } from "app/core/hooks/useCurrentUser"
 import logout from "app/auth/mutations/logout"
 import Dashboard from "./../dashboard"
@@ -55,22 +45,45 @@ import Calendar from "./../calendar"
 import Orders from "./../orders"
 import Services from "./../services"
 import Settings from "./../settings"
-import NotesIcon from "./../icons/NotesIcon"
-import Notes from "./../notes"
+import Logs from "../logsJournal"
 import SuccessToast from "app/core/components/toast/SuccessToast"
 import updateServiceInfo from "app/partners/mutations/updateServiceInfo"
 import getServiceAddress from "app/partners/queries/getServiceAddress"
-import DiscountsIcon from "./../icons/DiscountsIcon"
 import Discounts from "./../discounts"
-import LockIcon from "../icons/LockIcon"
-import CopyIcon from "../icons/CopyIcon"
-import getUserNotifications from "app/partners/queries/getUserNotifications"
 import CustomTabNotifications from "../customTab/CustomTabNotifications"
 import moment from "moment"
 import "moment/locale/lt"
-import updateUserNotification from "app/partners/mutations/updateUserNotification"
+import updateUserOrderNotification from "app/partners/mutations/updateUserOrderNotification"
+import updateUserUpdateNotification from "app/partners/mutations/updateUserUpdateNotification"
 import { Scrollbars } from "react-custom-scrollbars"
-import { Notification } from "db"
+import { NotificationOrder, NotificationUpdate } from "db"
+import getUserOrderNotifications from "app/partners/queries/getUserOrderNotifications"
+import getUserUpdateNotifications from "app/partners/queries/getUserUpdateNotifications"
+import CalendarDatesIcon from "app/core/components/icons/CalendarDatesIcon"
+import FolderIcon from "app/core/components/icons/FolderIcon"
+import MegaphoneIcon from "app/core/components/icons/MegaphoneIcon"
+import GearIcon from "app/core/components/icons/GearIcon"
+import LogOutIcon from "app/core/components/icons/LogOutIcon"
+import HomeIcon from "app/core/components/icons/HomeIcon"
+import ActivityIcon from "app/core/components/icons/ActivityIcon"
+import CalendarNoteIcon from "app/core/components/icons/CalendarNoteIcon"
+import BoxIcon from "app/core/components/icons/BoxIcon"
+import ProcentCircleIcon from "app/core/components/icons/ProcentCircleIcon"
+import MenuRecIcon from "app/core/components/icons/MenuRecIcon"
+import SendIcon from "app/core/components/icons/SendIcon"
+import BookOpenIcon from "app/core/components/icons/BookOpenIcon"
+import HeadphonesIcon from "app/core/components/icons/HeadphonesIcon"
+import ChevronDownIcon from "app/core/components/icons/ChevronDownIcon"
+import FolderPlusIcon from "app/core/components/icons/FolderPlusIcon"
+import MenuIcon from "app/core/components/icons/MenuIcon"
+import LockIcon from "app/core/components/icons/LockIcon"
+import CopyIcon from "app/core/components/icons/CopyIcon"
+import BellIcon from "app/core/components/icons/BellIcon"
+import RefreshIcon from "app/core/components/icons/RefreshIcon"
+import EyeIcon from "app/core/components/icons/EyeIcon"
+import EyeSlashIcon from "app/core/components/icons/EyeSlashIcon"
+import FacebookIcon from "app/core/components/icons/FacebookIcon"
+import InstagramIcon from "app/core/components/icons/InstagramIcon"
 
 type MenuLinkProps = {
   isOpen: boolean
@@ -80,6 +93,28 @@ type MenuLinkProps = {
   isOrders: boolean
   newOrders?: number
   lateOrdersCount?: number
+}
+
+type IconProps = {
+  icon: React.ReactNode
+}
+
+const Icon = ({ icon }: IconProps) => {
+  return (
+    <Box
+      backgroundColor="white"
+      borderRadius="100%"
+      p="0.4rem"
+      boxShadow="0px 0px 10px 0px rgba(0, 0, 0, 0.12);"
+      cursor="pointer"
+      color="brand.500"
+      _hover={{ backgroundColor: "brand.500", color: "white" }}
+      mr={4}
+      transition="all 0.2s"
+    >
+      {icon}
+    </Box>
+  )
 }
 
 const UserInfo = () => {
@@ -106,20 +141,32 @@ const UserInfo = () => {
           <Text fontWeight="500" mx="10px" transition="all 0.2s">
             {name}
           </Text>
-          <ArrowIcon boxSize={2} color="#4F5665" transition="all 0.2s" />
+          <ChevronDownIcon boxSize={4} color="#4F5665" transition="all 0.2s" />
         </Flex>
       </MenuButton>
       <MenuList border="none" boxShadow="0px 0px 20px 0px rgba(0, 0, 0, 0.3)">
-        <MenuItem _hover={{ background: "#F8F8F8" }}>Mano servisai</MenuItem>
+        <MenuItem fontSize="sm" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+          <FolderIcon boxSize={3} color="text" mr={2} />
+          Mano servisai
+        </MenuItem>
         <MenuDivider color="#d8d8d8" />
-        <MenuItem _hover={{ background: "#F8F8F8" }}>Naujienos</MenuItem>
-        <MenuItem _hover={{ background: "#F8F8F8" }}>Nustatymai</MenuItem>
+        <MenuItem fontSize="sm" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+          <MegaphoneIcon boxSize={3} color="text" mr={2} /> Naujienos
+        </MenuItem>
+        <MenuItem fontSize="sm" color="text" py="0.3rem" _hover={{ background: "#F8F8F8" }}>
+          <GearIcon boxSize={3} color="text" mr={2} />
+          Nustatymai
+        </MenuItem>
         <MenuItem
+          fontSize="sm"
+          color="text"
+          py="0.3rem"
           _hover={{ background: "#F8F8F8" }}
           onClick={async () => {
             await logoutMutation()
           }}
         >
+          <LogOutIcon boxSize={3} color="text" mr={2} />
           Atsijungti
         </MenuItem>
       </MenuList>
@@ -253,16 +300,17 @@ const DashboardMenu = () => {
       refetchInterval: 60000,
     }
   )
-  const [lastNotificationsCount, setLastNofiticationCount] = useState<any>()
+  const [lastNotificationsCount, setLastNotificationCount] = useState(0)
   const [notificationSound] = useSound("/notification.mp3")
-  const [notifications, { refetch: refecthNotifications }] = useQuery(
-    getUserNotifications,
+  const [notificationsOrder, { refetch: refecthOrderNotifications }] = useQuery(
+    getUserOrderNotifications,
     {
       where: { carServiceUserId: currentUser?.id },
       select: {
         id: true,
         createdAt: true,
         type: true,
+        updateType: true,
         read: true,
         seen: true,
         order: {
@@ -298,27 +346,87 @@ const DashboardMenu = () => {
       refetchIntervalInBackground: true,
     }
   )
-  const notificationsCount = notifications.filter((n) => n.seen === false).length
+  const [notificationsUpdate, { refetch: refecthUpdateNotifications }] = useQuery(
+    getUserUpdateNotifications,
+    {
+      where: { carServiceUserId: currentUser?.id },
+      select: {
+        id: true,
+        createdAt: true,
+        type: true,
+        read: true,
+        seen: true,
+        title: true,
+        message: true,
+        employee: {
+          select: {
+            id: true,
+            carService: {
+              select: {
+                id: true,
+                name: true,
+                url: true,
+              },
+            },
+            carServiceUser: {
+              select: {
+                id: true,
+                name: true,
+                surname: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      refetchInterval: 60000,
+      refetchIntervalInBackground: true,
+    }
+  )
+  const notificationsCount = ((notificationsOrder.filter((n) => n.seen === false)
+    .length as number) + notificationsUpdate.filter((n) => n.seen === false).length) as number
+  useEffect(() => {
+    if (notificationsCount > lastNotificationsCount) notificationSound()
+    return () => {
+      setLastNotificationCount(notificationsCount)
+    }
+  }, [notificationsCount])
   const toast = useToast()
   const toastIdRef = useRef<any>()
   const [buttonLoading, setButtonLoading] = useState(false)
 
-  const updateNotification = async (id: number, state: boolean) => {
-    await updateUserNotification({
-      where: {
-        id: id,
-        carServiceUserId: currentUser?.id,
-      },
-      data: {
-        read: state,
-      },
-    }).then(() => {
-      refecthNotifications()
-    })
+  const updateNotification = async (type: string, id: number, state: boolean) => {
+    if (type === "ORDER") {
+      await updateUserOrderNotification({
+        where: {
+          id: id,
+          carServiceUserId: currentUser?.id,
+        },
+        data: {
+          read: state,
+        },
+      }).then(() => {
+        refecthOrderNotifications()
+      })
+    } else {
+      await updateUserUpdateNotification({
+        where: {
+          id: id,
+          carServiceUserId: currentUser?.id,
+        },
+        data: {
+          read: state,
+        },
+      }).then(() => {
+        refecthUpdateNotifications()
+      })
+    }
   }
 
   const updateAllNotifications = async () => {
-    await updateUserNotification({
+    await updateUserOrderNotification({
       where: {
         carServiceUserId: currentUser?.id,
       },
@@ -326,12 +434,22 @@ const DashboardMenu = () => {
         read: true,
       },
     }).then(() => {
-      refecthNotifications()
+      refecthOrderNotifications()
+    })
+    await updateUserUpdateNotification({
+      where: {
+        carServiceUserId: currentUser?.id,
+      },
+      data: {
+        read: true,
+      },
+    }).then(() => {
+      refecthUpdateNotifications()
     })
   }
 
   const markAllNotificationsSeen = async () => {
-    await updateUserNotification({
+    await updateUserOrderNotification({
       where: {
         carServiceUserId: currentUser?.id,
       },
@@ -339,7 +457,17 @@ const DashboardMenu = () => {
         seen: true,
       },
     }).then(() => {
-      refecthNotifications()
+      refecthOrderNotifications()
+    })
+    await updateUserUpdateNotification({
+      where: {
+        carServiceUserId: currentUser?.id,
+      },
+      data: {
+        seen: true,
+      },
+    }).then(() => {
+      refecthUpdateNotifications()
     })
   }
 
@@ -407,14 +535,14 @@ const DashboardMenu = () => {
           )}
         </Head>
       )}
-      {Router.route === "/partners/notes" && (
+      {Router.route === "/partners/logs" && (
         <Head>
           {notificationsCount ? (
             <title>
-              ({notificationsCount > 9 ? "9+" : notificationsCount}) Užrašinė ・ Wheelter
+              ({notificationsCount > 9 ? "9+" : notificationsCount}) Veiksmų žurnalas ・ Wheelter
             </title>
           ) : (
-            <title>Užrašinė ・ Wheelter</title>
+            <title>Veiksmų žurnalas ・ Wheelter</title>
           )}
         </Head>
       )}
@@ -603,7 +731,7 @@ const DashboardMenu = () => {
             url="dashboard"
             label="Suvestinė"
             icon={
-              <DashboardIcon
+              <HomeIcon
                 boxSize={7}
                 color={Router.route === "/partners/dashboard" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -618,7 +746,7 @@ const DashboardMenu = () => {
             url="stats"
             label="Statistika"
             icon={
-              <StatsIcon
+              <ActivityIcon
                 boxSize={7}
                 color={Router.route === "/partners/stats" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -633,7 +761,7 @@ const DashboardMenu = () => {
             url="calendar"
             label="Kalendorius"
             icon={
-              <CalendarIcon
+              <CalendarDatesIcon
                 boxSize={7}
                 color={Router.route === "/partners/calendar" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -648,7 +776,7 @@ const DashboardMenu = () => {
             url="orders"
             label="Užsakymai"
             icon={
-              <OrdersIcon
+              <CalendarNoteIcon
                 boxSize={7}
                 color={Router.route === "/partners/orders" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -665,7 +793,7 @@ const DashboardMenu = () => {
             url="services"
             label="Paslaugos"
             icon={
-              <ServicesIcon
+              <BoxIcon
                 boxSize={7}
                 color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
@@ -675,29 +803,31 @@ const DashboardMenu = () => {
             }
             isOrders={false}
           />
+          {activeCarService?.carService.plan === "PREMIUM" && (
+            <MenuLink
+              isOpen={isOpen}
+              url="logs"
+              label="Veiksmų žurnalas"
+              icon={
+                <MenuRecIcon
+                  boxSize={7}
+                  color={Router.route === "/partners/logs" ? "#6500E6" : "#A8A8A8"}
+                  mr={isOpen ? "20px" : "0"}
+                  ml={isOpen ? "70px" : "34px"}
+                  transition="all 0.2s"
+                />
+              }
+              isOrders={false}
+            />
+          )}
           <MenuLink
             isOpen={isOpen}
-            url="services"
-            label="Paslaugos"
+            url="discounts"
+            label="Akcijos"
             icon={
-              <ServicesIcon
+              <ProcentCircleIcon
                 boxSize={7}
-                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
-                transition="all 0.2s"
-              />
-            }
-            isOrders={false}
-          />
-          <MenuLink
-            isOpen={isOpen}
-            url="notes"
-            label="Užrašinė"
-            icon={
-              <NotesIcon
-                boxSize={7}
-                color={Router.route === "/partners/notes" ? "#6500E6" : "#A8A8A8"}
+                color={Router.route === "/partners/discounts" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
                 ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
@@ -710,24 +840,9 @@ const DashboardMenu = () => {
             url="settings"
             label="Nustatymai"
             icon={
-              <SettingsIcon
+              <GearIcon
                 boxSize={7}
                 color={Router.route === "/partners/settings" ? "#6500E6" : "#A8A8A8"}
-                mr={isOpen ? "20px" : "0"}
-                ml={isOpen ? "70px" : "34px"}
-                transition="all 0.2s"
-              />
-            }
-            isOrders={false}
-          />
-          <MenuLink
-            isOpen={isOpen}
-            url="services"
-            label="Paslaugos"
-            icon={
-              <ServicesIcon
-                boxSize={7}
-                color={Router.route === "/partners/services" ? "#6500E6" : "#A8A8A8"}
                 mr={isOpen ? "20px" : "0"}
                 ml={isOpen ? "70px" : "34px"}
                 transition="all 0.2s"
@@ -759,7 +874,7 @@ const DashboardMenu = () => {
                 },
               }}
             >
-              <ShareIcon
+              <SendIcon
                 boxSize={7}
                 color="#A8A8A8"
                 mr={isOpen ? "20px" : "0"}
@@ -807,7 +922,7 @@ const DashboardMenu = () => {
                 },
               }}
             >
-              <InstructionsIcon
+              <BookOpenIcon
                 boxSize={7}
                 color="#A8A8A8"
                 mr={isOpen ? "20px" : "0"}
@@ -844,7 +959,7 @@ const DashboardMenu = () => {
                 },
               }}
             >
-              <SupportIcon
+              <HeadphonesIcon
                 boxSize={7}
                 color="#A8A8A8"
                 mr={isOpen ? "20px" : "0"}
@@ -912,7 +1027,7 @@ const DashboardMenu = () => {
                       </Text>
                     </Flex>
                   )}
-                  <ArrowIcon boxSize={2} color="#4F5665" ml="10px" transition="all 0.2s" />
+                  <ChevronDownIcon boxSize={4} color="#4F5665" ml="10px" transition="all 0.2s" />
                 </Flex>
               </MenuButton>
               <MenuList
@@ -941,7 +1056,7 @@ const DashboardMenu = () => {
                               service?.carServiceId.toString()
                             )
                             setActiveService(service?.carServiceId)
-                            setLastNofiticationCount(undefined)
+                            setLastNotificationCount(0)
                             Router.reload()
                           }}
                         >
@@ -997,12 +1112,17 @@ const DashboardMenu = () => {
                 >
                   <MenuItem
                     _hover={{ background: "#F8F8F8" }}
+                    transition="all 0.2s"
                     key="new"
                     onClick={() => {
                       console.log("create new car service")
                     }}
                   >
-                    <Avatar size="sm" name="+" bg="#d8d8d8" transition="all 0.2s" color="black" />
+                    <Circle backgroundColor="#d8d8d8" size="32px">
+                      <Center>
+                        <FolderPlusIcon boxSize={4} color="text" ml="2px" transition="all 0.2s" />
+                      </Center>
+                    </Circle>
                     {isOpen && (
                       <Flex
                         flexDirection="column"
@@ -1015,7 +1135,7 @@ const DashboardMenu = () => {
                           as="h5"
                           fontSize="sm"
                           fontWeight="600"
-                          color="#4F5665"
+                          color="text"
                           textAlign="center"
                           transition="all 0.2s"
                           whiteSpace="nowrap"
@@ -1050,11 +1170,11 @@ const DashboardMenu = () => {
               : 0
           }
         >
-          <Modal isOpen={isModalOpen} onClose={onModalClose} size="xl">
+          <Modal isOpen={isModalOpen} onClose={onModalClose} size="xl" isCentered>
             <ModalOverlay />
             <ModalContent>
               <Flex justifyContent="center" mt="20px">
-                <ShareIcon boxSize={10} color="brand.500" />
+                <SendIcon boxSize={10} color="brand.500" />
               </Flex>
               <ModalHeader textAlign="center" fontWeight="500" fontSize="2xl">
                 Pasidalinkite savo servisu
@@ -1109,6 +1229,10 @@ const DashboardMenu = () => {
                 <Text color="text" fontWeight="400" fontSize="md" mt="20px">
                   Dalinkitės per:
                 </Text>
+                <Flex>
+                  <Icon icon={<FacebookIcon boxSize={6} />} />
+                  <Icon icon={<InstagramIcon boxSize={6} />} />
+                </Flex>
               </ModalBody>
               <ModalFooter>
                 <Button
@@ -1120,8 +1244,8 @@ const DashboardMenu = () => {
                   borderRadius="10px"
                   fontWeight="400"
                   borderColor="#d8d8d8"
-                  // boxShadow="0 5px 15px 0 rgb(100 0 230 / 30%)"
-                  // _hover={{ backgroundColor: "brand.400" }}
+                  _hover={{ backgroundColor: "#f8f8f8" }}
+                  _focus={{ boxShadow: "none" }}
                   onClick={onModalClose}
                 >
                   Atšaukti
@@ -1151,7 +1275,7 @@ const DashboardMenu = () => {
               justifySelf="flex-start"
             >
               <MenuIcon
-                boxSize={6}
+                boxSize={8}
                 color="black"
                 transition="all 0.2s"
                 onClick={() => {
@@ -1177,7 +1301,7 @@ const DashboardMenu = () => {
                   }}
                 >
                   <Flex>
-                    <NotificationsIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
+                    <BellIcon boxSize={8} color="#0B132A" transition="all 0.2s" />
                     {notificationsCount > 0 && (
                       <Flex
                         justifyContent="center"
@@ -1226,20 +1350,21 @@ const DashboardMenu = () => {
                       <Heading fontWeight="500" color="black" fontSize="2xl">
                         Pranešimai
                       </Heading>
-                      <Text
+                      <Flex
+                        alignItems="center"
                         color="brand.500"
                         fontSize="xs"
                         _hover={{ opacity: 0.8 }}
                         cursor="pointer"
                         onClick={() => updateAllNotifications()}
                       >
-                        Pažymėti visus kaip perskaitytus
-                      </Text>
+                        <EyeSlashIcon boxSize={4} mr={1} /> Pažymėti visus kaip perskaitytus
+                      </Flex>
                     </Flex>
                     <TabList px={6} borderBottom="1px solid" borderColor="#efefef">
                       <CustomTabNotifications>
                         <Flex alignItems="center">
-                          Užsakymai{" "}
+                          <CalendarNoteIcon boxSize={5} mr={1} /> Užsakymai
                           <Flex
                             justifyContent="center"
                             alignItems="center"
@@ -1250,17 +1375,14 @@ const DashboardMenu = () => {
                             ml="10px"
                           >
                             <Text color="#ffffff" fontWeight="400" fontSize="0.6rem">
-                              {
-                                notifications
-                                  .filter((n) => n.type === "ORDER")
-                                  .filter((n) => n.read === false).length
-                              }
+                              {notificationsOrder.filter((n) => n.read === false).length}
                             </Text>
                           </Flex>
                         </Flex>
                       </CustomTabNotifications>
                       <CustomTabNotifications>
                         <Flex alignItems="center">
+                          <RefreshIcon boxSize={5} mr={1} />
                           Atnaujinimai
                           <Flex
                             justifyContent="center"
@@ -1272,11 +1394,7 @@ const DashboardMenu = () => {
                             ml="10px"
                           >
                             <Text color="#ffffff" fontWeight="400" fontSize="0.6rem">
-                              {
-                                notifications
-                                  .filter((n) => n.type === "UPDATE")
-                                  .filter((n) => n.read === false).length
-                              }
+                              {notificationsUpdate.filter((n) => n.read === false).length}
                             </Text>
                           </Flex>
                         </Flex>
@@ -1285,23 +1403,20 @@ const DashboardMenu = () => {
                     <Scrollbars autoHeight autoHeightMax={700} noScrollX>
                       <TabPanels>
                         <TabPanel p="0">
-                          {notifications.filter((n) => n.type === "ORDER").length === 0 && (
+                          {notificationsOrder.length === 0 && (
                             <Text textAlign="center" py="20px" fontSize="xl">
                               Pranešimų nėra.
                             </Text>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "ORDER")
-                            .filter((n) => n.read === false).length !== 0 && (
+                          {notificationsOrder.filter((n) => n.read === false).length !== 0 && (
                             <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
                               Neperskaityti
                             </Heading>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "ORDER")
+                          {notificationsOrder
                             .filter((n) => n.read === false)
                             .sort(
-                              (a: Notification, b: Notification) =>
+                              (a: NotificationOrder, b: NotificationOrder) =>
                                 b.createdAt.getTime() - a.createdAt.getTime()
                             )
                             .map((notification: any, i, { length }) => {
@@ -1316,18 +1431,14 @@ const DashboardMenu = () => {
                                   // href={`/partners/orders/${notification.order.id}`}
                                   _hover={{ backgroundColor: "#F5F6FD" }}
                                   borderBottomRightRadius={
-                                    notifications
-                                      .filter((n) => n.type === "ORDER")
-                                      .filter((n) => n.read === true).length
+                                    notificationsOrder.filter((n) => n.read === true).length
                                       ? "0"
                                       : i !== length - 1
                                       ? "0"
                                       : "10px"
                                   }
                                   borderBottomLeftRadius={
-                                    notifications
-                                      .filter((n) => n.type === "ORDER")
-                                      .filter((n) => n.read === true).length
+                                    notificationsOrder.filter((n) => n.read === true).length
                                       ? "0"
                                       : i !== length - 1
                                       ? "0"
@@ -1342,17 +1453,29 @@ const DashboardMenu = () => {
                                     />
                                     <Box ml="10px">
                                       <Heading fontSize="md" fontWeight="600" mb="5px">
-                                        Naujas užsakymas
+                                        {notification.type === "NEW"
+                                          ? "Naujas užsakymas"
+                                          : notification.type === "UPDATED"
+                                          ? "Atnaujintas užsakymas"
+                                          : "Atšauktas užsakymas"}
                                       </Heading>
                                       <Text color="#525456" fontSize="sm">
                                         <Text display="inline" color="brand.500" fontWeight="400">
                                           {notification.order.client.name}{" "}
                                           {notification.order.client.surname[0]}.
                                         </Text>{" "}
-                                        užsakė{" "}
+                                        {notification.type === "NEW"
+                                          ? "užsakė"
+                                          : notification.type === "UPDATED"
+                                          ? "atnaujino"
+                                          : "atšaukė"}{" "}
                                         <Text display="inline" color="brand.500" fontWeight="500">
                                           {notification.order.service.name}
                                         </Text>{" "}
+                                        {notification.type === "UPDATED" &&
+                                        notification.updateType === "TIME"
+                                          ? "laiką"
+                                          : ""}{" "}
                                         servise{" "}
                                         <Text display="inline" color="brand.500" fontWeight="400">
                                           {notification.order.carService.name}
@@ -1362,7 +1485,7 @@ const DashboardMenu = () => {
                                   </Flex>
                                   <Flex
                                     textAlign="end"
-                                    minW="160px"
+                                    minW="180px"
                                     direction="column"
                                     justifyContent="space-between"
                                   >
@@ -1370,8 +1493,11 @@ const DashboardMenu = () => {
                                       color="brand.500"
                                       fontSize="xs"
                                       _hover={{ opacity: 0.8 }}
-                                      onClick={() => updateNotification(notification.id, true)}
+                                      onClick={() =>
+                                        updateNotification("ORDER", notification.id, true)
+                                      }
                                     >
+                                      <EyeSlashIcon boxSize={4} mr={1} />
                                       Pažymėti kaip perskaitytą
                                     </Text>
                                     <Text color="#B7BBC0" fontSize="xs">
@@ -1381,18 +1507,15 @@ const DashboardMenu = () => {
                                 </Flex>
                               )
                             })}
-                          {notifications
-                            .filter((n) => n.type === "ORDER")
-                            .filter((n) => n.read === true).length !== 0 && (
+                          {notificationsOrder.filter((n) => n.read === true).length !== 0 && (
                             <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
                               Perskaityti
                             </Heading>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "ORDER")
+                          {notificationsOrder
                             .filter((n) => n.read === true)
                             .sort(
-                              (a: Notification, b: Notification) =>
+                              (a: NotificationOrder, b: NotificationOrder) =>
                                 b.createdAt.getTime() - a.createdAt.getTime()
                             )
                             .map((notification: any, i, { length }) => (
@@ -1415,17 +1538,29 @@ const DashboardMenu = () => {
                                   />
                                   <Box ml="10px">
                                     <Heading fontSize="md" fontWeight="600" mb="5px">
-                                      Naujas užsakymas
+                                      {notification.type === "NEW"
+                                        ? "Naujas užsakymas"
+                                        : notification.type === "UPDATED"
+                                        ? "Atnaujintas užsakymas"
+                                        : "Atšauktas užsakymas"}
                                     </Heading>
                                     <Text color="#525456" fontSize="sm">
                                       <Text display="inline" fontWeight="400">
                                         {notification.order.client.name}{" "}
                                         {notification.order.client.surname[0]}.
                                       </Text>{" "}
-                                      užsakė{" "}
+                                      {notification.type === "NEW"
+                                        ? "užsakė"
+                                        : notification.type === "UPDATED"
+                                        ? "atnaujino"
+                                        : "atšaukė"}{" "}
                                       <Text display="inline" fontWeight="500">
                                         {notification.order.service.name}
                                       </Text>{" "}
+                                      {notification.type === "UPDATED" &&
+                                      notification.updateType === "TIME"
+                                        ? "laiką"
+                                        : ""}{" "}
                                       servise{" "}
                                       <Text display="inline" fontWeight="400">
                                         {notification.order.carService.name}
@@ -1435,7 +1570,7 @@ const DashboardMenu = () => {
                                 </Flex>
                                 <Flex
                                   textAlign="end"
-                                  minW="160px"
+                                  minW="180px"
                                   direction="column"
                                   justifyContent="space-between"
                                 >
@@ -1443,8 +1578,11 @@ const DashboardMenu = () => {
                                     color="brand.500"
                                     fontSize="xs"
                                     _hover={{ opacity: 0.8 }}
-                                    onClick={() => updateNotification(notification.id, false)}
+                                    onClick={() =>
+                                      updateNotification("ORDER", notification.id, false)
+                                    }
                                   >
+                                    <EyeIcon boxSize={4} mr={1} />
                                     Pažymėti kaip neperskaitytą
                                   </Text>
                                   <Text color="#B7BBC0" fontSize="xs">
@@ -1455,23 +1593,20 @@ const DashboardMenu = () => {
                             ))}
                         </TabPanel>
                         <TabPanel p="0">
-                          {notifications.filter((n) => n.type === "UPDATE").length === 0 && (
+                          {notificationsUpdate.length === 0 && (
                             <Text textAlign="center" py="20px" fontSize="xl">
                               Pranešimų nėra.
                             </Text>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "UPDATE")
-                            .filter((n) => n.read === false).length !== 0 && (
+                          {notificationsUpdate.filter((n) => n.read === false).length !== 0 && (
                             <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
                               Neperskaityti
                             </Heading>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "UPDATE")
+                          {notificationsUpdate
                             .filter((n) => n.read === false)
                             .sort(
-                              (a: Notification, b: Notification) =>
+                              (a: NotificationUpdate, b: NotificationUpdate) =>
                                 b.createdAt.getTime() - a.createdAt.getTime()
                             )
                             .map((notification: any, i, { length }) => (
@@ -1485,18 +1620,14 @@ const DashboardMenu = () => {
                                 // href={`/partners/orders/${notification.order.id}`}
                                 _hover={{ backgroundColor: "#F5F6FD" }}
                                 borderBottomRightRadius={
-                                  notifications
-                                    .filter((n) => n.type === "UPDATE")
-                                    .filter((n) => n.read === true).length
+                                  notificationsUpdate.filter((n) => n.read === true).length
                                     ? "0"
                                     : i !== length - 1
                                     ? "0"
                                     : "10px"
                                 }
                                 borderBottomLeftRadius={
-                                  notifications
-                                    .filter((n) => n.type === "UPDATE")
-                                    .filter((n) => n.read === true).length
+                                  notificationsUpdate.filter((n) => n.read === true).length
                                     ? "0"
                                     : i !== length - 1
                                     ? "0"
@@ -1506,33 +1637,39 @@ const DashboardMenu = () => {
                                 <Flex mr="10px">
                                   <Avatar
                                     size="md"
-                                    name={notification.order.client.name}
-                                    src={notification.order.client.avatarUrl}
+                                    name={notification.employee.carServiceUser.name}
+                                    src={notification.employee.carServiceUser.avatarUrl}
                                   />
                                   <Box ml="10px">
                                     <Heading fontSize="md" fontWeight="600" mb="5px">
-                                      Naujas užsakymas
+                                      {notification.type === "EMPLOYEE"
+                                        ? "Naujas darbuotojas"
+                                        : "Naujas atnaujinimas"}
                                     </Heading>
                                     <Text color="#525456" fontSize="sm">
-                                      Klientas{" "}
-                                      <Text display="inline" color="brand.500" fontWeight="400">
-                                        {notification.order.client.name}{" "}
-                                        {notification.order.client.surname[0]}.
-                                      </Text>{" "}
-                                      užsakė{" "}
-                                      <Text display="inline" color="brand.500" fontWeight="500">
-                                        {notification.order.service.name}
-                                      </Text>{" "}
-                                      servise{" "}
-                                      <Text display="inline" color="brand.500" fontWeight="400">
-                                        {notification.order.carService.name}
-                                      </Text>
+                                      {notification.type === "EMPLOYEE" && "Darbuotojas"}{" "}
+                                      {notification.type === "EMPLOYEE" && (
+                                        <Text display="inline" color="brand.500" fontWeight="500">
+                                          {notification.employee.carServiceUser.name}{" "}
+                                          {notification.employee.carServiceUser.surname}
+                                        </Text>
+                                      )}{" "}
+                                      {notification.type === "EMPLOYEE" &&
+                                        "sėkmingai užsiregistravo"}{" "}
+                                      {notification.type === "EMPLOYEE" && "servise"}{" "}
+                                      {notification.type === "EMPLOYEE" && (
+                                        <Text display="inline" color="brand.500" fontWeight="500">
+                                          {notification.employee.carService.name}
+                                        </Text>
+                                      )}{" "}
+                                      {notification.type === "EMPLOYEE" &&
+                                        "su jūsų suteikta vienkartine nuoroda"}
                                     </Text>
                                   </Box>
                                 </Flex>
                                 <Flex
                                   textAlign="end"
-                                  minW="160px"
+                                  minW="180px"
                                   direction="column"
                                   justifyContent="space-between"
                                 >
@@ -1540,8 +1677,11 @@ const DashboardMenu = () => {
                                     color="brand.500"
                                     fontSize="xs"
                                     _hover={{ opacity: 0.8 }}
-                                    onClick={() => updateNotification(notification.id, true)}
+                                    onClick={() =>
+                                      updateNotification("UPDATE", notification.id, true)
+                                    }
                                   >
+                                    <EyeSlashIcon boxSize={4} mr={1} />
                                     Pažymėti kaip perskaitytą
                                   </Text>
                                   <Text color="#B7BBC0" fontSize="xs">
@@ -1550,18 +1690,15 @@ const DashboardMenu = () => {
                                 </Flex>
                               </Flex>
                             ))}
-                          {notifications
-                            .filter((n) => n.type === "UPDATE")
-                            .filter((n) => n.read === true).length !== 0 && (
-                            <Heading fontSize="lg" mx={6} py={2} fontWeight="600">
+                          {notificationsUpdate.filter((n) => n.read === true).length !== 0 && (
+                            <Heading fontSize="xl" mx={6} py={2} fontWeight="600">
                               Perskaityti
                             </Heading>
                           )}
-                          {notifications
-                            .filter((n) => n.type === "UPDATE")
+                          {notificationsUpdate
                             .filter((n) => n.read === true)
                             .sort(
-                              (a: Notification, b: Notification) =>
+                              (a: NotificationUpdate, b: NotificationUpdate) =>
                                 b.createdAt.getTime() - a.createdAt.getTime()
                             )
                             .map((notification: any, i, { length }) => (
@@ -1579,33 +1716,39 @@ const DashboardMenu = () => {
                                 <Flex mr="10px">
                                   <Avatar
                                     size="md"
-                                    name={notification.order.client.name}
-                                    src={notification.order.client.avatarUrl}
+                                    name={notification.employee.carServiceUser.name}
+                                    src={notification.employee.carServiceUser.avatarUrl}
                                   />
                                   <Box ml="10px">
                                     <Heading fontSize="md" fontWeight="600" mb="5px">
-                                      Naujas užsakymas
+                                      {notification.type === "EMPLOYEE"
+                                        ? "Naujas darbuotojas"
+                                        : "Naujas atnaujinimas"}
                                     </Heading>
                                     <Text color="#525456" fontSize="sm">
-                                      Klientas{" "}
-                                      <Text display="inline" fontWeight="400">
-                                        {notification.order.client.name}{" "}
-                                        {notification.order.client.surname[0]}.
-                                      </Text>{" "}
-                                      užsakė{" "}
-                                      <Text display="inline" fontWeight="500">
-                                        {notification.order.service.name}
-                                      </Text>{" "}
-                                      servise{" "}
-                                      <Text display="inline" fontWeight="400">
-                                        {notification.order.carService.name}
-                                      </Text>
+                                      {notification.type === "EMPLOYEE" && "Darbuotojas"}{" "}
+                                      {notification.type === "EMPLOYEE" && (
+                                        <Text display="inline" fontWeight="500">
+                                          {notification.employee.carServiceUser.name}{" "}
+                                          {notification.employee.carServiceUser.surname}
+                                        </Text>
+                                      )}{" "}
+                                      {notification.type === "EMPLOYEE" &&
+                                        "sėkmingai užsiregistravo"}{" "}
+                                      {notification.type === "EMPLOYEE" && "servise"}{" "}
+                                      {notification.type === "EMPLOYEE" && (
+                                        <Text display="inline" fontWeight="500">
+                                          {notification.employee.carService.name}
+                                        </Text>
+                                      )}{" "}
+                                      {notification.type === "EMPLOYEE" &&
+                                        "su jūsų suteikta vienkartine nuoroda"}
                                     </Text>
                                   </Box>
                                 </Flex>
                                 <Flex
                                   textAlign="end"
-                                  minW="160px"
+                                  minW="180px"
                                   direction="column"
                                   justifyContent="space-between"
                                 >
@@ -1613,8 +1756,11 @@ const DashboardMenu = () => {
                                     color="brand.500"
                                     fontSize="xs"
                                     _hover={{ opacity: 0.8 }}
-                                    onClick={() => updateNotification(notification.id, false)}
+                                    onClick={() =>
+                                      updateNotification("UPDATE", notification.id, false)
+                                    }
                                   >
+                                    <EyeIcon boxSize={4} mr={1} />
                                     Pažymėti kaip neperskaitytą
                                   </Text>
                                   <Text color="#B7BBC0" fontSize="xs">
@@ -1647,13 +1793,22 @@ const DashboardMenu = () => {
             <Calendar isOpen={isOpen} activeService={activeService} />
           )}
           {Router.route === "/partners/orders" && (
-            <Orders isOpen={isOpen} activeService={activeService} />
+            <Orders
+              isOpen={isOpen}
+              activeService={activeService}
+              newOrders={newOrders}
+              lateOrdersCount={lateOrdersCount}
+            />
           )}
           {Router.route === "/partners/services" && (
             <Services isOpen={isOpen} activeService={activeService} />
           )}
-          {Router.route === "/partners/notes" && (
-            <Notes isOpen={isOpen} activeService={activeService} />
+          {Router.route === "/partners/logs" && (
+            <Logs
+              isOpen={isOpen}
+              activeService={activeService}
+              plan={activeCarService?.carService.plan!}
+            />
           )}
           {Router.route === "/partners/discounts" && (
             <Discounts isOpen={isOpen} activeService={activeService} />

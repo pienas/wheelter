@@ -1,12 +1,12 @@
 import React from "react"
 import { Box, Circle, Center, Flex, Heading, Text, useToast } from "@chakra-ui/react"
-import CheckIcon from "../icons/CheckIcon"
-import { CloseIcon } from "@chakra-ui/icons"
+import CheckCircleIcon from "../icons/CheckCircleIcon"
 import moment from "moment"
+import CrossIcon from "../icons/CrossIcon"
 
 type Props = {
   heading: string
-  text: string
+  text: string | React.ReactNode
   id: number
 }
 
@@ -21,7 +21,7 @@ const SuccessToast = ({ heading, text, id }: Props) => {
     <Flex
       color="black"
       p={6}
-      bg="rgba(255, 255, 255, 0.5)"
+      bg="white"
       position="relative"
       borderRadius="5px"
       alignItems="center"
@@ -29,7 +29,7 @@ const SuccessToast = ({ heading, text, id }: Props) => {
     >
       <Circle backgroundColor="green.100" size="24px">
         <Center>
-          <CheckIcon boxSize={3} color="green.400" />
+          <CheckCircleIcon boxSize={5} color="green.400" />
         </Center>
       </Circle>
       <Box px={6}>
@@ -43,8 +43,8 @@ const SuccessToast = ({ heading, text, id }: Props) => {
           {moment().format("HH:mm")}
         </Text>
       </Box>
-      <CloseIcon
-        boxSize={3}
+      <CrossIcon
+        boxSize={5}
         color="#a0a0a0"
         onClick={close}
         cursor="pointer"

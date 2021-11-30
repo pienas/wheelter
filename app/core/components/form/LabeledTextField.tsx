@@ -69,16 +69,25 @@ export const LabeledTextField = forwardRef<HTMLInputElement, LabeledTextFieldPro
   ({ name, label, isPhone, outerProps, ...props }, ref) => {
     const {
       input,
-      meta: { error, submitError, submitting },
-    } = useField(name, {
-      parse: props.type === "number" ? Number : undefined,
-    })
-    // const normalizedError = Array.isArray(error) ? error.join(", ") : error || submitError
+      meta: { submitting },
+    } = useField(name)
 
     return (
       <Box {...outerProps}>
         <Text mb={1}>{label}</Text>
-        {!isPhone && <Input {...input} disabled={submitting} ref={ref} />}
+        {!isPhone && (
+          <Input
+            {...input}
+            type={props.type}
+            disabled={submitting}
+            ref={ref}
+            borderRadius="0.6rem"
+            border="none"
+            height="2.5rem"
+            background="#eff0f7"
+            _focus={{ boxShadow: "none" }}
+          />
+        )}
         {isPhone && (
           <Box>
             <Field

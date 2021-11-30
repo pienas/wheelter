@@ -1,4 +1,5 @@
 import { Flex, Heading, Text, Button, Link as ChakraLink, Box } from "@chakra-ui/react"
+import GiftIcon from "app/core/components/icons/GiftIcon"
 import { Image, Link } from "blitz"
 
 const BrandText = ({ children }) => {
@@ -14,16 +15,16 @@ const Hero = () => {
     <Flex direction="column">
       <Flex alignItems="center" justifyContent="space-between" height="3xl">
         <Box maxWidth="2xl">
-          <Heading
-            size="xs"
+          <Flex
+            fontSize="xs"
             color="#8C929F"
             fontWeight="500"
             textTransform="uppercase"
             mb="5px"
             as="h4"
           >
-            Nemokama versija 3 mėnesiams
-          </Heading>
+            <GiftIcon boxSize={4} mr={1} /> Nemokama versija 3 mėnesiams
+          </Flex>
           <Heading size="2xl" fontWeight="500" lineHeight="1.4">
             Valdyk šiuolaikiškai - <br />
             naudokis <BrandText>Wheelter</BrandText>.

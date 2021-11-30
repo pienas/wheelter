@@ -10,8 +10,8 @@ import {
   Text,
   Button,
 } from "@chakra-ui/react"
+import ChevronDownIcon from "app/core/components/icons/ChevronDownIcon"
 import { Image, Link, Routes } from "blitz"
-import DownIcon from "app/partners/components/icons/ArrowIcon"
 import ReactCountryFlag from "react-country-flag"
 
 const MenuLink = ({ children }) => {
@@ -72,7 +72,7 @@ const Header = () => {
         <Menu>
           <MenuButton
             as={Button}
-            rightIcon={<DownIcon boxSize={2} color="#4F5665" transition="all 0.2s" />}
+            rightIcon={<ChevronDownIcon boxSize={4} color="#4F5665" transition="all 0.2s" />}
             fontWeight="400"
             color="text"
             _focus={{ boxShadow: "none" }}

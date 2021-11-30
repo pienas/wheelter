@@ -5,19 +5,11 @@ import { Textarea } from "@chakra-ui/textarea"
 import { useEffect, useRef, useState } from "react"
 import CustomTabSettings from "./../customTab/CustomTabSettings"
 import ImageUploading from "react-images-uploading"
-import ImageIcon from "./../icons/ImageIcon"
 import { Image, useQuery } from "blitz"
 import { Button } from "@chakra-ui/button"
 import updateServiceAvatar from "app/partners/mutations/updateServiceAvatar"
-import NotificationsIcon from "./../icons/NotificationsIcon"
-import InfoIcon from "./../icons/InfoIcon"
-import EmployeesIcon from "./../icons/EmployeesIcon"
-import SubscriptionIcon from "./../icons/SubscriptionIcon"
-import ContactsIcon from "./../icons/ContactsIcon"
 import { Avatar } from "@chakra-ui/avatar"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
-import PlusIcon from "./../icons/PlusIcon"
-import DropHereIcon from "./../icons/DropHereIcon"
 import { useToast } from "@chakra-ui/toast"
 import WarningToast from "app/core/components/toast/WarningToast"
 import sha1 from "sha1"
@@ -28,7 +20,6 @@ import createServiceImages from "app/partners/mutations/createServiceImages"
 import updateServiceImages from "app/partners/mutations/updateServiceImages"
 import getServiceImages from "app/partners/queries/getServiceImages"
 import deleteServiceImages from "app/partners/mutations/deleteServiceImages"
-import OtherIcon from "./../icons/OtherIcon"
 import { CircularProgress } from "@chakra-ui/progress"
 import updateServiceAddress from "app/partners/mutations/updateServiceAddress"
 import Employees from "./Employees"
@@ -36,6 +27,15 @@ import Other from "./Other"
 import Subscription from "./Subscription"
 import Notifications from "./Notifications"
 import Contacts from "./Contacts"
+import InfoIcon from "app/core/components/icons/InfoIcon"
+import UsersIcon from "app/core/components/icons/UsersIcon"
+import BellIcon from "app/core/components/icons/BellIcon"
+import CreditCardIcon from "app/core/components/icons/CreditCardIcon"
+import EmailIcon from "app/core/components/icons/EmailIcon"
+import MoreHorizIcon from "app/core/components/icons/MoreHorizIcon"
+import ImageIcon from "app/core/components/icons/ImageIcon"
+import ImageDownloadIcon from "app/core/components/icons/ImageDownloadIcon"
+import ImagePlusIcon from "app/core/components/icons/ImagePlusIcon"
 
 type SettingsProps = {
   isMenuOpen: boolean
@@ -149,7 +149,7 @@ const Settings = ({
             borderRadius="full"
             transition="all 0.2s"
           >
-            <PlusIcon boxSize={3} transition="all 0.2s" color="#787E97" />
+            <ImagePlusIcon boxSize={4} transition="all 0.2s" color="#787E97" />
           </Flex>
         </Flex>
       ),
@@ -274,6 +274,7 @@ const Settings = ({
     if (error.maxNumber) {
       toastIdRef.current = toast({
         duration: 5000,
+        position: "bottom-left",
         render: () => (
           <WarningToast
             heading="Kažkas netaip!"
@@ -316,6 +317,7 @@ const Settings = ({
         setIsInvalidUrl(true)
         toastIdRef.current = toast({
           duration: 3000,
+          position: "bottom-left",
           render: () => (
             <WarningToast
               heading="Kažkas netaip!"
@@ -457,6 +459,7 @@ const Settings = ({
         setIsInvalidUrl(true)
         toastIdRef.current = toast({
           duration: 3000,
+          position: "bottom-left",
           render: () => (
             <WarningToast
               heading="Kažkas netaip!"
@@ -473,6 +476,7 @@ const Settings = ({
         setIsInvalidUrl(true)
         toastIdRef.current = toast({
           duration: 5000,
+          position: "bottom-left",
           render: () => (
             <WarningToast
               heading="Kažkas netaip!"
@@ -594,27 +598,27 @@ const Settings = ({
               Pagrindinė informacija
             </CustomTabSettings>
             <CustomTabSettings
-              icon={<EmployeesIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+              icon={<UsersIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
               Darbuotojai
             </CustomTabSettings>
             <CustomTabSettings
-              icon={<NotificationsIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+              icon={<BellIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
               Pranešimų nustatymai
             </CustomTabSettings>
             <CustomTabSettings
-              icon={<SubscriptionIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+              icon={<CreditCardIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
-              Prenumerata
+              Mokėjimai ir prenumerata
             </CustomTabSettings>
             <CustomTabSettings
-              icon={<ContactsIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+              icon={<EmailIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
               Kontaktinė informacija
             </CustomTabSettings>
             <CustomTabSettings
-              icon={<OtherIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
+              icon={<MoreHorizIcon boxSize={4} transition="all 0.2s" mr={2} color="#787E97" />}
             >
               Kiti nustatymai
             </CustomTabSettings>
@@ -864,10 +868,14 @@ const Settings = ({
                                   mb="10px"
                                   transition="all 0.2s"
                                 >
-                                  <ImageIcon boxSize={6} color="#787E97" transition="all 0.2s" />
+                                  <ImageDownloadIcon
+                                    boxSize={6}
+                                    color="#787E97"
+                                    transition="all 0.2s"
+                                  />
                                 </Box>
                                 <Text color="#787E97" fontSize="sm" textAlign="center" width="90%">
-                                  Tempkite nuotraukas čia
+                                  Paleiskite tempiamas nuotraukas čia
                                 </Text>
                               </>
                             ) : (
@@ -1026,14 +1034,14 @@ const Settings = ({
                                                   transition="all 0.2s"
                                                 >
                                                   {isDragging ? (
-                                                    <DropHereIcon
-                                                      boxSize={3}
+                                                    <ImageDownloadIcon
+                                                      boxSize={4}
                                                       transition="all 0.2s"
                                                       color="#787E97"
                                                     />
                                                   ) : (
-                                                    <PlusIcon
-                                                      boxSize={3}
+                                                    <ImagePlusIcon
+                                                      boxSize={4}
                                                       transition="all 0.2s"
                                                       color="#787E97"
                                                     />
@@ -1081,6 +1089,8 @@ const Settings = ({
                 activeService={activeService}
                 changing={changing}
                 onChanging={() => onChanging()}
+                url={url}
+                plan={plan}
               />
             </TabPanel>
             <TabPanel padding="0">

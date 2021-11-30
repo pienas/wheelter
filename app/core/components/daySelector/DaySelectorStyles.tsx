@@ -11,17 +11,22 @@ const DaySelectorStyles = ({ type }: Props) => (
       <style>
         {`
             .DayPicker-Day--today {
-                color: #7000ff !important;
+                color: #923ffb !important;
+                font-weight: 400 !important;
             }
             .DayPicker-Day--selected {
                 color: #f4f8f8 !important;
             }
             .Selectable .DayPicker-Day--selected:not(.DayPicker-Day--start):not(.DayPicker-Day--end):not(.DayPicker-Day--outside) {
-                background-color: #7000ff;
+                background-color: #F8F8F8 !important;
+                color: #923ffb !important;
+                font-weight: 500 !important;
             }
-            .DayPicker-Day:not(.DayPicker-Day--disabled):hover {
-                background-color: #8d33ff !important;
-                color: #f4f8f8 !important;
+            .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day.DayPicker-Day--selected):hover {
+                background-color: #F8F8F8 !important;
+                color: #0b132a !important;
+                font-weight: 500 !important;
+                border-radius: 10px !important;
             }
             .Selectable .DayPicker-Day.DayPicker-Day--selected.DayPicker-Day--disabled:not(.DayPicker-Day--start):not(.DayPicker-Day--end) {
                 background-color: transparent !important;
@@ -32,17 +37,17 @@ const DaySelectorStyles = ({ type }: Props) => (
             .Selectable .DayPicker-Day {
                 border-radius: 0 !important;
             }
-            .Selectable .DayPicker-Day--start {
-                background-color: #7000ff !important;
-                color: #f4f8f8;
-                border-top-left-radius: 50% !important;
-                border-bottom-left-radius: 50% !important;
+            .Selectable .DayPicker-Day--start:not(.DayPicker-Day--outside) {
+                background-color: #923ffb !important;
+                color: #f4f8f8 !important;
+                border-top-left-radius: 10px !important;
+                border-bottom-left-radius: 10px !important;
             }
-            .Selectable .DayPicker-Day--end {
-                border-top-right-radius: 50% !important;
-                border-bottom-right-radius: 50% !important;
-                background-color: #7000ff !important;
-                color: #f4f8f8;
+            .Selectable .DayPicker-Day--end:not(.DayPicker-Day--outside) {
+                border-top-right-radius: 10px !important;
+                border-bottom-right-radius: 10px !important;
+                background-color: #923ffb !important;
+                color: #f4f8f8 !important;
             }
             .DayPicker-Day {
                 height: 40px;
@@ -56,23 +61,32 @@ const DaySelectorStyles = ({ type }: Props) => (
             .DayPicker-Day {
                 height: 40px;
                 width: 40px;
+                transition: all 0.2s;
             }
-            .DayPicker-Day:not(.DayPicker-Day--disabled):hover {
-                background-color: #8d33ff !important;
-                color: #f4f8f8 !important;
+            .DayPicker-Day:not(.DayPicker-Day--disabled):not(.DayPicker-Day.DayPicker-Day--selected):hover {
+                background-color: #F8F8FA !important;
+                color: #0b132a !important;
+                font-weight: 500 !important;
+                border-radius: 10px !important;
             }
             .Selectable .DayPicker-Day.DayPicker-Day--selected {
-                background-color: #7000ff !important;
-                border-radius: 50% !important;
+                background-color: #923ffb !important;
+                border-radius: 10px !important;
+                font-weight: 400 !important;
             }
             .Selectable .DayPicker-Day.DayPicker-Day--selected.DayPicker-Day--disabled {
                 background-color: transparent !important;
             }
             .DayPicker-Day--today {
-                color: #7000ff !important;
+                color: #923ffb !important;
+                font-weight: 400 !important;
             }
             .DayPicker-Day--selected {
                 color: #f4f8f8 !important;
+            }
+            .DayPicker-Day--disabled {
+                color: #DCE0E0 !important;
+                font-weight: 400 !important;
             }
         `}
       </style>
