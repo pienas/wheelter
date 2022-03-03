@@ -1,5 +1,9 @@
 # **Wheelter**
 
+## About wheelter
+
+That's my personal project to try out [https://blitzjs.com/](https://blitzjs.com/) full-stack React framework. It's not finished, but some of the features works.
+
 ## Set up
 
 Install Blitz and yarn globally
@@ -43,6 +47,7 @@ Run Prisma Studio for easy-access database.
 ```
 blitz prisma studio
 ```
+
 ## Commands
 
 Blitz comes with a powerful CLI that is designed to make development easy and fast. You can install it with `npm i -g blitz`
