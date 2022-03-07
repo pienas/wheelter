@@ -4,6 +4,58 @@
 
 That's my personal project to try out [https://blitzjs.com/](https://blitzjs.com/) full-stack React framework. It's not finished, but some of the features works.
 
+# Landing page
+
+![Landing page](https://github.com/pienas/wheelter/blob/main/public/landing.png?raw=true)
+
+# Date picker
+
+![Date picker](https://github.com/pienas/wheelter/blob/main/public/date-picker.png?raw=true)
+
+# Partners landing page
+
+![Partners landing page](https://github.com/pienas/wheelter/blob/main/public/partners-landing.png?raw=true)
+
+# Login page
+
+![Login page](https://github.com/pienas/wheelter/blob/main/public/login.png?raw=true)
+
+# Dashboard
+
+![Dashboard](https://github.com/pienas/wheelter/blob/main/public/dashboard.png?raw=true)
+
+# Notifications
+
+![Notifications](https://github.com/pienas/wheelter/blob/main/public/notifications.png?raw=true)
+
+# Orders panel
+
+![Orders panel](https://github.com/pienas/wheelter/blob/main/public/orders.png?raw=true)
+
+# Share modal
+
+![Share modal](https://github.com/pienas/wheelter/blob/main/public/share.png?raw=true)
+
+# Settings page
+
+![Settings page](https://github.com/pienas/wheelter/blob/main/public/settings-main.png?raw=true)
+
+# Employees page
+
+![Employees page](https://github.com/pienas/wheelter/blob/main/public/settings-employees.png?raw=true)
+
+# Add employee
+
+![Add employee](https://github.com/pienas/wheelter/blob/main/public/employee-invite.png?raw=true)
+
+# Remove employee
+
+![Remove employee](https://github.com/pienas/wheelter/blob/main/public/employee-remove.png?raw=true)
+
+# Contact information page
+
+![Contact information page](https://github.com/pienas/wheelter/blob/main/public/settings-contacts.png?raw=true)
+
 ## Set up
 
 Install Blitz and yarn globally
